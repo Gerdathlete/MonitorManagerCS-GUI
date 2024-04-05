@@ -66,13 +66,13 @@ namespace MonitorManagerCS_GUI
             if (settings == null) { throw new ArgumentNullException(nameof(settings), "Settings cannot be null"); }
 
             //Add all the settings to the settings data grid
-            settingDimStart = new SettingsGridItem("When to start decreasing brightness", GetReadableTime(DefaultSettings.DimStartHour, DefaultSettings.DimStartMinute), GetReadableTime(settings.DimStartHour, settings.DimStartMinute));
+            settingDimStart = new SettingsGridItem("When to start decreasing brightness", DataFormatter.GetReadableTime(DefaultSettings.DimStartHour, DefaultSettings.DimStartMinute), DataFormatter.GetReadableTime(settings.DimStartHour, settings.DimStartMinute));
             ViewModel.SettingsGridData.Add(settingDimStart);
-            settingDimEnd = new SettingsGridItem("When monitors should reach minimum brightness", GetReadableTime(DefaultSettings.DimEndHour, DefaultSettings.DimEndMinute), GetReadableTime(settings.DimEndHour, settings.DimEndMinute));
+            settingDimEnd = new SettingsGridItem("When monitors should reach minimum brightness", DataFormatter.GetReadableTime(DefaultSettings.DimEndHour, DefaultSettings.DimEndMinute), DataFormatter.GetReadableTime(settings.DimEndHour, settings.DimEndMinute));
             ViewModel.SettingsGridData.Add(settingDimEnd);
-            settingBrightStart = new SettingsGridItem("When to start increasing brightness", GetReadableTime(DefaultSettings.BrightStartHour, DefaultSettings.BrightStartMinute), GetReadableTime(settings.BrightStartHour, settings.BrightStartMinute));
+            settingBrightStart = new SettingsGridItem("When to start increasing brightness", DataFormatter.GetReadableTime(DefaultSettings.BrightStartHour, DefaultSettings.BrightStartMinute), DataFormatter.GetReadableTime(settings.BrightStartHour, settings.BrightStartMinute));
             ViewModel.SettingsGridData.Add(settingBrightStart);
-            settingBrightEnd = new SettingsGridItem("When monitors should reach maximum brightness", GetReadableTime(DefaultSettings.BrightEndHour, DefaultSettings.BrightEndMinute), GetReadableTime(settings.BrightEndHour, settings.BrightEndMinute));
+            settingBrightEnd = new SettingsGridItem("When monitors should reach maximum brightness", DataFormatter.GetReadableTime(DefaultSettings.BrightEndHour, DefaultSettings.BrightEndMinute), DataFormatter.GetReadableTime(settings.BrightEndHour, settings.BrightEndMinute));
             ViewModel.SettingsGridData.Add(settingBrightEnd);
             settingMonitorLeft = new SettingsGridItem("Left monitor name or ID", DefaultSettings.MonitorLeft, settings.MonitorLeft);
             ViewModel.SettingsGridData.Add(settingMonitorLeft);
@@ -80,13 +80,13 @@ namespace MonitorManagerCS_GUI
             ViewModel.SettingsGridData.Add(settingMonitorCenter);
             settingMonitorRight = new SettingsGridItem("Right monitor name or ID", DefaultSettings.MonitorRight, settings.MonitorRight);
             ViewModel.SettingsGridData.Add(settingMonitorRight);
-            settingLeftBrightness = new SettingsGridItem("Left monitor brightness range", GetMinMaxString(DefaultSettings.LeftMinBrightness, DefaultSettings.LeftMaxBrightness), GetMinMaxString(settings.LeftMinBrightness, settings.LeftMaxBrightness));
+            settingLeftBrightness = new SettingsGridItem("Left monitor brightness range", DataFormatter.GetMinMaxString(DefaultSettings.LeftMinBrightness, DefaultSettings.LeftMaxBrightness), DataFormatter.GetMinMaxString(settings.LeftMinBrightness, settings.LeftMaxBrightness));
             ViewModel.SettingsGridData.Add(settingLeftBrightness);
-            settingCenterBrightness = new SettingsGridItem("Center monitor brightness range", GetMinMaxString(DefaultSettings.CenterMinBrightness, DefaultSettings.CenterMaxBrightness), GetMinMaxString(settings.CenterMinBrightness, settings.CenterMaxBrightness));
+            settingCenterBrightness = new SettingsGridItem("Center monitor brightness range", DataFormatter.GetMinMaxString(DefaultSettings.CenterMinBrightness, DefaultSettings.CenterMaxBrightness), DataFormatter.GetMinMaxString(settings.CenterMinBrightness, settings.CenterMaxBrightness));
             ViewModel.SettingsGridData.Add(settingCenterBrightness);
-            settingRightBrightness = new SettingsGridItem("Right monitor brightness range", GetMinMaxString(DefaultSettings.RightMinBrightness, DefaultSettings.RightMaxBrightness), GetMinMaxString(settings.RightMinBrightness, settings.RightMaxBrightness));
+            settingRightBrightness = new SettingsGridItem("Right monitor brightness range", DataFormatter.GetMinMaxString(DefaultSettings.RightMinBrightness, DefaultSettings.RightMaxBrightness), DataFormatter.GetMinMaxString(settings.RightMinBrightness, settings.RightMaxBrightness));
             ViewModel.SettingsGridData.Add(settingRightBrightness);
-            settingCenterBlueFilter = new SettingsGridItem("Center monitor blue light filter range", GetMinMaxString(DefaultSettings.MinBlueLightFilter, DefaultSettings.MaxBlueLightFilter), GetMinMaxString(settings.MinBlueLightFilter, settings.MaxBlueLightFilter));
+            settingCenterBlueFilter = new SettingsGridItem("Center monitor blue light filter range", DataFormatter.GetMinMaxString(DefaultSettings.MinBlueLightFilter, DefaultSettings.MaxBlueLightFilter), DataFormatter.GetMinMaxString(settings.MinBlueLightFilter, settings.MaxBlueLightFilter));
             ViewModel.SettingsGridData.Add(settingCenterBlueFilter);
             settingBrightCheckTime = new SettingsGridItem("Time between brightness updates (seconds)", DefaultSettings.BrightCheckTime.ToString(), DefaultSettings.BrightCheckTime.ToString());
             ViewModel.SettingsGridData.Add(settingBrightCheckTime);
@@ -280,7 +280,112 @@ namespace MonitorManagerCS_GUI
             return null;
         }
 
-        public string GetReadableTime(byte hour, byte minute)
+        private string StatusPrefix()
+        {
+            string output = statusPrefixes[statusPrefixIndex++];
+            if (statusPrefixIndex >= statusPrefixes.Length) statusPrefixIndex = 0;
+            return output;
+        }
+
+        private void BtnUpdateSettings_Click(object sender, RoutedEventArgs e)
+        {
+            //When you press the update settings button
+            //Take each "current" setting from the grid list, put it into the settings object, and then write it to the settings file.
+            bool invalidSettings = false;
+            string invalidList = "";
+
+            void InvalidSetting(string invalidText, string inputString) { invalidSettings = true; invalidList += $"{invalidText}: {inputString}\n"; }
+
+            void CheckSettingRegex(Regex regex, string inputString, string invalidText)
+            {
+                if (!regex.IsMatch(inputString)) { InvalidSetting(invalidText, inputString); }
+            }
+
+            //Check if the inputted settings are valid
+            CheckSettingRegex(DataInterpreter.readableTimeRegex, settingDimStart.CurrentVal, "Invalid time");
+            CheckSettingRegex(DataInterpreter.readableTimeRegex, settingDimEnd.CurrentVal, "Invalid time");
+            CheckSettingRegex(DataInterpreter.readableTimeRegex, settingBrightStart.CurrentVal, "Invalid time");
+            CheckSettingRegex(DataInterpreter.readableTimeRegex, settingBrightEnd.CurrentVal, "Invalid time");
+            CheckSettingRegex(DataInterpreter.minMaxRegex, settingLeftBrightness.CurrentVal, "Invalid brightness range");
+            CheckSettingRegex(DataInterpreter.minMaxRegex, settingCenterBrightness.CurrentVal, "Invalid brightness range");
+            CheckSettingRegex(DataInterpreter.minMaxRegex, settingRightBrightness.CurrentVal, "Invalid brightness range");
+            CheckSettingRegex(DataInterpreter.blueLightRegex, settingCenterBlueFilter.CurrentVal, "Invalid blue light filter range");
+
+            if (!int.TryParse(settingBrightCheckTime.CurrentVal, out int brightCheckTime))
+            {
+                InvalidSetting("Invalid time between brightness updates", settingBrightCheckTime.CurrentVal);
+            }
+
+            if (!invalidSettings)
+            {
+                //If the settings are valid...
+
+                //Convert the time into the hour and minute bytes and store them in the settings
+                byte[] twoBytes = DataInterpreter.ParseReadableTime(settingDimStart.CurrentVal);
+                settings.DimStartHour = twoBytes[0];
+                settings.DimStartMinute = twoBytes[1];
+
+                twoBytes = DataInterpreter.ParseReadableTime(settingDimEnd.CurrentVal);
+                settings.DimEndHour = twoBytes[0];
+                settings.DimEndMinute = twoBytes[1];
+
+                twoBytes = DataInterpreter.ParseReadableTime(settingBrightStart.CurrentVal);
+                settings.BrightStartHour = twoBytes[0];
+                settings.BrightStartMinute = twoBytes[1];
+
+                twoBytes = DataInterpreter.ParseReadableTime(settingBrightEnd.CurrentVal);
+                settings.BrightEndHour = twoBytes[0];
+                settings.BrightEndMinute = twoBytes[1];
+
+                //Store monitor ids in settings
+                settings.MonitorLeft = settingMonitorLeft.CurrentVal;
+                settings.MonitorCenter = settingMonitorCenter.CurrentVal;
+                settings.MonitorRight = settingMonitorRight.CurrentVal;
+
+                //Store min and max brightnesses in the settings
+                twoBytes = DataInterpreter.ParseMinMaxString(settingLeftBrightness.CurrentVal);
+                settings.LeftMinBrightness = twoBytes[0];
+                settings.LeftMaxBrightness = twoBytes[1];
+
+                twoBytes = DataInterpreter.ParseMinMaxString(settingCenterBrightness.CurrentVal);
+                settings.CenterMinBrightness = twoBytes[0];
+                settings.CenterMaxBrightness = twoBytes[1];
+
+                twoBytes = DataInterpreter.ParseMinMaxString(settingRightBrightness.CurrentVal);
+                settings.RightMinBrightness = twoBytes[0];
+                settings.RightMaxBrightness = twoBytes[1];
+
+                //Store blue light filter range in the settings
+                twoBytes = DataInterpreter.ParseMinMaxString(settingCenterBlueFilter.CurrentVal);
+                settings.MinBlueLightFilter = twoBytes[0];
+                settings.MaxBlueLightFilter = twoBytes[1];
+
+                //Store the brightness check time in the settings
+                settings.BrightCheckTime = brightCheckTime;
+
+                //Save the settings file
+                settings.WriteSettingsFile(startupSettings.SettingsFilePath);
+
+                TxtStatus.Text = $"{StatusPrefix()} Settings saved to {startupSettings.SettingsFilePath}";
+                //Restart the monitor manager service
+                StartMonitorService();
+            }
+            else
+            {
+                //If the settings are invalid, show an error message to the user
+                System.Windows.MessageBox.Show($"{invalidList}", "Invalid Settings", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnLoadSettings_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
+
+    public static class DataFormatter
+    {
+        public static string GetReadableTime(byte hour, byte minute)
         {
             string minuteStr = "";
             string AMPM = "AM";
@@ -309,7 +414,15 @@ namespace MonitorManagerCS_GUI
             return $"{hour}:{minuteStr}{minute} {AMPM}";
         }
 
-        public byte[] ParseReadableTime(string time)
+        public static string GetMinMaxString(byte min, byte max)
+        {
+            return $"{min}-{max}";
+        }
+    }
+
+    public static class DataInterpreter
+    {
+        public static byte[] ParseReadableTime(string time)
         {
             //Example input: "7:08 PM"
             //Returns [19, 8]
@@ -368,21 +481,9 @@ namespace MonitorManagerCS_GUI
 
         public static Regex readableTimeRegex = new Regex(@"^([1-9]|1[0-2]):[0-5][0-9] (AM|PM)$");
 
-        private string StatusPrefix()
-        {
-            string output = statusPrefixes[statusPrefixIndex++];
-            if (statusPrefixIndex >= statusPrefixes.Length) statusPrefixIndex = 0;
-            return output;
-        }
-
         public static Regex blueLightRegex = new Regex(@"^[0-4]-[0-4]$");
 
         public static Regex minMaxRegex = new Regex(@"^(?:0|[1-9][0-9]?|100)-(?:0|[1-9][0-9]?|100)$");
-
-        public string GetMinMaxString(byte min, byte max)
-        {
-            return $"{min}-{max}";
-        }
 
         /// <summary>
         /// Turns a min-max string into two bytes:
@@ -390,112 +491,12 @@ namespace MonitorManagerCS_GUI
         /// </summary>
         /// <param name="minMaxString"></param>
         /// <returns></returns>
-        public byte[] ParseMinMaxString(string minMaxString)
+        public static byte[] ParseMinMaxString(string minMaxString)
         {
             //Example input: 15-100
             string[] minMax = minMaxString.Split('-');
             return new byte[] { byte.Parse(minMax[0]), byte.Parse(minMax[1]) };
 
         }
-
-        private void BtnUpdateSettings_Click(object sender, RoutedEventArgs e)
-        {
-            //When you press the update settings button
-            //Take each "current" setting from the grid list, put it into the settings object, and then write it to the settings file.
-            bool invalidSettings = false;
-            string invalidList = "";
-
-            void InvalidSetting(string invalidText, string inputString) { invalidSettings = true; invalidList += $"{invalidText}: {inputString}\n"; }
-
-            void CheckSettingRegex(Regex regex, string inputString, string invalidText)
-            {
-                if (!regex.IsMatch(inputString)) { InvalidSetting(invalidText, inputString); }
-            }
-
-            //Check if the inputted settings are valid
-            CheckSettingRegex(readableTimeRegex, settingDimStart.CurrentVal, "Invalid time");
-            CheckSettingRegex(readableTimeRegex, settingDimEnd.CurrentVal, "Invalid time");
-            CheckSettingRegex(readableTimeRegex, settingBrightStart.CurrentVal, "Invalid time");
-            CheckSettingRegex(readableTimeRegex, settingBrightEnd.CurrentVal, "Invalid time");
-            CheckSettingRegex(minMaxRegex, settingLeftBrightness.CurrentVal, "Invalid brightness range");
-            CheckSettingRegex(minMaxRegex, settingCenterBrightness.CurrentVal, "Invalid brightness range");
-            CheckSettingRegex(minMaxRegex, settingRightBrightness.CurrentVal, "Invalid brightness range");
-            CheckSettingRegex(blueLightRegex, settingCenterBlueFilter.CurrentVal, "Invalid blue light filter range");
-
-            if (!int.TryParse(settingBrightCheckTime.CurrentVal, out int brightCheckTime))
-            {
-                InvalidSetting("Invalid time between brightness updates", settingBrightCheckTime.CurrentVal);
-            }
-
-            if (!invalidSettings)
-            {
-                //If the settings are valid...
-
-                //Convert the time into the hour and minute bytes and store them in the settings
-                byte[] twoBytes = ParseReadableTime(settingDimStart.CurrentVal);
-                settings.DimStartHour = twoBytes[0];
-                settings.DimStartMinute = twoBytes[1];
-
-                twoBytes = ParseReadableTime(settingDimEnd.CurrentVal);
-                settings.DimEndHour = twoBytes[0];
-                settings.DimEndMinute = twoBytes[1];
-
-                twoBytes = ParseReadableTime(settingBrightStart.CurrentVal);
-                settings.BrightStartHour = twoBytes[0];
-                settings.BrightStartMinute = twoBytes[1];
-
-                twoBytes = ParseReadableTime(settingBrightEnd.CurrentVal);
-                settings.BrightEndHour = twoBytes[0];
-                settings.BrightEndMinute = twoBytes[1];
-
-                //Store monitor ids in settings
-                settings.MonitorLeft = settingMonitorLeft.CurrentVal;
-                settings.MonitorCenter = settingMonitorCenter.CurrentVal;
-                settings.MonitorRight = settingMonitorRight.CurrentVal;
-
-                //Store min and max brightnesses in the settings
-                twoBytes = ParseMinMaxString(settingLeftBrightness.CurrentVal);
-                settings.LeftMinBrightness = twoBytes[0];
-                settings.LeftMaxBrightness = twoBytes[1];
-
-                twoBytes = ParseMinMaxString(settingCenterBrightness.CurrentVal);
-                settings.CenterMinBrightness = twoBytes[0];
-                settings.CenterMaxBrightness = twoBytes[1];
-
-                twoBytes = ParseMinMaxString(settingRightBrightness.CurrentVal);
-                settings.RightMinBrightness = twoBytes[0];
-                settings.RightMaxBrightness = twoBytes[1];
-
-                //Store blue light filter range in the settings
-                twoBytes = ParseMinMaxString(settingCenterBlueFilter.CurrentVal);
-                settings.MinBlueLightFilter = twoBytes[0];
-                settings.MaxBlueLightFilter = twoBytes[1];
-
-                //Store the brightness check time in the settings
-                settings.BrightCheckTime = brightCheckTime;
-
-                //Save the settings file
-                settings.WriteSettingsFile(startupSettings.SettingsFilePath);
-
-                TxtStatus.Text = $"{StatusPrefix()} Settings saved to {startupSettings.SettingsFilePath}";
-                //Restart the monitor manager service
-                StartMonitorService();
-            }
-            else
-            {
-                //If the settings are invalid, show an error message to the user
-                System.Windows.MessageBox.Show($"{invalidList}", "Invalid Settings", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void BtnLoadSettings_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-    }
-
-    public static class DataValidation
-    {
-
     }
 }
