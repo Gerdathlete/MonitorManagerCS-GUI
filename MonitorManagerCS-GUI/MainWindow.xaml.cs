@@ -232,11 +232,14 @@ namespace MonitorManagerCS_GUI
 
             trayIcon.ContextMenuStrip = trayMenuStrip;
 
-            trayIcon.Click += (s, e) =>
+            trayIcon.MouseClick += (s, e) =>
             {
-                Show();
-                WindowState = WindowState.Normal;
-                trayIcon.Visible = false;
+                if (e.Button == MouseButtons.Left)
+                {
+                    Show();
+                    WindowState = WindowState.Normal;
+                    trayIcon.Visible = false;
+                }
             };
         }
 
