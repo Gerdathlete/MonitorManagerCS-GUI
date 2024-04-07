@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.IO;
+using System.Security.AccessControl;
 
 namespace MonitorManagerCS_GUI
 {
@@ -106,17 +107,25 @@ namespace MonitorManagerCS_GUI
 
         private void StartMonitorService()
         {
+            //End the monitor service (if its running)
+            EndMonitorService();
+
+            //Create a new token source for the service (this allows it to be ended)
+            monitorServiceTokenSource = new CancellationTokenSource();
+
+            //Launch the monitor service
+            Debug.WriteLine("Launching monitor service...");
+            monitorServiceTask = Task.Run(() => { App.MonitorService(settings, monitorServiceTokenSource.Token); });
+        }
+
+        private void EndMonitorService()
+        {
             if (monitorServiceTask != null && !monitorServiceTask.IsCompleted)
             {
                 monitorServiceTokenSource.Cancel();
                 Debug.WriteLine("Shutting down monitor service...");
                 monitorServiceTask.Wait();
             }
-
-            monitorServiceTokenSource = new CancellationTokenSource();
-
-            Debug.WriteLine("Launching monitor service...");
-            monitorServiceTask = Task.Run(() => { App.MonitorService(settings, monitorServiceTokenSource.Token); });
         }
 
         public class MainViewModel : INotifyPropertyChanged
@@ -433,6 +442,13 @@ namespace MonitorManagerCS_GUI
             TxtStatus.Text = $"{StatusPrefix()}Loaded settings from {TxtSettingsPath.Text}";
             //Restart the monitor service to use the new settings
             StartMonitorService();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            EndMonitorService();
         }
     }
 
