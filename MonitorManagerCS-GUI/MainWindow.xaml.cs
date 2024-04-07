@@ -45,16 +45,19 @@ namespace MonitorManagerCS_GUI
             //Mandatory line to make the main window work
             InitializeComponent();
 
+            //Initialize the tray icon
+            InitializeTrayIcon();
+            //Run the MainWindow_StateChanged function when the window's state changes (this is used to make the minimize button minimize to tray)
+            StateChanged += MainWindow_StateChanged;
+
+            //Minimize to system tray at startup
+            MinimizeToTray();
+
             //These two lines make it so that data bindings work, IDK how it works
             //Initialize the view model (idk how this works, ChatGPT did this)
             ViewModel = new MainViewModel();
             //Make the view model the data context (idk how this works, ChatGPT did this)
             DataContext = ViewModel;
-
-            //Initialize the tray icon
-            InitializeTrayIcon();
-            //Run the MainWindow_StateChanged function when the window's state changes (this is used to make the minimize button minimize to tray)
-            StateChanged += MainWindow_StateChanged;
 
             //Load settings
             startupSettings = App.InitStartupSettings();
@@ -229,7 +232,7 @@ namespace MonitorManagerCS_GUI
 
             trayIcon.ContextMenuStrip = trayMenuStrip;
 
-            trayIcon.DoubleClick += (s, e) =>
+            trayIcon.Click += (s, e) =>
             {
                 Show();
                 WindowState = WindowState.Normal;
@@ -253,9 +256,14 @@ namespace MonitorManagerCS_GUI
         {
             if (WindowState == WindowState.Minimized)
             {
-                Hide();
-                trayIcon.Visible = true;
+                MinimizeToTray();
             }
+        }
+
+        private void MinimizeToTray()
+        {
+            Hide();
+            trayIcon.Visible = true;
         }
 
         protected override void OnClosed(EventArgs e)
