@@ -1,4 +1,1 @@
-When user presses enter in settings path field, load those settings, update grid list
-When user selects a file through browse, load those settings, update grid list
-
 Fix bug where if time starts in PM and ends in AM, it doesn't work as expected

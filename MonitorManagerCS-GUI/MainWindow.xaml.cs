@@ -2,11 +2,14 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.IO;
 
 namespace MonitorManagerCS_GUI
 {
@@ -38,12 +41,18 @@ namespace MonitorManagerCS_GUI
 
         public MainWindow()
         {
+            //Mandatory line to make the main window work
             InitializeComponent();
 
-            ViewModel = new MainViewModel(); // Initialize your view model
-            DataContext = ViewModel; // Set the DataContext to the view mode
+            //These two lines make it so that data bindings work, IDK how it works
+            //Initialize the view model (idk how this works, ChatGPT did this)
+            ViewModel = new MainViewModel();
+            //Make the view model the data context (idk how this works, ChatGPT did this)
+            DataContext = ViewModel;
 
+            //Initialize the tray icon
             InitializeTrayIcon();
+            //Run the MainWindow_StateChanged function when the window's state changes (this is used to make the minimize button minimize to tray)
             StateChanged += MainWindow_StateChanged;
 
             //Load settings
@@ -64,6 +73,9 @@ namespace MonitorManagerCS_GUI
         {
             //Throw an exception if the settings don't exist
             if (settings == null) { throw new ArgumentNullException(nameof(settings), "Settings cannot be null"); }
+
+            //Clear the settings data grid
+            ViewModel.SettingsGridData.Clear();
 
             //Add all the settings to the settings data grid
             settingDimStart = new SettingsGridItem("When to start decreasing brightness", DataFormatter.GetReadableTime(DefaultSettings.DimStartHour, DefaultSettings.DimStartMinute), DataFormatter.GetReadableTime(settings.DimStartHour, settings.DimStartMinute));
@@ -316,70 +328,111 @@ namespace MonitorManagerCS_GUI
                 InvalidSetting("Invalid time between brightness updates", settingBrightCheckTime.CurrentVal);
             }
 
-            if (!invalidSettings)
-            {
-                //If the settings are valid...
-
-                //Convert the time into the hour and minute bytes and store them in the settings
-                byte[] twoBytes = DataInterpreter.ParseReadableTime(settingDimStart.CurrentVal);
-                settings.DimStartHour = twoBytes[0];
-                settings.DimStartMinute = twoBytes[1];
-
-                twoBytes = DataInterpreter.ParseReadableTime(settingDimEnd.CurrentVal);
-                settings.DimEndHour = twoBytes[0];
-                settings.DimEndMinute = twoBytes[1];
-
-                twoBytes = DataInterpreter.ParseReadableTime(settingBrightStart.CurrentVal);
-                settings.BrightStartHour = twoBytes[0];
-                settings.BrightStartMinute = twoBytes[1];
-
-                twoBytes = DataInterpreter.ParseReadableTime(settingBrightEnd.CurrentVal);
-                settings.BrightEndHour = twoBytes[0];
-                settings.BrightEndMinute = twoBytes[1];
-
-                //Store monitor ids in settings
-                settings.MonitorLeft = settingMonitorLeft.CurrentVal;
-                settings.MonitorCenter = settingMonitorCenter.CurrentVal;
-                settings.MonitorRight = settingMonitorRight.CurrentVal;
-
-                //Store min and max brightnesses in the settings
-                twoBytes = DataInterpreter.ParseMinMaxString(settingLeftBrightness.CurrentVal);
-                settings.LeftMinBrightness = twoBytes[0];
-                settings.LeftMaxBrightness = twoBytes[1];
-
-                twoBytes = DataInterpreter.ParseMinMaxString(settingCenterBrightness.CurrentVal);
-                settings.CenterMinBrightness = twoBytes[0];
-                settings.CenterMaxBrightness = twoBytes[1];
-
-                twoBytes = DataInterpreter.ParseMinMaxString(settingRightBrightness.CurrentVal);
-                settings.RightMinBrightness = twoBytes[0];
-                settings.RightMaxBrightness = twoBytes[1];
-
-                //Store blue light filter range in the settings
-                twoBytes = DataInterpreter.ParseMinMaxString(settingCenterBlueFilter.CurrentVal);
-                settings.MinBlueLightFilter = twoBytes[0];
-                settings.MaxBlueLightFilter = twoBytes[1];
-
-                //Store the brightness check time in the settings
-                settings.BrightCheckTime = brightCheckTime;
-
-                //Save the settings file
-                settings.WriteSettingsFile(startupSettings.SettingsFilePath);
-
-                TxtStatus.Text = $"{StatusPrefix()} Settings saved to {startupSettings.SettingsFilePath}";
-                //Restart the monitor manager service
-                StartMonitorService();
-            }
-            else
+            //If any of the settings are invalid, show an error message and exit early
+            if (invalidSettings)
             {
                 //If the settings are invalid, show an error message to the user
                 System.Windows.MessageBox.Show($"{invalidList}", "Invalid Settings", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
+            //If the settings are valid...
+
+            //Convert the time into the hour and minute bytes and store them in the settings
+            byte[] twoBytes = DataInterpreter.ParseReadableTime(settingDimStart.CurrentVal);
+            settings.DimStartHour = twoBytes[0];
+            settings.DimStartMinute = twoBytes[1];
+
+            twoBytes = DataInterpreter.ParseReadableTime(settingDimEnd.CurrentVal);
+            settings.DimEndHour = twoBytes[0];
+            settings.DimEndMinute = twoBytes[1];
+
+            twoBytes = DataInterpreter.ParseReadableTime(settingBrightStart.CurrentVal);
+            settings.BrightStartHour = twoBytes[0];
+            settings.BrightStartMinute = twoBytes[1];
+
+            twoBytes = DataInterpreter.ParseReadableTime(settingBrightEnd.CurrentVal);
+            settings.BrightEndHour = twoBytes[0];
+            settings.BrightEndMinute = twoBytes[1];
+
+            //Store monitor ids in settings
+            settings.MonitorLeft = settingMonitorLeft.CurrentVal;
+            settings.MonitorCenter = settingMonitorCenter.CurrentVal;
+            settings.MonitorRight = settingMonitorRight.CurrentVal;
+
+            //Store min and max brightnesses in the settings
+            twoBytes = DataInterpreter.ParseMinMaxString(settingLeftBrightness.CurrentVal);
+            settings.LeftMinBrightness = twoBytes[0];
+            settings.LeftMaxBrightness = twoBytes[1];
+
+            twoBytes = DataInterpreter.ParseMinMaxString(settingCenterBrightness.CurrentVal);
+            settings.CenterMinBrightness = twoBytes[0];
+            settings.CenterMaxBrightness = twoBytes[1];
+
+            twoBytes = DataInterpreter.ParseMinMaxString(settingRightBrightness.CurrentVal);
+            settings.RightMinBrightness = twoBytes[0];
+            settings.RightMaxBrightness = twoBytes[1];
+
+            //Store blue light filter range in the settings
+            twoBytes = DataInterpreter.ParseMinMaxString(settingCenterBlueFilter.CurrentVal);
+            settings.MinBlueLightFilter = twoBytes[0];
+            settings.MaxBlueLightFilter = twoBytes[1];
+
+            //Store the brightness check time in the settings
+            settings.BrightCheckTime = brightCheckTime;
+
+            //Save the settings file
+            settings.WriteSettingsFile(startupSettings.SettingsFilePath);
+
+            //Show a status message to let the user know it worked
+            TxtStatus.Text = $"{StatusPrefix()} Settings saved to {startupSettings.SettingsFilePath}";
+            //Restart the monitor manager service
+            StartMonitorService();
         }
 
         private void BtnLoadSettings_Click(object sender, RoutedEventArgs e)
         {
+            //If the settings path doesn't lead to a file, show an error message
+            if (!File.Exists(TxtSettingsPath.Text))
+            {
+                System.Windows.MessageBox.Show($"File does not exist: {TxtSettingsPath.Text}", "Invalid file path",MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
+            //Ask the user if they want to continue
+            MessageBoxResult msgBoxResult = System.Windows.MessageBox.Show($"Are you sure you want to change the settings file path to {TxtSettingsPath.Text}?", "Change settings file path?", MessageBoxButton.YesNo);
+            if (msgBoxResult == MessageBoxResult.No)
+            {
+                return;
+            }
+
+            //Read the text out of the file and store it in a string
+            string settingsText = File.ReadAllText(TxtSettingsPath.Text);
+
+            //Attempt to read the settings file
+            try
+            {
+                JsonSerializer.Deserialize<Settings>(settingsText);
+            }
+            //If the json reader can't read the settings file, show an error message
+            catch (Exception)
+            {
+                System.Windows.MessageBox.Show($"Failed to read file\n {TxtSettingsPath.Text}", "Invalid file format", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            //Read the settings from the settings path
+            settings.ReadSettingsFile(TxtSettingsPath.Text);
+            //Update the data grid with the new settings
+            PopulateSettingsGrid(settings);
+            //Update the startup settings to the new path
+            startupSettings.SettingsFilePath = TxtSettingsPath.Text;
+            //Update the startup settings file
+            startupSettings.WriteStartupSettingsFile();
+
+            //Show a status message to let the user know it worked
+            TxtStatus.Text = $"{StatusPrefix()}Loaded settings from {TxtSettingsPath.Text}";
+            //Restart the monitor service to use the new settings
+            StartMonitorService();
         }
     }
 
