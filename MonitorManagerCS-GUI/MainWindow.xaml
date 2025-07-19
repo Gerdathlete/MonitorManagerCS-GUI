@@ -9,7 +9,19 @@
     <Window.Icon>
         <BitmapImage UriSource="pack://siteoforigin:,,,/icon.ico"/>
     </Window.Icon>
-    <TabControl>
-        
+    <TabControl ItemsSource="{Binding Tabs}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <!-- Tab Header -->
+                <TextBlock Text="{Binding TabName}"/>
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+
+
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <!-- Tab Content -->
+            </DataTemplate>
+        </TabControl.ContentTemplate>
     </TabControl>
 </Window>

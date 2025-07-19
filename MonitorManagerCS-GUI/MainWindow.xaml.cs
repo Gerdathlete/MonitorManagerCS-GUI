@@ -20,19 +20,7 @@ namespace MonitorManagerCS_GUI
         private ContextMenuStrip trayMenuStrip;
         private ToolStripMenuItem showTrayMenuItem;
         private ToolStripMenuItem exitTrayMenuItem;
-        public MainViewModel mainViewModel { get; set; }
-        public SettingsGridItem settingDimStart;
-        public SettingsGridItem settingDimEnd;
-        public SettingsGridItem settingBrightStart;
-        public SettingsGridItem settingBrightEnd;
-        public SettingsGridItem settingMonitorLeft;
-        public SettingsGridItem settingMonitorCenter;
-        public SettingsGridItem settingMonitorRight;
-        public SettingsGridItem settingLeftBrightness;
-        public SettingsGridItem settingCenterBrightness;
-        public SettingsGridItem settingRightBrightness;
-        public SettingsGridItem settingCenterBlueFilter;
-        public SettingsGridItem settingBrightCheckTime;
+        public MainViewModel ViewModel { get; set; }
         public StartupSettings startupSettings;
         public Settings settings;
         public Task monitorServiceTask;
@@ -55,8 +43,8 @@ namespace MonitorManagerCS_GUI
 
             //MinimizeToTray();
 
-            mainViewModel = new MainViewModel();
-            DataContext = mainViewModel;
+            ViewModel = new MainViewModel();
+            DataContext = ViewModel;
         }
 
 
@@ -85,22 +73,17 @@ namespace MonitorManagerCS_GUI
 
         public class MainViewModel : INotifyPropertyChanged
         {
-            private ObservableCollection<SettingsGridItem> _settingsGridData;
-
-            public ObservableCollection<SettingsGridItem> SettingsGridData
-            {
-                get { return _settingsGridData; }
-                set
-                {
-                    _settingsGridData = value;
-                    OnPropertyChanged(nameof(SettingsGridData));
-                }
-            }
+            public ObservableCollection<TabViewModel> Tabs { get; set; }
 
             public MainViewModel()
             {
-                // Initialize SettingsGridData
-                SettingsGridData = new ObservableCollection<SettingsGridItem>();
+                Tabs = new ObservableCollection<TabViewModel>
+                {
+                    new TabViewModel
+                    {
+                        TabName = "Tab 1"
+                    }
+                };
             }
 
             public event PropertyChangedEventHandler PropertyChanged;
@@ -111,57 +94,10 @@ namespace MonitorManagerCS_GUI
             }
         }
 
-        public class SettingsGridItem : INotifyPropertyChanged
+        public class TabViewModel
         {
-            private string _settingName;
-            public string SettingName
-            {
-                get { return _settingName; }
-                set
-                {
-                    _settingName = value;
-                    OnPropertyChanged(nameof(SettingName));
-                }
-            }
-
-            private string _defaultVal;
-            public string DefaultVal
-            {
-                get { return _defaultVal; }
-                set
-                {
-                    _defaultVal = value;
-                    OnPropertyChanged(nameof(DefaultVal));
-                }
-            }
-
-            private string _currentVal;
-            public string CurrentVal
-            {
-                get { return _currentVal; }
-                set
-                {
-                    _currentVal = value;
-                    OnPropertyChanged(nameof(CurrentVal));
-                }
-            }
-
-            public SettingsGridItem(string settingName, string defaultValue, string currentValue)
-            {
-                SettingName = settingName;
-                DefaultVal = defaultValue;
-                CurrentVal = currentValue;
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            protected virtual void OnPropertyChanged(string propertyName)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
+            public string TabName { get; set; } 
         }
-
-        public ObservableCollection<SettingsGridItem> SettingsGridData { get; set; }
 
         private void InitializeTrayIcon()
         {
