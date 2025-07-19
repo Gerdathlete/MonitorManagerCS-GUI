@@ -9,5 +9,7 @@
     <Window.Icon>
         <BitmapImage UriSource="pack://siteoforigin:,,,/icon.ico"/>
     </Window.Icon>
-    
+    <TabControl>
+        
+    </TabControl>
 </Window>
