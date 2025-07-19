@@ -40,23 +40,22 @@ namespace MonitorManagerCS_GUI
         private static readonly string[] statusPrefixes = { "", "  ", "    " };
         private byte statusPrefixIndex;
 
+        /// <summary>
+        /// Entry point of the program.
+        /// </summary>
         public MainWindow()
         {
             //Mandatory line to make the main window work
             InitializeComponent();
 
-            //Initialize the tray icon
             InitializeTrayIcon();
-            //Run the MainWindow_StateChanged function when the window's state changes (this is used to make the minimize button minimize to tray)
+
+            //Run the MainWindow_StateChanged function when the window's state changes (e.g. when the window is opened, minimized, or closed)
             StateChanged += MainWindow_StateChanged;
 
-            //Minimize to system tray at startup
             MinimizeToTray();
 
-            //These two lines make it so that data bindings work, IDK how it works
-            //Initialize the view model (idk how this works, ChatGPT did this)
             ViewModel = new MainViewModel();
-            //Make the view model the data context (idk how this works, ChatGPT did this)
             DataContext = ViewModel;
 
             //Load settings
@@ -66,10 +65,8 @@ namespace MonitorManagerCS_GUI
             //Update the text in the settings file path text box
             TxtSettingsPath.Text = startupSettings.SettingsFilePath;
 
-            //Run the monitor service
             StartMonitorService();
 
-            //Add all the settings to the settings data grid
             PopulateSettingsGrid(settings);
         }
 

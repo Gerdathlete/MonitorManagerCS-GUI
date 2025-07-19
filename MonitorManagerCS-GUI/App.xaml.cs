@@ -304,25 +304,26 @@ namespace MonitorManagerCS_GUI
         public static void MonitorService(Settings settings, CancellationToken cancellationToken)
         {
             Debug.WriteLine("[Monitor Service] Monitor service started");
-            //Perform actions based on settings
-            int secondsElapsed = 0;
+
             UpdateBrightness(settings);
+
+            int secondsElapsed = 0;
             while (true)
             {
-                //Every second check if the task should be canceled
                 Thread.Sleep(1000);
-                if (cancellationToken.IsCancellationRequested) break;
                 secondsElapsed++;
+
+                //Every second, check if the task should be canceled
+                if (cancellationToken.IsCancellationRequested) break;
 
                 //If the number of seconds that have elapsed is enough to update brightness...
                 if (secondsElapsed >= settings.BrightCheckTime)
                 {
-                    //Update the brightness
                     UpdateBrightness(settings);
-                    //Reset the seconds elapsed counter
                     secondsElapsed = 0;
                 }
             }
+
             Debug.WriteLine("[Monitor Service] Monitor service ended");
         }
 

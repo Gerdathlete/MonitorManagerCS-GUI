@@ -1,1 +1,1 @@
-Fix bug where if time starts in PM and ends in AM, it doesn't work as expected
+Completely overhauling this program now.
