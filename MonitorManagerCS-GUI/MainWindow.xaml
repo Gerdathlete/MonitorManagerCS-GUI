@@ -41,7 +41,8 @@
                     Grid.Row="1"
                     Series ="{Binding Chart.Series}" XAxes="{Binding Chart.XAxes}" YAxes="{Binding Chart.YAxes}"
                     PointerReleasedCommand="{Binding Chart.PointerReleasedCommand}"
-                    PointerMoveCommand="{Binding Chart.PointerMovedCommand}"/>
+                    PointerMoveCommand="{Binding Chart.PointerMovedCommand}"
+                    PointerPressedCommand="{Binding Chart.PointerPressedCommand}"/>
             </Grid>
         </DataTemplate>
         

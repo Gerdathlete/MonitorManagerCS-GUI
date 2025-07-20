@@ -1,3 +1,4 @@
 Completely overhauling this program now.
 
 Allow adding of new points
+	Make a function that gives valid data points that are snapped to grid rather than repeating code

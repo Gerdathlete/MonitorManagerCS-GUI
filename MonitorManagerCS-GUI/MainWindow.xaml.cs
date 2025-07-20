@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
+using LiveChartsCore.Drawing;
 using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Events;
 using LiveChartsCore.Kernel.Sketches;
@@ -274,13 +275,15 @@ namespace MonitorManagerCS_GUI
         public double YSnap { get; set; } = 1;
         public IRelayCommand<PointerCommandArgs> PointerReleasedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerMovedCommand { get; }
+        public IRelayCommand<PointerCommandArgs> PointerPressedCommand { get; }
 
         private ObservablePoint _draggedPoint = null;
 
         public TimeChartDraggable()
         {
-            PointerReleasedCommand = new RelayCommand<PointerCommandArgs>(OnPointerReleased);
-            PointerMovedCommand = new RelayCommand<PointerCommandArgs>(OnPointerMoved);
+            PointerReleasedCommand = new RelayCommand<PointerCommandArgs>(OnMouseReleased);
+            PointerMovedCommand = new RelayCommand<PointerCommandArgs>(OnMouseMoved);
+            PointerPressedCommand = new RelayCommand<PointerCommandArgs>(OnMousePressed);
 
             _points = new ObservableCollection<ObservablePoint>
             {
@@ -296,7 +299,7 @@ namespace MonitorManagerCS_GUI
                 LineSmoothness = 0,
             };
 
-            lineSeries.ChartPointPointerDown += OnPointerDown;
+            lineSeries.ChartPointPointerDown += OnClickPoint;
 
             Series = new ISeries[] { lineSeries };
 
@@ -320,12 +323,24 @@ namespace MonitorManagerCS_GUI
             YAxes = new[] { YAxis };
         }
 
+        private void OnMousePressed(PointerCommandArgs args)
+        {
+            var chart = (ICartesianChartView)args.Chart;
+            var mousePos = args.PointerPosition;
+
+            var clickedPoints = chart.GetPointsAt(mousePos);
+
+            if (clickedPoints.Any()) { return; }
+
+            var mouseChartPos = chart.ScalePixelsToData(mousePos);
+        }
+
         /// <summary>
         /// Runs when a mouse button is pressed. Handles the initiation of dragging points.
         /// </summary>
         /// <param name="chart"></param>
         /// <param name="point"></param>
-        private void OnPointerDown(IChartView chart, ChartPoint<ObservablePoint, CircleGeometry, LabelGeometry> point)
+        private void OnClickPoint(IChartView chart, ChartPoint<ObservablePoint, CircleGeometry, LabelGeometry> point)
         {
             if (point == null) return;
 
@@ -334,10 +349,10 @@ namespace MonitorManagerCS_GUI
         }
 
         /// <summary>
-        /// Runs when the mouse pointer is moved. Updates the position of points when they are dragged.
+        /// Runs when the mouse is moved. Updates the position of points when they are dragged.
         /// </summary>
         /// <param name="args"></param>
-        private void OnPointerMoved(PointerCommandArgs args)
+        private void OnMouseMoved(PointerCommandArgs args)
         {
             if (_draggedPoint == null) return;
 
@@ -370,14 +385,19 @@ namespace MonitorManagerCS_GUI
                 newPointY = (double)YAxis.MinLimit;
             }
 
-            _draggedPoint.X = newPointX;
-            _draggedPoint.Y = newPointY;
-
-            //Reorder points if needed
             int draggedPointIndex = _draggedPoint.MetaData.EntityIndex;
             var prevPointX = (draggedPointIndex > 0) ? Points[draggedPointIndex - 1].X : null;
             var nextPointX = (draggedPointIndex < Points.Count - 1) ? Points[draggedPointIndex + 1].X : null;
 
+            //Prevent the point from being at the same time as adjacent points
+            if (newPointX != prevPointX && newPointX != nextPointX)
+            {
+                _draggedPoint.X = newPointX;
+            }
+
+            _draggedPoint.Y = newPointY;
+
+            //Reorder points if needed
             if (newPointX < prevPointX)
             {
                 Points.Move(draggedPointIndex, draggedPointIndex - 1);
@@ -392,7 +412,7 @@ namespace MonitorManagerCS_GUI
         /// Runs when a mouse button is released. Releases dragged points.
         /// </summary>
         /// <param name="args"></param>
-        private void OnPointerReleased(PointerCommandArgs args)
+        private void OnMouseReleased(PointerCommandArgs args)
         {
             if (_draggedPoint == null) return;
 
