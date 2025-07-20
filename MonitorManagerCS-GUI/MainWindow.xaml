@@ -4,24 +4,57 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MonitorManagerCS_GUI"
+        xmlns:livecharts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:MainViewModel, IsDesignTimeCreatable=True}"
         Title="Nathan's Monitor Manager" Height="450" Width="800">
+
     <Window.Icon>
         <BitmapImage UriSource="pack://siteoforigin:,,,/icon.ico"/>
     </Window.Icon>
-    <TabControl ItemsSource="{Binding Tabs}">
+
+    <Window.Resources>
+        <!-- Tab Templates -->
+        <DataTemplate DataType="{x:Type local:DisplayTab}">
+            <!-- Display Tab Content -->
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                
+                <ComboBox ItemsSource="{Binding VCPCodes}" SelectedItem="{Binding SelectedVCPCode}" 
+                          Grid.Row="0" MaxWidth="200" Height="25">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text=" ("/>
+                                <TextBlock Text="{Binding Code}"/>
+                                <TextBlock Text=")"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <livecharts:CartesianChart Series ="{Binding Chart.Series}" XAxes="{Binding Chart.XAxes}" YAxes="{Binding Chart.YAxes}" 
+                                    Grid.Row="1"/>
+            </Grid>
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type local:SettingsTab}">
+            <!-- Display Tab Content -->
+            <TextBlock Text="{Binding Text}"/>
+        </DataTemplate>
+        
+    </Window.Resources>
+
+    <TabControl ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}">
         <TabControl.ItemTemplate>
             <DataTemplate>
                 <!-- Tab Header -->
                 <TextBlock Text="{Binding TabName}"/>
             </DataTemplate>
         </TabControl.ItemTemplate>
-
-
-        <TabControl.ContentTemplate>
-            <DataTemplate>
-                <!-- Tab Content -->
-            </DataTemplate>
-        </TabControl.ContentTemplate>
     </TabControl>
 </Window>

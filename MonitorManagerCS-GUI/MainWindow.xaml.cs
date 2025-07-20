@@ -1,16 +1,16 @@
-﻿using System;
+﻿using LiveChartsCore;
+using LiveChartsCore.Defaults;
+using LiveChartsCore.SkiaSharpView;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Text.Json;
-using System.Text.Json.Nodes;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using System.IO;
-using System.Security.AccessControl;
 
 namespace MonitorManagerCS_GUI
 {
@@ -45,8 +45,9 @@ namespace MonitorManagerCS_GUI
 
             ViewModel = new MainViewModel();
             DataContext = ViewModel;
-        }
 
+            ViewModel.Tab_Display1.Chart.AddPoint(new ObservablePoint(3, 51));
+        }
 
         private void StartMonitorService()
         {
@@ -69,34 +70,6 @@ namespace MonitorManagerCS_GUI
                 Debug.WriteLine("Shutting down monitor service...");
                 monitorServiceTask.Wait();
             }
-        }
-
-        public class MainViewModel : INotifyPropertyChanged
-        {
-            public ObservableCollection<TabViewModel> Tabs { get; set; }
-
-            public MainViewModel()
-            {
-                Tabs = new ObservableCollection<TabViewModel>
-                {
-                    new TabViewModel
-                    {
-                        TabName = "Tab 1"
-                    }
-                };
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            protected virtual void OnPropertyChanged(string propertyName)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        public class TabViewModel
-        {
-            public string TabName { get; set; } 
         }
 
         private void InitializeTrayIcon()
@@ -207,38 +180,179 @@ namespace MonitorManagerCS_GUI
         }
     }
 
-    public static class DataFormatter
+    public class MainViewModel : INotifyPropertyChanged
     {
-        public static string GetReadableTime(byte hour, byte minute)
+        public ObservableCollection<TabViewModel> Tabs { get; set; }
+        public TabViewModel SelectedTab { get; set; }
+        public DisplayTab Tab_Display1;
+        public SettingsTab Tab_Settings;
+
+        public MainViewModel()
         {
-            string minuteStr = "";
-            string AMPM = "AM";
-
-            //If the hour is greater than 12, convert to PM
-            if (hour > 12)
+            Tab_Display1 = new DisplayTab
             {
-                //Subtract 12 from the time, Make it PM
-                hour -= 12;
-                AMPM = "PM";
-            }
+                TabName = "Display 1"
+            };
 
-            //If the hour is zero, make it 12 (this is 12 AM)
-            if (hour == 0)
+            Tab_Settings = new SettingsTab
             {
-                hour = 12;
-            }
+                TabName = "Settings",
+                Text = "This is a settings tab."
+            };
 
-            //If the minute is less than 10, add a leading zero
-            if (minute < 10)
+            Tabs = new ObservableCollection<TabViewModel>
             {
-                //Add a zero before the minute
-                minuteStr = "0";
-            }
+                Tab_Display1,
+                Tab_Settings
+            };
 
-            return $"{hour}:{minuteStr}{minute} {AMPM}";
+            SelectedTab = Tab_Display1;
         }
 
-        public static string GetMinMaxString(byte min, byte max)
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class TabViewModel
+    {
+        public string TabName { get; set; }
+    }
+
+    public class DisplayTab : TabViewModel
+    {
+        public ObservableCollection<VCPCode> VCPCodes { get; set; }
+        public VCPCode SelectedVCPCode { get; set; }
+        public TimeChartDraggable Chart { get; set; }
+        public DisplayTab()
+        {
+            VCPCodes = new ObservableCollection<VCPCode>();
+            Chart = new TimeChartDraggable();
+        }
+    }
+
+    public class SettingsTab : TabViewModel
+    {
+        public string Text { get; set; }
+    }
+
+    public class TimeChartDraggable : INotifyPropertyChanged
+    {
+        private ObservableCollection<ObservablePoint> _points;
+        public ObservableCollection<ObservablePoint> Points
+        {
+            get => _points;
+            set
+            {
+                if (_points != value)
+                {
+                    var sortedPoints = new ObservableCollection<ObservablePoint>(value.OrderBy(p => p.X));
+                    if (_points != sortedPoints)
+                    {
+                        _points = sortedPoints; 
+                        OnPropertyChanged(nameof(Points));
+                    }
+                }
+            }
+        }
+        public ISeries[] Series { get; }
+        public Axis[] XAxes { get; }
+        public Axis[] YAxes { get; }
+
+        public TimeChartDraggable()
+        {
+            _points = new ObservableCollection<ObservablePoint>
+            {
+                new ObservablePoint(8, 20),
+                new ObservablePoint(12, 80),
+                new ObservablePoint(18, 30)
+            };
+
+            Series = new ISeries[]
+            {
+                new LineSeries<ObservablePoint>
+                {
+                    Values = Points,
+                    GeometrySize = 10,
+                    LineSmoothness = 0,
+                }
+            };
+
+            XAxes = new[] {
+                new Axis
+                {
+                    Name = "Time",
+                    MinLimit = 0,
+                    MaxLimit = 24,
+                    Labeler = v => DataFormatter.GetReadableTime(v)
+                }
+            };
+
+            YAxes = new[] {
+                new Axis
+                {
+                    Name = "Brightness",
+                    MinLimit = 0,
+                    MaxLimit = 100,
+                }
+            };
+        }
+
+        /// <summary>
+        /// Adds a point to the chart in the correct position so that the lines connect in order of X value
+        /// </summary>
+        /// <param name="newPoint"></param>
+        public void AddPoint(ObservablePoint newPoint)
+        {
+            int pointIndex = 0;
+            while (pointIndex < _points.Count && _points[pointIndex].X < newPoint.X)
+            { pointIndex++; }
+            _points.Insert(pointIndex, newPoint);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class VCPCode
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public int MaximumValue { get; set; }
+        public int CurrentValue { get; set; }
+    }
+
+    public static class DataFormatter
+    {
+        public static string GetReadableTime(double hour)
+        {
+            int hourInt = (int)hour;
+            int minute = (int)(hour % 1 * 60);
+
+            return GetReadableTime(hourInt, minute);
+        }
+        public static string GetReadableTime(int hour, int minute)
+        {
+            string AMPM = hour < 12 ? "AM" : "PM";
+
+            hour %= 12;
+            hour = hour == 0 ? 12 : hour;
+
+            string hourStr = hour.ToString();
+
+            //Add a leading zero to the minute if needed
+            string minuteStr = minute < 10 ? $"0{minute}" : minute.ToString();
+
+            return $"{hourStr}:{minuteStr} {AMPM}";
+        }
+
+        public static string GetMinMaxString(int min, int max)
         {
             return $"{min}-{max}";
         }
@@ -246,7 +360,7 @@ namespace MonitorManagerCS_GUI
 
     public static class DataInterpreter
     {
-        public static byte[] ParseReadableTime(string time)
+        public static int[] ParseReadableTime(string time)
         {
             //Example input: "7:08 PM"
             //Returns [19, 8]
@@ -300,7 +414,7 @@ namespace MonitorManagerCS_GUI
                 //Add the character to the buffer
                 buffer += c;
             }
-            return new byte[] { hour, minute };
+            return new int[] { hour, minute };
         }
 
         public static Regex readableTimeRegex = new Regex(@"^([1-9]|1[0-2]):[0-5][0-9] (AM|PM)$");
@@ -310,16 +424,16 @@ namespace MonitorManagerCS_GUI
         public static Regex minMaxRegex = new Regex(@"^(?:0|[1-9][0-9]?|100)-(?:0|[1-9][0-9]?|100)$");
 
         /// <summary>
-        /// Turns a min-max string into two bytes:
-        /// "&lt;min&gt;-&lt;max&gt;" -&gt; byte {min, max}
+        /// Turns a min-max string into two ints
+        /// (e.g. "2-5" -&gt; {2, 5})
         /// </summary>
         /// <param name="minMaxString"></param>
         /// <returns></returns>
-        public static byte[] ParseMinMaxString(string minMaxString)
+        public static int[] ParseMinMaxString(string minMaxString)
         {
             //Example input: 15-100
             string[] minMax = minMaxString.Split('-');
-            return new byte[] { byte.Parse(minMax[0]), byte.Parse(minMax[1]) };
+            return new int[] { int.Parse(minMax[0]), int.Parse(minMax[1]) };
 
         }
     }
