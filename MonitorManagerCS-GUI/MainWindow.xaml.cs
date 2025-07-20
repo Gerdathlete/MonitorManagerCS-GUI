@@ -1,11 +1,19 @@
-﻿using LiveChartsCore;
+﻿using CommunityToolkit.Mvvm.Input;
+using LiveChartsCore;
 using LiveChartsCore.Defaults;
+using LiveChartsCore.Kernel;
+using LiveChartsCore.Kernel.Events;
+using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,6 +53,8 @@ namespace MonitorManagerCS_GUI
 
             ViewModel = new MainViewModel();
             DataContext = ViewModel;
+
+
 
             ViewModel.Tab_Display1.Chart.AddPoint(new ObservablePoint(3, 51));
         }
@@ -239,7 +249,7 @@ namespace MonitorManagerCS_GUI
         public string Text { get; set; }
     }
 
-    public class TimeChartDraggable : INotifyPropertyChanged
+    public partial class TimeChartDraggable : INotifyPropertyChanged
     {
         private ObservableCollection<ObservablePoint> _points;
         public ObservableCollection<ObservablePoint> Points
@@ -261,9 +271,18 @@ namespace MonitorManagerCS_GUI
         public ISeries[] Series { get; }
         public Axis[] XAxes { get; }
         public Axis[] YAxes { get; }
+        public double XSnap { get; set; } = .25;
+        public double YSnap { get; set; } = 1;
+        public IRelayCommand<PointerCommandArgs> PointerReleasedCommand { get; }
+        public IRelayCommand<PointerCommandArgs> PointerMovedCommand { get; }
+
+        private ObservablePoint _draggedPoint = null;
 
         public TimeChartDraggable()
         {
+            PointerReleasedCommand = new RelayCommand<PointerCommandArgs>(OnPointerReleased);
+            PointerMovedCommand = new RelayCommand<PointerCommandArgs>(OnPointerMoved);
+
             _points = new ObservableCollection<ObservablePoint>
             {
                 new ObservablePoint(8, 20),
@@ -271,15 +290,16 @@ namespace MonitorManagerCS_GUI
                 new ObservablePoint(18, 30)
             };
 
-            Series = new ISeries[]
+            var lineSeries = new LineSeries<ObservablePoint>
             {
-                new LineSeries<ObservablePoint>
-                {
-                    Values = Points,
-                    GeometrySize = 10,
-                    LineSmoothness = 0,
-                }
+                Values = Points,
+                GeometrySize = 10,
+                LineSmoothness = 0,
             };
+
+            lineSeries.ChartPointPointerDown += OnPointerDown;
+
+            Series = new ISeries[] { lineSeries };
 
             XAxes = new[] {
                 new Axis
@@ -299,6 +319,38 @@ namespace MonitorManagerCS_GUI
                     MaxLimit = 100,
                 }
             };
+        }
+
+        private void OnPointerDown(IChartView chart, ChartPoint<ObservablePoint, CircleGeometry, LabelGeometry> point)
+        {
+            if (point == null) return;
+
+            Debug.WriteLine($"Clicked on {point.Coordinate}");
+            _draggedPoint = point.Model;
+        }
+
+        private void OnPointerMoved(PointerCommandArgs args)
+        {
+            if (_draggedPoint == null) return;
+
+            var mousePos = args.PointerPosition;
+            var chart = (ICartesianChartView)args.Chart;
+            var mouseChartPos = chart.ScalePixelsToData(mousePos);
+
+            var newPointX = Math.Round(mouseChartPos.X / XSnap) * XSnap;
+            var newPointY = Math.Round(mouseChartPos.Y / YSnap) * YSnap;
+
+            _draggedPoint.X = newPointX;
+            _draggedPoint.Y = newPointY;
+        }
+
+        private void OnPointerReleased(PointerCommandArgs args)
+        {
+            if (_draggedPoint == null) return;
+
+            Debug.WriteLine($"Released point at {_draggedPoint.Coordinate}");
+
+            _draggedPoint = null;
         }
 
         /// <summary>

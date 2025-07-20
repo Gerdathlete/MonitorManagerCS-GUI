@@ -37,8 +37,11 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
-                <livecharts:CartesianChart Series ="{Binding Chart.Series}" XAxes="{Binding Chart.XAxes}" YAxes="{Binding Chart.YAxes}" 
-                                    Grid.Row="1"/>
+                <livecharts:CartesianChart 
+                    Grid.Row="1"
+                    Series ="{Binding Chart.Series}" XAxes="{Binding Chart.XAxes}" YAxes="{Binding Chart.YAxes}"
+                    PointerReleasedCommand="{Binding Chart.PointerReleasedCommand}"
+                    PointerMoveCommand="{Binding Chart.PointerMovedCommand}"/>
             </Grid>
         </DataTemplate>
         
