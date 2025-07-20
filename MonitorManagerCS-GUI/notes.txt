@@ -1,1 +1,3 @@
 Completely overhauling this program now.
+
+Fix the deal where if you drag a point to the left of another, the points stay in the wrong order.
