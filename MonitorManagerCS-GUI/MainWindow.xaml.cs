@@ -320,6 +320,11 @@ namespace MonitorManagerCS_GUI
             YAxes = new[] { YAxis };
         }
 
+        /// <summary>
+        /// Runs when a mouse button is pressed. Handles the initiation of dragging points.
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="point"></param>
         private void OnPointerDown(IChartView chart, ChartPoint<ObservablePoint, CircleGeometry, LabelGeometry> point)
         {
             if (point == null) return;
@@ -328,6 +333,10 @@ namespace MonitorManagerCS_GUI
             _draggedPoint = point.Model;
         }
 
+        /// <summary>
+        /// Runs when the mouse pointer is moved. Updates the position of points when they are dragged.
+        /// </summary>
+        /// <param name="args"></param>
         private void OnPointerMoved(PointerCommandArgs args)
         {
             if (_draggedPoint == null) return;
@@ -379,6 +388,10 @@ namespace MonitorManagerCS_GUI
             }
         }
 
+        /// <summary>
+        /// Runs when a mouse button is released. Releases dragged points.
+        /// </summary>
+        /// <param name="args"></param>
         private void OnPointerReleased(PointerCommandArgs args)
         {
             if (_draggedPoint == null) return;
