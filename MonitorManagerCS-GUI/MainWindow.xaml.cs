@@ -7,13 +7,10 @@ using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -262,13 +259,15 @@ namespace MonitorManagerCS_GUI
                     var sortedPoints = new ObservableCollection<ObservablePoint>(value.OrderBy(p => p.X));
                     if (_points != sortedPoints)
                     {
-                        _points = sortedPoints; 
+                        _points = sortedPoints;
                         OnPropertyChanged(nameof(Points));
                     }
                 }
             }
         }
         public ISeries[] Series { get; }
+        public Axis TimeAxis { get; }
+        public Axis YAxis { get; set; }
         public Axis[] XAxes { get; }
         public Axis[] YAxes { get; }
         public double XSnap { get; set; } = .25;
@@ -301,24 +300,24 @@ namespace MonitorManagerCS_GUI
 
             Series = new ISeries[] { lineSeries };
 
-            XAxes = new[] {
-                new Axis
-                {
-                    Name = "Time",
-                    MinLimit = 0,
-                    MaxLimit = 24,
-                    Labeler = v => DataFormatter.GetReadableTime(v)
-                }
+            TimeAxis = new Axis
+            {
+                Name = "Time",
+                MinLimit = 0,
+                MaxLimit = 24,
+                Labeler = v => DataFormatter.GetReadableTime(v)
             };
 
-            YAxes = new[] {
-                new Axis
-                {
-                    Name = "Brightness",
-                    MinLimit = 0,
-                    MaxLimit = 100,
-                }
+            YAxis = new Axis
+            {
+                Name = "Brightness",
+                MinLimit = 0,
+                MaxLimit = 100,
             };
+
+            XAxes = new[] { TimeAxis };
+
+            YAxes = new[] { YAxis };
         }
 
         private void OnPointerDown(IChartView chart, ChartPoint<ObservablePoint, CircleGeometry, LabelGeometry> point)
@@ -333,6 +332,7 @@ namespace MonitorManagerCS_GUI
         {
             if (_draggedPoint == null) return;
 
+            //Move the point to the mouse position with snapping
             var mousePos = args.PointerPosition;
             var chart = (ICartesianChartView)args.Chart;
             var mouseChartPos = chart.ScalePixelsToData(mousePos);
@@ -340,8 +340,43 @@ namespace MonitorManagerCS_GUI
             var newPointX = Math.Round(mouseChartPos.X / XSnap) * XSnap;
             var newPointY = Math.Round(mouseChartPos.Y / YSnap) * YSnap;
 
+            //Prevent dragging outside of the chart boundary
+            if (TimeAxis.MaxLimit != null && newPointX > TimeAxis.MaxLimit)
+            {
+                newPointX = (double)TimeAxis.MaxLimit;
+            }
+
+            if (TimeAxis.MinLimit != null && newPointX < TimeAxis.MinLimit)
+            {
+                newPointX = (double)TimeAxis.MinLimit;
+            }
+
+            if (YAxis.MaxLimit != null && newPointY > YAxis.MaxLimit)
+            {
+                newPointY = (double)YAxis.MaxLimit;
+            }
+
+            if (YAxis.MinLimit != null && newPointY < YAxis.MinLimit)
+            {
+                newPointY = (double)YAxis.MinLimit;
+            }
+
             _draggedPoint.X = newPointX;
             _draggedPoint.Y = newPointY;
+
+            //Reorder points if needed
+            int draggedPointIndex = _draggedPoint.MetaData.EntityIndex;
+            var prevPointX = (draggedPointIndex > 0) ? Points[draggedPointIndex - 1].X : null;
+            var nextPointX = (draggedPointIndex < Points.Count - 1) ? Points[draggedPointIndex + 1].X : null;
+
+            if (newPointX < prevPointX)
+            {
+                Points.Move(draggedPointIndex, draggedPointIndex - 1);
+            }
+            else if (newPointX > nextPointX)
+            {
+                Points.Move(draggedPointIndex, draggedPointIndex + 1);
+            }
         }
 
         private void OnPointerReleased(PointerCommandArgs args)
