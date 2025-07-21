@@ -51,10 +51,6 @@ namespace MonitorManagerCS_GUI
 
             ViewModel = new MainViewModel();
             DataContext = ViewModel;
-
-
-
-            ViewModel.Tab_Display1.Chart.AddPoint(3, 51);
         }
 
         private void StartMonitorService()
@@ -285,12 +281,7 @@ namespace MonitorManagerCS_GUI
             PointerMovedCommand = new RelayCommand<PointerCommandArgs>(OnMouseMoved);
             PointerPressedCommand = new RelayCommand<PointerCommandArgs>(OnMousePressed);
 
-            _points = new ObservableCollection<ObservablePoint>
-            {
-                new ObservablePoint(8, 20),
-                new ObservablePoint(12, 80),
-                new ObservablePoint(18, 30)
-            };
+            _points = new ObservableCollection<ObservablePoint>();
 
             var lineSeries = new LineSeries<ObservablePoint>
             {
