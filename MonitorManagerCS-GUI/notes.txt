@@ -1,2 +1,3 @@
 Completely overhauling this program now.
 
+Use linear interpolation to place points slightly outside of the chart area, giving the appearance of a cyclic chart.
