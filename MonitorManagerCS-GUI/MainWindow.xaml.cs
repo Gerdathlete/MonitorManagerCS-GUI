@@ -54,7 +54,7 @@ namespace MonitorManagerCS_GUI
 
 
 
-            ViewModel.Tab_Display1.Chart.AddPoint(new ObservablePoint(3, 51));
+            ViewModel.Tab_Display1.Chart.AddPoint(3, 51);
         }
 
         private void StartMonitorService()
@@ -333,6 +333,9 @@ namespace MonitorManagerCS_GUI
             if (clickedPoints.Any()) { return; }
 
             var mouseChartPos = chart.ScalePixelsToData(mousePos);
+
+            var newPoint = AddPoint(mouseChartPos);
+            _draggedPoint = newPoint;
         }
 
         /// <summary>
@@ -361,51 +364,16 @@ namespace MonitorManagerCS_GUI
             var chart = (ICartesianChartView)args.Chart;
             var mouseChartPos = chart.ScalePixelsToData(mousePos);
 
-            var newPointX = Math.Round(mouseChartPos.X / XSnap) * XSnap;
-            var newPointY = Math.Round(mouseChartPos.Y / YSnap) * YSnap;
+            var newPosNullable = GetValidPointLocation(mouseChartPos, _draggedPoint);
+            if (newPosNullable == null) return;
 
-            //Prevent dragging outside of the chart boundary
-            if (TimeAxis.MaxLimit != null && newPointX > TimeAxis.MaxLimit)
-            {
-                newPointX = (double)TimeAxis.MaxLimit;
-            }
+            var newPos = (LvcPointD)newPosNullable;
 
-            if (TimeAxis.MinLimit != null && newPointX < TimeAxis.MinLimit)
-            {
-                newPointX = (double)TimeAxis.MinLimit;
-            }
-
-            if (YAxis.MaxLimit != null && newPointY > YAxis.MaxLimit)
-            {
-                newPointY = (double)YAxis.MaxLimit;
-            }
-
-            if (YAxis.MinLimit != null && newPointY < YAxis.MinLimit)
-            {
-                newPointY = (double)YAxis.MinLimit;
-            }
-
-            int draggedPointIndex = _draggedPoint.MetaData.EntityIndex;
-            var prevPointX = (draggedPointIndex > 0) ? Points[draggedPointIndex - 1].X : null;
-            var nextPointX = (draggedPointIndex < Points.Count - 1) ? Points[draggedPointIndex + 1].X : null;
-
-            //Prevent the point from being at the same time as adjacent points
-            if (newPointX != prevPointX && newPointX != nextPointX)
-            {
-                _draggedPoint.X = newPointX;
-            }
-
-            _draggedPoint.Y = newPointY;
+            _draggedPoint.X = newPos.X;
+            _draggedPoint.Y = newPos.Y;
 
             //Reorder points if needed
-            if (newPointX < prevPointX)
-            {
-                Points.Move(draggedPointIndex, draggedPointIndex - 1);
-            }
-            else if (newPointX > nextPointX)
-            {
-                Points.Move(draggedPointIndex, draggedPointIndex + 1);
-            }
+            UpdatePointIndex(_draggedPoint);
         }
 
         /// <summary>
@@ -421,16 +389,165 @@ namespace MonitorManagerCS_GUI
             _draggedPoint = null;
         }
 
-        /// <summary>
-        /// Adds a point to the chart in the correct position so that the lines connect in order of X value
-        /// </summary>
-        /// <param name="newPoint"></param>
-        public void AddPoint(ObservablePoint newPoint)
+        private LvcPointD? GetValidPointLocation(LvcPointD chartPos, ObservablePoint point = null)
         {
-            int pointIndex = 0;
-            while (pointIndex < _points.Count && _points[pointIndex].X < newPoint.X)
-            { pointIndex++; }
+            LvcPointD pointLocation = new LvcPointD(chartPos.X, chartPos.Y);
+
+            //Snap to grid
+            pointLocation.X = Math.Round(pointLocation.X / XSnap) * XSnap;
+            pointLocation.Y = Math.Round(pointLocation.Y / YSnap) * YSnap;
+
+            //Prevent point locations outside of the chart boundary
+            if (TimeAxis.MaxLimit != null && pointLocation.X > TimeAxis.MaxLimit)
+            {
+                pointLocation.X = (double)TimeAxis.MaxLimit;
+            }
+
+            if (TimeAxis.MinLimit != null && pointLocation.X < TimeAxis.MinLimit)
+            {
+                pointLocation.X = (double)TimeAxis.MinLimit;
+            }
+
+            if (YAxis.MaxLimit != null && pointLocation.Y > YAxis.MaxLimit)
+            {
+                pointLocation.Y = (double)YAxis.MaxLimit;
+            }
+
+            if (YAxis.MinLimit != null && pointLocation.Y < YAxis.MinLimit)
+            {
+                pointLocation.Y = (double)YAxis.MinLimit;
+            }
+
+            //Prevent the location from being at the same X-value as another point
+
+            int oldIndex = 0;
+            if (point != null)
+            {
+                oldIndex = (point.MetaData != null) ? point.MetaData.EntityIndex : 0;
+                _points.Remove(point);
+            }
+
+            int pointIndex = GetPointIndex(pointLocation.X);
+
+            var replacedPointX = (pointIndex < _points.Count) ? _points[pointIndex].X : null;
+
+            int leftDist = 0;
+            int rightDist = 0;
+
+            if (pointLocation.X == replacedPointX)
+            {
+                //Move left by the snap distance until we reach a location without a point
+                leftDist++;
+                double testLocation = pointLocation.X - XSnap;
+                int testIndex = pointIndex - 1;
+                var testPointX = (testIndex >= 0) ? _points[testIndex].X : null;
+
+                while (testPointX == testLocation)
+                {
+                    leftDist++;
+                    testLocation -= XSnap;
+                    testIndex--;
+                    testPointX = (testIndex >= 0) ? _points[testIndex].X : null;
+                }
+
+                //Move right by the snap distance until we reach a location without a point
+                rightDist++;
+                testLocation = pointLocation.X + XSnap;
+                testIndex = pointIndex + 1;
+                testPointX = (testIndex < _points.Count) ? _points[testIndex].X : null;
+
+                while (testPointX == testLocation)
+                {
+                    rightDist++;
+                    testLocation += XSnap;
+                    testIndex++;
+                    testPointX = (testIndex < _points.Count) ? _points[testIndex].X : null;
+                }
+
+                double newX;
+
+                //Move the shorter distance to the new location
+                if (leftDist >= rightDist)
+                {
+                    //Try moving right, check if out of bounds
+                    newX = pointLocation.X + rightDist * XSnap;
+                    if (newX > TimeAxis.MaxLimit)
+                    {
+                        //Try moving left, return null if still out of bounds
+                        newX = pointLocation.X - leftDist * XSnap;
+                        if (newX < TimeAxis.MinLimit)
+                        {
+                            return null;
+                        }
+                    }
+                }
+                else
+                {
+                    //Try moving left, check if out of bounds
+                    newX = pointLocation.X - leftDist * XSnap;
+                    if (newX < TimeAxis.MinLimit)
+                    {
+                        //Try moving right, return null if still out of bounds
+                        newX = pointLocation.X + rightDist * XSnap;
+                        if (newX > TimeAxis.MaxLimit)
+                        {
+                            return null;
+                        }
+                    }
+                }
+
+                pointLocation.X = newX;
+            }
+
+            if (point != null)
+            {
+                _points.Insert(oldIndex, point);
+            }
+
+            return pointLocation;
+        }
+
+        /// <summary>
+        /// Adds a point to the chart at the correct index so that the lines connect in order of X value
+        /// </summary>
+        /// <param name="chartPos"></param>
+        public ObservablePoint AddPoint(LvcPointD chartPos) => AddPoint(chartPos.X, chartPos.Y);
+        /// <summary>
+        /// Adds a point to the chart at the correct index so that the lines connect in order of X value
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public ObservablePoint AddPoint(double x, double y)
+        {
+            LvcPointD? pointLocNullable = GetValidPointLocation(new LvcPointD(x, y));
+            if (pointLocNullable == null) return null;
+
+            var pointLoc = (LvcPointD)pointLocNullable;
+
+            var newPoint = new ObservablePoint(pointLoc.X, pointLoc.Y);
+
+            int pointIndex = GetPointIndex(newPoint.X);
             _points.Insert(pointIndex, newPoint);
+
+            return newPoint;
+        }
+
+        public void UpdatePointIndex(ObservablePoint point)
+        {
+            _points.Remove(point);
+            int newIndex = GetPointIndex(point.X);
+            _points.Insert(newIndex, point);
+        }
+
+        public int GetPointIndex(double? pointX)
+        {
+            Debug.Assert(pointX != null);
+
+            int pointIndex = 0;
+            while (pointIndex < _points.Count && _points[pointIndex].X < pointX)
+            { pointIndex++; }
+
+            return pointIndex;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
