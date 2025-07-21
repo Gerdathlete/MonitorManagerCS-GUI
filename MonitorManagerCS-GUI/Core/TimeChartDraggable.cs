@@ -102,7 +102,7 @@ namespace MonitorManagerCS_GUI
         }
 
         /// <summary>
-        /// Runs when a mouse button is pressed. Handles dragging points and adding new points.
+        /// Runs when a mouse button is pressed. Handles dragging points, adding new points, and deleting points.
         /// </summary>
         /// <param name="args"></param>
         private void OnMousePressed(PointerCommandArgs args)
