@@ -6,8 +6,6 @@ using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Events;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
-using LiveChartsCore.SkiaSharpView.WPF;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -278,7 +276,6 @@ namespace MonitorManagerCS_GUI
         public IRelayCommand<PointerCommandArgs> PointerReleasedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerMovedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerPressedCommand { get; }
-        public IRelayCommand<MouseButtonEventArgs> RightClickCommand { get; }
 
         private ObservablePoint _draggedPoint = null;
 
@@ -287,7 +284,6 @@ namespace MonitorManagerCS_GUI
             PointerReleasedCommand = new RelayCommand<PointerCommandArgs>(OnMouseReleased);
             PointerMovedCommand = new RelayCommand<PointerCommandArgs>(OnMouseMoved);
             PointerPressedCommand = new RelayCommand<PointerCommandArgs>(OnMousePressed);
-            RightClickCommand = new RelayCommand<MouseButtonEventArgs>(OnRightClick);
 
             _points = new ObservableCollection<ObservablePoint>
             {
@@ -302,8 +298,6 @@ namespace MonitorManagerCS_GUI
                 GeometrySize = 10,
                 LineSmoothness = 0,
             };
-
-            lineSeries.ChartPointPointerDown += OnClickPoint;
 
             Series = new ISeries[] { lineSeries };
 
@@ -327,47 +321,45 @@ namespace MonitorManagerCS_GUI
             YAxes = new[] { YAxis };
         }
 
-        private void OnRightClick(MouseButtonEventArgs args)
-        {
-            var source = (IInputElement)args.Source;
-            Point mousePosP = args.GetPosition(source);
-
-            var chart = (IChartView)args.Source;
-            var mousePos = new LvcPointD(mousePosP.X, mousePosP.Y);
-
-            var clickedPoints = chart.GetPointsAt(mousePos);
-        }
-
         /// <summary>
-        /// Runs when a mouse button is pressed. Handles adding of points.
+        /// Runs when a mouse button is pressed. Handles dragging points and adding new points.
         /// </summary>
         /// <param name="args"></param>
         private void OnMousePressed(PointerCommandArgs args)
         {
+            var originalArgs = (MouseButtonEventArgs)args.OriginalEventArgs;
             var chart = (ICartesianChartView)args.Chart;
-            var mousePos = args.PointerPosition;
+            LvcPointD mousePos = args.PointerPosition;
 
             var clickedPoints = chart.GetPointsAt(mousePos);
+            ObservablePoint clickedPoint = null;
 
-            if (clickedPoints.Any()) { return; }
+            if (clickedPoints != null && clickedPoints.Any())
+            {
+                ChartPoint clickedChartPoint = clickedPoints.First();
+                clickedPoint = (ObservablePoint)clickedChartPoint.Context.DataSource;
+            }
 
-            var mouseChartPos = chart.ScalePixelsToData(mousePos);
+            if (originalArgs.ChangedButton == MouseButton.Left)
+            {
+                if (clickedPoint != null)
+                {
+                    Debug.WriteLine($"Clicked on {clickedPoint.Coordinate}");
+                    _draggedPoint = clickedPoint;
+                }
+                else
+                {
+                    var mouseChartPos = chart.ScalePixelsToData(mousePos);
 
-            var newPoint = AddPoint(mouseChartPos);
-            _draggedPoint = newPoint;
-        }
+                    var newPoint = AddPoint(mouseChartPos);
+                    _draggedPoint = newPoint;
+                }
+            }
 
-        /// <summary>
-        /// Runs when a mouse button is pressed. Handles the initiation of dragging points.
-        /// </summary>
-        /// <param name="chart"></param>
-        /// <param name="point"></param>
-        private void OnClickPoint(IChartView chart, ChartPoint<ObservablePoint, CircleGeometry, LabelGeometry> point)
-        {
-            if (point == null) return;
+            if (originalArgs.ChangedButton == MouseButton.Right)
+            {
 
-            Debug.WriteLine($"Clicked on {point.Coordinate}");
-            _draggedPoint = point.Model;
+            }
         }
 
         /// <summary>
