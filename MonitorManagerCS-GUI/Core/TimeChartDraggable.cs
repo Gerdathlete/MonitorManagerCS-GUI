@@ -1,19 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
+using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Events;
 using LiveChartsCore.Kernel.Sketches;
-using LiveChartsCore.Kernel;
+using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI
@@ -44,11 +42,25 @@ namespace MonitorManagerCS_GUI
         public Axis[] YAxes { get; }
         public double XSnap { get; set; } = .25;
         public double YSnap { get; set; } = 1;
+        private TooltipPosition _toolTipPos = TooltipPosition.Top;
+        public TooltipPosition TooltipPos 
+        { 
+            get => _toolTipPos; 
+            set
+            {
+                if (_toolTipPos != value)
+                {
+                    _toolTipPos = value;
+                    OnPropertyChanged(nameof(TooltipPos));
+                }
+            } 
+        }
         public IRelayCommand<PointerCommandArgs> PointerReleasedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerMovedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerPressedCommand { get; }
 
         private ObservablePoint _draggedPoint = null;
+        private TooltipPosition _prevTooltipPos;
 
         public TimeChartDraggable()
         {
@@ -85,6 +97,8 @@ namespace MonitorManagerCS_GUI
             XAxes = new[] { TimeAxis };
 
             YAxes = new[] { YAxis };
+
+            _prevTooltipPos = TooltipPos;
         }
 
         /// <summary>
@@ -93,6 +107,8 @@ namespace MonitorManagerCS_GUI
         /// <param name="args"></param>
         private void OnMousePressed(PointerCommandArgs args)
         {
+            HideTooltips();
+
             var originalArgs = (MouseButtonEventArgs)args.OriginalEventArgs;
             var chart = (ICartesianChartView)args.Chart;
             LvcPointD mousePos = args.PointerPosition;
@@ -159,6 +175,8 @@ namespace MonitorManagerCS_GUI
 
             //Reorder points if needed
             UpdatePointIndex(_draggedPoint);
+
+            
         }
 
         /// <summary>
@@ -167,6 +185,9 @@ namespace MonitorManagerCS_GUI
         /// <param name="args"></param>
         private void OnMouseReleased(PointerCommandArgs args)
         {
+            ShowTooltips();
+            
+
             if (_draggedPoint == null) return;
 
             _draggedPoint = null;
@@ -331,6 +352,20 @@ namespace MonitorManagerCS_GUI
             { pointIndex++; }
 
             return pointIndex;
+        }
+
+        public void HideTooltips()
+        {
+            if (TooltipPos == TooltipPosition.Hidden) return;
+
+            TooltipPos = TooltipPosition.Hidden;
+        }
+
+        public void ShowTooltips()
+        {
+            if (TooltipPos == _prevTooltipPos) return;
+            
+            TooltipPos = _prevTooltipPos;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

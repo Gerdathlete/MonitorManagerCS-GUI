@@ -44,7 +44,8 @@
                     PointerReleasedCommand="{Binding Chart.PointerReleasedCommand}"
                     PointerMoveCommand="{Binding Chart.PointerMovedCommand}"
                     PointerPressedCommand="{Binding Chart.PointerPressedCommand}"
-                    EasingFunction="{x:Null}">
+                    EasingFunction="{x:Null}"
+                    TooltipPosition="{Binding Chart.TooltipPos}">
                 </livecharts:CartesianChart>
             </Grid>
         </DataTemplate>
