@@ -7,6 +7,7 @@ using LiveChartsCore.Kernel.Events;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
+using LiveChartsCore.SkiaSharpView.WPF;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -17,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI
 {
@@ -276,6 +278,7 @@ namespace MonitorManagerCS_GUI
         public IRelayCommand<PointerCommandArgs> PointerReleasedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerMovedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerPressedCommand { get; }
+        public IRelayCommand<MouseButtonEventArgs> RightClickCommand { get; }
 
         private ObservablePoint _draggedPoint = null;
 
@@ -284,6 +287,7 @@ namespace MonitorManagerCS_GUI
             PointerReleasedCommand = new RelayCommand<PointerCommandArgs>(OnMouseReleased);
             PointerMovedCommand = new RelayCommand<PointerCommandArgs>(OnMouseMoved);
             PointerPressedCommand = new RelayCommand<PointerCommandArgs>(OnMousePressed);
+            RightClickCommand = new RelayCommand<MouseButtonEventArgs>(OnRightClick);
 
             _points = new ObservableCollection<ObservablePoint>
             {
@@ -323,6 +327,21 @@ namespace MonitorManagerCS_GUI
             YAxes = new[] { YAxis };
         }
 
+        private void OnRightClick(MouseButtonEventArgs args)
+        {
+            var source = (IInputElement)args.Source;
+            Point mousePosP = args.GetPosition(source);
+
+            var chart = (IChartView)args.Source;
+            var mousePos = new LvcPointD(mousePosP.X, mousePosP.Y);
+
+            var clickedPoints = chart.GetPointsAt(mousePos);
+        }
+
+        /// <summary>
+        /// Runs when a mouse button is pressed. Handles adding of points.
+        /// </summary>
+        /// <param name="args"></param>
         private void OnMousePressed(PointerCommandArgs args)
         {
             var chart = (ICartesianChartView)args.Chart;

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MonitorManagerCS_GUI"
         xmlns:livecharts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel, IsDesignTimeCreatable=True}"
         Title="Nathan's Monitor Manager" Height="450" Width="800">
@@ -42,7 +43,12 @@
                     Series ="{Binding Chart.Series}" XAxes="{Binding Chart.XAxes}" YAxes="{Binding Chart.YAxes}"
                     PointerReleasedCommand="{Binding Chart.PointerReleasedCommand}"
                     PointerMoveCommand="{Binding Chart.PointerMovedCommand}"
-                    PointerPressedCommand="{Binding Chart.PointerPressedCommand}"/>
+                    PointerPressedCommand="{Binding Chart.PointerPressedCommand}">
+                    <i:Interaction.Behaviors>
+                        <local:MouseClickBehavior
+                            RightClickCommand="{Binding Chart.RightClickCommand}"/>
+                    </i:Interaction.Behaviors>
+                </livecharts:CartesianChart>
             </Grid>
         </DataTemplate>
         
