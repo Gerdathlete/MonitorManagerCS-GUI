@@ -1,3 +1,2 @@
 Completely overhauling this program now.
 
-Allow deletion of points (maybe through a right click context menu? Or just right click?)

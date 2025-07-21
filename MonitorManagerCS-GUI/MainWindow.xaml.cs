@@ -331,6 +331,7 @@ namespace MonitorManagerCS_GUI
             var chart = (ICartesianChartView)args.Chart;
             LvcPointD mousePos = args.PointerPosition;
 
+            //Find if we clicked a point and get that point.
             var clickedPoints = chart.GetPointsAt(mousePos);
             ObservablePoint clickedPoint = null;
 
@@ -340,15 +341,17 @@ namespace MonitorManagerCS_GUI
                 clickedPoint = (ObservablePoint)clickedChartPoint.Context.DataSource;
             }
 
+            //Left Click
             if (originalArgs.ChangedButton == MouseButton.Left)
             {
                 if (clickedPoint != null)
                 {
-                    Debug.WriteLine($"Clicked on {clickedPoint.Coordinate}");
+                    //Drag existing point
                     _draggedPoint = clickedPoint;
                 }
                 else
                 {
+                    //Create new point and start dragging it
                     var mouseChartPos = chart.ScalePixelsToData(mousePos);
 
                     var newPoint = AddPoint(mouseChartPos);
@@ -356,9 +359,14 @@ namespace MonitorManagerCS_GUI
                 }
             }
 
+            //Right Click
             if (originalArgs.ChangedButton == MouseButton.Right)
             {
-
+                if (clickedPoint != null)
+                {
+                    //Delete existing point
+                    _points.Remove(clickedPoint);
+                }
             }
         }
 
@@ -394,8 +402,6 @@ namespace MonitorManagerCS_GUI
         private void OnMouseReleased(PointerCommandArgs args)
         {
             if (_draggedPoint == null) return;
-
-            Debug.WriteLine($"Released point at {_draggedPoint.Coordinate}");
 
             _draggedPoint = null;
         }
