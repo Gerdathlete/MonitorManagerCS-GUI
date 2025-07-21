@@ -43,7 +43,8 @@
                     Series ="{Binding Chart.Series}" XAxes="{Binding Chart.XAxes}" YAxes="{Binding Chart.YAxes}"
                     PointerReleasedCommand="{Binding Chart.PointerReleasedCommand}"
                     PointerMoveCommand="{Binding Chart.PointerMovedCommand}"
-                    PointerPressedCommand="{Binding Chart.PointerPressedCommand}">
+                    PointerPressedCommand="{Binding Chart.PointerPressedCommand}"
+                    EasingFunction="{x:Null}">
                 </livecharts:CartesianChart>
             </Grid>
         </DataTemplate>
