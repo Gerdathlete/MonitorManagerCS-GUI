@@ -224,7 +224,10 @@ namespace MonitorManagerCS_GUI
 
         public void UpdateWrappingPoints()
         {
-            if (TimeAxis.MinLimit == null || TimeAxis.MaxLimit == null) { return; }
+            if (TimeAxis.MinLimit == null || TimeAxis.MaxLimit == null) {
+                Debug.WriteLine("Tried to update wrapping points, but the X axis didn't have its limits set.");
+                return; 
+            }
 
             var minX = (double)TimeAxis.MinLimit;
             var maxX = (double)TimeAxis.MaxLimit;
@@ -232,75 +235,26 @@ namespace MonitorManagerCS_GUI
             double leftPointX = minX - _wrappingPointOffset;
             double rightPointX = maxX + _wrappingPointOffset;
 
+            ObservablePoint leftPoint;
+            ObservablePoint rightPoint;
+
             bool hasWrappingPoints = _points.Any(p => p.X == leftPointX);
             if (!hasWrappingPoints)
             {
-                AddWrappingPoints(leftPointX, rightPointX);
-                return;
+                leftPoint = new ObservablePoint(leftPointX, 0);
+                rightPoint = new ObservablePoint(rightPointX, 0);
+
+
+                _points.Insert(0, leftPoint);
+                _points.Add(rightPoint);
             }
-        }
-
-        public void AddWrappingPoints(double leftPointX, double rightPointX)
-        {
-            double leftPointY = 0;
-            double rightPointY = 0;
-
-            //Get all the points that have X and Y values only
-            var points = _points.Where(p => p.X != null && p.Y != null).ToList();
-
-            switch (points.Count)
+            else
             {
-                //Use the chart's middle Y coordinate if there aren't any points
-                case 0:
-                    var minY = YAxis.MinLimit;
-                    var maxY = YAxis.MaxLimit;
-                    if (minY != null && maxY != null)
-                    {
-                        leftPointY = (double)(minY + maxY) / 2;
-                    }
-                    break;
-
-                case 1:
-                    leftPointY = (double)_points[0].Y;
-                    break;
-
-                default:
-                    //Use interpolation to calculate y value of wrapping points
-                    var point1 = points[0];
-                    var point2 = points.Last();
-
-                    var p1Y = (double)point1.Y;
-                    var p1X = (double)point1.X;
-                    var p2Y = (double)point2.Y;
-                    var p2X = (double)point2.X;
-
-                    var min = (double)TimeAxis.MinLimit;
-                    var max = (double)TimeAxis.MaxLimit;
-
-                    var yDiff = p1Y-p2Y;
-                    var rightDist = max - p2X;
-                    var leftDist = p1X - min;
-                    var xDiff = leftDist + rightDist;
-
-                    //Can't have wrapping points if both points are against the edges of the chart
-                    if (xDiff == 0) { return; }
-
-                    var leftScale = (leftDist + _wrappingPointOffset) / xDiff;
-                    var rightScale = (rightDist + _wrappingPointOffset) / xDiff;
-
-                    var leftOffset = yDiff * leftScale;
-                    var rightOffset = yDiff * rightScale;
-
-                    leftPointY = p1Y - leftOffset;
-                    rightPointY = p2Y + rightOffset;
-                    break;
+                leftPoint = _points[0];
+                rightPoint = _points.Last();
             }
 
-            var leftPoint = new ObservablePoint(leftPointX, leftPointY);
-            var rightPoint = new ObservablePoint(rightPointX, rightPointY);
-
-            _points.Insert(0, leftPoint);
-            _points.Add(rightPoint);
+            SetWrappingPointsY(ref leftPoint, ref rightPoint);
         }
 
         public void SetWrappingPointsY(ref ObservablePoint leftPoint, ref ObservablePoint rightPoint)
@@ -323,11 +277,13 @@ namespace MonitorManagerCS_GUI
                     if (minY != null && maxY != null)
                     {
                         leftPointY = (double)(minY + maxY) / 2;
+                        rightPointY = leftPointY;
                     }
                     break;
 
                 case 1:
-                    leftPointY = (double)_points[0].Y;
+                    leftPointY = (double)points[0].Y;
+                    rightPointY = leftPointY;
                     break;
 
                 default:
