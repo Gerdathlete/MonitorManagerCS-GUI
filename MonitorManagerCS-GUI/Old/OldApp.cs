@@ -1,14 +1,13 @@
-﻿using System.IO;
-using System.Reflection;
-using System.Text.Json;
+﻿using MonitorManagerCS_GUI.Core;
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text.Json;
 using System.Threading;
-using MonitorManagerCS_GUI.Core;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.ComponentModel;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace MonitorManagerCS_GUI.Old
 {

@@ -1,5 +1,4 @@
-﻿using MonitorManagerCS_GUI.ViewModels;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
