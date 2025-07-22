@@ -43,9 +43,9 @@ namespace MonitorManagerCS_GUI
         public double XSnap { get; set; } = .25;
         public double YSnap { get; set; } = 1;
         private TooltipPosition _toolTipPos = TooltipPosition.Top;
-        public TooltipPosition TooltipPos 
-        { 
-            get => _toolTipPos; 
+        public TooltipPosition TooltipPos
+        {
+            get => _toolTipPos;
             set
             {
                 if (_toolTipPos != value)
@@ -53,7 +53,7 @@ namespace MonitorManagerCS_GUI
                     _toolTipPos = value;
                     OnPropertyChanged(nameof(TooltipPos));
                 }
-            } 
+            }
         }
         public IRelayCommand<PointerCommandArgs> PointerReleasedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerMovedCommand { get; }
@@ -61,6 +61,7 @@ namespace MonitorManagerCS_GUI
 
         private ObservablePoint _draggedPoint = null;
         private TooltipPosition _prevTooltipPos;
+        private double _wrappingPointOffset = 0.5;
 
         public TimeChartDraggable()
         {
@@ -150,6 +151,11 @@ namespace MonitorManagerCS_GUI
                     _points.Remove(clickedPoint);
                 }
             }
+
+            if (originalArgs.ChangedButton == MouseButton.Middle)
+            {
+                UpdateWrappingPoints();
+            }
         }
 
         /// <summary>
@@ -176,21 +182,188 @@ namespace MonitorManagerCS_GUI
             //Reorder points if needed
             UpdatePointIndex(_draggedPoint);
 
-            
+
         }
 
         /// <summary>
-        /// Runs when a mouse button is released. Releases dragged points.
+        /// Runs when the left mouse button is released. Releases dragged points.
         /// </summary>
         /// <param name="args"></param>
         private void OnMouseReleased(PointerCommandArgs args)
         {
             ShowTooltips();
-            
-
             if (_draggedPoint == null) return;
 
             _draggedPoint = null;
+        }
+
+        /// <summary>
+        /// Adds a point to the chart at the correct index so that the lines connect in order of X value
+        /// </summary>
+        /// <param name="chartPos"></param>
+        public ObservablePoint AddPoint(LvcPointD chartPos) => AddPoint(chartPos.X, chartPos.Y);
+        /// <summary>
+        /// Adds a point to the chart at the correct index so that the lines connect in order of X value
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public ObservablePoint AddPoint(double x, double y)
+        {
+            LvcPointD? pointLocNullable = GetValidPointLocation(new LvcPointD(x, y));
+            if (pointLocNullable == null) return null;
+
+            var pointLoc = (LvcPointD)pointLocNullable;
+
+            var newPoint = new ObservablePoint(pointLoc.X, pointLoc.Y);
+
+            int pointIndex = GetPointIndex(newPoint.X);
+            _points.Insert(pointIndex, newPoint);
+
+            return newPoint;
+        }
+
+        public void UpdateWrappingPoints()
+        {
+            if (TimeAxis.MinLimit == null || TimeAxis.MaxLimit == null) { return; }
+
+            var minX = (double)TimeAxis.MinLimit;
+            var maxX = (double)TimeAxis.MaxLimit;
+
+            double leftPointX = minX - _wrappingPointOffset;
+            double rightPointX = maxX + _wrappingPointOffset;
+
+            bool hasWrappingPoints = _points.Any(p => p.X == leftPointX);
+            if (!hasWrappingPoints)
+            {
+                AddWrappingPoints(leftPointX, rightPointX);
+                return;
+            }
+        }
+
+        public void AddWrappingPoints(double leftPointX, double rightPointX)
+        {
+            double leftPointY = 0;
+            double rightPointY = 0;
+
+            //Get all the points that have X and Y values only
+            var points = _points.Where(p => p.X != null && p.Y != null).ToList();
+
+            switch (points.Count)
+            {
+                //Use the chart's middle Y coordinate if there aren't any points
+                case 0:
+                    var minY = YAxis.MinLimit;
+                    var maxY = YAxis.MaxLimit;
+                    if (minY != null && maxY != null)
+                    {
+                        leftPointY = (double)(minY + maxY) / 2;
+                    }
+                    break;
+
+                case 1:
+                    leftPointY = (double)_points[0].Y;
+                    break;
+
+                default:
+                    //Use interpolation to calculate y value of wrapping points
+                    var point1 = points[0];
+                    var point2 = points.Last();
+
+                    var p1Y = (double)point1.Y;
+                    var p1X = (double)point1.X;
+                    var p2Y = (double)point2.Y;
+                    var p2X = (double)point2.X;
+
+                    var min = (double)TimeAxis.MinLimit;
+                    var max = (double)TimeAxis.MaxLimit;
+
+                    var yDiff = p1Y-p2Y;
+                    var rightDist = max - p2X;
+                    var leftDist = p1X - min;
+                    var xDiff = leftDist + rightDist;
+
+                    //Can't have wrapping points if both points are against the edges of the chart
+                    if (xDiff == 0) { return; }
+
+                    var leftScale = (leftDist + _wrappingPointOffset) / xDiff;
+                    var rightScale = (rightDist + _wrappingPointOffset) / xDiff;
+
+                    var leftOffset = yDiff * leftScale;
+                    var rightOffset = yDiff * rightScale;
+
+                    leftPointY = p1Y - leftOffset;
+                    rightPointY = p2Y + rightOffset;
+                    break;
+            }
+
+            var leftPoint = new ObservablePoint(leftPointX, leftPointY);
+            var rightPoint = new ObservablePoint(rightPointX, rightPointY);
+
+            _points.Insert(0, leftPoint);
+            _points.Add(rightPoint);
+        }
+
+        public void SetWrappingPointsY(ref ObservablePoint leftPoint, ref ObservablePoint rightPoint)
+        {
+            double leftPointY = 0;
+            double rightPointY = 0;
+
+            //Get all the points that have X and Y values, excluding the wrapping points
+            var points = _points.ToList();
+            points.Remove(leftPoint);
+            points.Remove(rightPoint);
+            points.RemoveAll(p => p.X == null || p.Y == null);
+
+            switch (points.Count)
+            {
+                //Use the chart's middle Y coordinate if there aren't any points
+                case 0:
+                    var minY = YAxis.MinLimit;
+                    var maxY = YAxis.MaxLimit;
+                    if (minY != null && maxY != null)
+                    {
+                        leftPointY = (double)(minY + maxY) / 2;
+                    }
+                    break;
+
+                case 1:
+                    leftPointY = (double)_points[0].Y;
+                    break;
+
+                default:
+                    //Use interpolation to calculate y value of wrapping points
+                    var point1 = points[0];
+                    var point2 = points.Last();
+
+                    var p1Y = (double)point1.Y;
+                    var p1X = (double)point1.X;
+                    var p2Y = (double)point2.Y;
+                    var p2X = (double)point2.X;
+
+                    var min = (double)TimeAxis.MinLimit;
+                    var max = (double)TimeAxis.MaxLimit;
+
+                    var yDiff = p1Y - p2Y;
+                    var rightDist = max - p2X;
+                    var leftDist = p1X - min;
+                    var xDiff = leftDist + rightDist;
+
+                    //Can't have wrapping points if both points are against the edges of the chart
+                    if (xDiff == 0) { return; }
+
+                    var leftScale = (leftDist + _wrappingPointOffset) / xDiff;
+                    var rightScale = (rightDist + _wrappingPointOffset) / xDiff;
+
+                    var leftOffset = yDiff * leftScale;
+                    var rightOffset = yDiff * rightScale;
+
+                    leftPointY = p1Y - leftOffset;
+                    rightPointY = p2Y + rightOffset;
+                    break;
+            }
+
+            leftPoint.Y = leftPointY;
+            rightPoint.Y = rightPointY;
         }
 
         private LvcPointD? GetValidPointLocation(LvcPointD chartPos, ObservablePoint point = null)
@@ -311,31 +484,6 @@ namespace MonitorManagerCS_GUI
             return pointLocation;
         }
 
-        /// <summary>
-        /// Adds a point to the chart at the correct index so that the lines connect in order of X value
-        /// </summary>
-        /// <param name="chartPos"></param>
-        public ObservablePoint AddPoint(LvcPointD chartPos) => AddPoint(chartPos.X, chartPos.Y);
-        /// <summary>
-        /// Adds a point to the chart at the correct index so that the lines connect in order of X value
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public ObservablePoint AddPoint(double x, double y)
-        {
-            LvcPointD? pointLocNullable = GetValidPointLocation(new LvcPointD(x, y));
-            if (pointLocNullable == null) return null;
-
-            var pointLoc = (LvcPointD)pointLocNullable;
-
-            var newPoint = new ObservablePoint(pointLoc.X, pointLoc.Y);
-
-            int pointIndex = GetPointIndex(newPoint.X);
-            _points.Insert(pointIndex, newPoint);
-
-            return newPoint;
-        }
-
         public void UpdatePointIndex(ObservablePoint point)
         {
             _points.Remove(point);
@@ -364,7 +512,7 @@ namespace MonitorManagerCS_GUI
         public void ShowTooltips()
         {
             if (TooltipPos == _prevTooltipPos) return;
-            
+
             TooltipPos = _prevTooltipPos;
         }
 
