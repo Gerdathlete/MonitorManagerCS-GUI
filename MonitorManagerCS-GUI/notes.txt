@@ -1,4 +1,1 @@
 Completely overhauling this program now.
-
-Add vertical chart lines to make it easier to see where your points are. 
-Maybe subdivide horizontal lines more as well.
