@@ -102,14 +102,25 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\TimeChartDraggable.cs" />
+    <Compile Include="Core\DisplayInfo.cs" />
+    <Compile Include="Core\Programs.cs" />
+    <Compile Include="Core\DisplayManager.cs" />
+    <Compile Include="Core\VCPCode.cs" />
+    <Compile Include="Core\DataFormatter.cs" />
+    <Compile Include="Core\DataInterpreter.cs" />
+    <Compile Include="ViewModels\TimeChartDraggable.cs" />
     <Compile Include="Core\MouseClickBehavior.cs" />
+    <Compile Include="ViewModels\DisplayTab.cs" />
+    <Compile Include="ViewModels\SettingsTab.cs" />
+    <Compile Include="ViewModels\TabViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Old\OldApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

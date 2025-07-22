@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace MonitorManagerCS_GUI
+namespace MonitorManagerCS_GUI.Core
 {
     public class MouseClickBehavior : Behavior<UIElement>
     {

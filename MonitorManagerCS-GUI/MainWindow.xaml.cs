@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using MonitorManagerCS_GUI.ViewModels;
+using System;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,10 +15,6 @@ namespace MonitorManagerCS_GUI
         private ToolStripMenuItem showTrayMenuItem;
         private ToolStripMenuItem exitTrayMenuItem;
         public MainViewModel ViewModel { get; set; }
-        public StartupSettings startupSettings;
-        public Settings settings;
-        public Task monitorServiceTask;
-        private CancellationTokenSource monitorServiceTokenSource;
         private static readonly string[] statusPrefixes = { "", "  ", "    " };
         private byte statusPrefixIndex;
         private static readonly double initWidth = 800;
@@ -39,29 +33,6 @@ namespace MonitorManagerCS_GUI
 
             ViewModel = new MainViewModel();
             DataContext = ViewModel;
-        }
-
-        private void StartMonitorService()
-        {
-            //End the monitor service (if its running)
-            EndMonitorService();
-
-            //Create a new token source for the service (this allows it to be ended)
-            monitorServiceTokenSource = new CancellationTokenSource();
-
-            //Launch the monitor service
-            Debug.WriteLine("Launching monitor service...");
-            monitorServiceTask = Task.Run(() => { App.MonitorService(settings, monitorServiceTokenSource.Token); });
-        }
-
-        private void EndMonitorService()
-        {
-            if (monitorServiceTask != null && !monitorServiceTask.IsCompleted)
-            {
-                monitorServiceTokenSource.Cancel();
-                Debug.WriteLine("Shutting down monitor service...");
-                monitorServiceTask.Wait();
-            }
         }
 
         private void InitializeTrayIcon()
@@ -128,47 +99,11 @@ namespace MonitorManagerCS_GUI
             trayIcon.Dispose();
         }
 
-        public string GetSettingsPathFromUser()
-        {
-            OpenFileDialog fileDialog = new OpenFileDialog
-            {
-                Filter = "JSON Files|*.json",
-                Title = "Select a Monitor Manager settings file",
-                InitialDirectory = StartupSettings.DefaultSettingsFilePath
-            };
-
-            //Stop the user from selecting the startup settings file
-            fileDialog.FileOk += (sender, e) =>
-            {
-                if (fileDialog.FileName == StartupSettings.StartupSettingsFilePath)
-                {
-                    e.Cancel = true;
-                    System.Windows.MessageBox.Show($"The file path '{StartupSettings.StartupSettingsFilePath}' is reserved for startup settings.", "Invalid Filename", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            };
-
-            DialogResult diaResult = fileDialog.ShowDialog();
-
-            if (diaResult == System.Windows.Forms.DialogResult.OK)
-            {
-                return fileDialog.FileName;
-            }
-            Debug.WriteLine("User did not select a file.");
-            return null;
-        }
-
         private string StatusPrefix()
         {
             string output = statusPrefixes[statusPrefixIndex++];
             if (statusPrefixIndex >= statusPrefixes.Length) statusPrefixIndex = 0;
             return output;
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
-
-            EndMonitorService();
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -180,235 +115,6 @@ namespace MonitorManagerCS_GUI
 
             Width = initWidth;
             Height = initHeight;
-        }
-    }
-
-    public class MainViewModel : INotifyPropertyChanged
-    {
-        public ObservableCollection<TabViewModel> Tabs { get; set; }
-        public int SelectedTabIndex { get; set; }
-
-        public MainViewModel()
-        {
-            var Tab_DisplayTest = new DisplayTab
-            {
-                TabName = "Display Test"
-            };
-
-            var Tab_Settings = new SettingsTab
-            {
-                TabName = "Settings",
-                Text = "This is a settings tab."
-            };
-
-            Tabs = new ObservableCollection<TabViewModel>
-            {
-                Tab_DisplayTest,
-                Tab_Settings
-            };
-
-            SelectedTabIndex = 0;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    public class TabViewModel : INotifyPropertyChanged
-    {
-        private string _tabName;
-        public string TabName
-        {
-            get => _tabName;
-            set
-            {
-                if (_tabName != value)
-                {
-                    _tabName = value;
-                    OnPropertyChanged(nameof(TabName));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    public class DisplayTab : TabViewModel
-    {
-        private ObservableCollection<VCPCode> _VCPCodes;
-        public ObservableCollection<VCPCode> VCPCodes
-        {
-            get => _VCPCodes;
-            set
-            {
-                if (_VCPCodes != value)
-                {
-                    _VCPCodes = value;
-                    OnPropertyChanged(nameof(VCPCodes));
-                }
-            }
-        }
-        private VCPCode _selectedVCPCode;
-        public VCPCode SelectedVCPCode
-        {
-            get => _selectedVCPCode;
-            set
-            {
-                if (value != _selectedVCPCode)
-                {
-                    _selectedVCPCode = value;
-                    OnPropertyChanged(nameof(SelectedVCPCode));
-                }
-            }
-        }
-        public TimeChartDraggable Chart { get; set; }
-        public DisplayTab()
-        {
-            VCPCodes = new ObservableCollection<VCPCode>();
-            Chart = new TimeChartDraggable();
-        }
-    }
-
-    public class SettingsTab : TabViewModel
-    {
-        public string Text { get; set; }
-    }
-
-    public class VCPCode
-    {
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public int MaximumValue { get; set; }
-        public int CurrentValue { get; set; }
-    }
-
-    public static class DataFormatter
-    {
-        /// <summary>
-        /// Gets a string in the format "hh:mm AM/PM" for the given time since 12 AM
-        /// </summary>
-        /// <param name="hour"></param>
-        /// <returns></returns>
-        public static string GetReadableTime(double hour)
-        {
-            int hourInt = (int)hour;
-            int minute = (int)(hour % 1 * 60);
-
-            return GetReadableTime(hourInt, minute);
-        }
-        /// <summary>
-        /// Gets a string in the format "hh:mm AM/PM" for the given time since 12 AM
-        /// </summary>
-        /// <param name="hour"></param>
-        /// <param name="minute"></param>
-        /// <returns></returns>
-        public static string GetReadableTime(int hour, int minute)
-        {
-            string AMPM = (hour % 24) < 12 ? "AM" : "PM";
-
-            hour %= 12;
-            hour = hour == 0 ? 12 : hour;
-
-            string hourStr = hour.ToString();
-
-            //Add a leading zero to the minute if needed
-            string minuteStr = minute < 10 ? $"0{minute}" : minute.ToString();
-
-            return $"{hourStr}:{minuteStr} {AMPM}";
-        }
-
-        public static string GetMinMaxString(int min, int max)
-        {
-            return $"{min}-{max}";
-        }
-    }
-
-    public static class DataInterpreter
-    {
-        public static int[] ParseReadableTime(string time)
-        {
-            //Example input: "7:08 PM"
-            //Returns [19, 8]
-            byte hour = 0;
-            byte minute = 0;
-            string buffer = "";
-            for (int i = 0; i < time.Length; i++)
-            {
-                char c = time[i];
-
-                //If we reach a colon, the content of the buffer is the hour
-                if (c == ':')
-                {
-                    //Store the buffer value as the hour
-                    hour = byte.Parse(buffer);
-                    //Empty the buffer, go to the next character
-                    buffer = "";
-                    continue;
-                }
-
-                //If we reach a space, the content of the buffer is the minute, possibly with a leading zero
-                if (c == ' ')
-                {
-                    //If there is a leading zero (ie. buffer == "0#"), remove it
-                    if (time[i - 2] == '0')
-                    {
-                        buffer = buffer.Substring(1);
-                    }
-                    //Store the buffer value as the minute
-                    minute = byte.Parse(buffer);
-
-                    //Put the last two characters into the buffer
-                    buffer = time.Substring(i + 1);
-
-                    //If its PM, but not 12 PM, add 12 to the hour
-                    if (buffer == "PM")
-                    {
-                        if (hour != 12) hour += 12;
-                    }
-                    //If its 12 AM, the hour is 0. Ex: "12:03 AM" -> hour = 0
-                    else if (hour == 12)
-                    {
-                        hour = 0;
-                    }
-                    //If its AM, and not 12 AM, the values are already correct
-
-                    //We are done!
-                    break;
-                }
-
-                //Add the character to the buffer
-                buffer += c;
-            }
-            return new int[] { hour, minute };
-        }
-
-        public static Regex readableTimeRegex = new Regex(@"^([1-9]|1[0-2]):[0-5][0-9] (AM|PM)$");
-
-        public static Regex blueLightRegex = new Regex(@"^[0-4]-[0-4]$");
-
-        public static Regex minMaxRegex = new Regex(@"^(?:0|[1-9][0-9]?|100)-(?:0|[1-9][0-9]?|100)$");
-
-        /// <summary>
-        /// Turns a min-max string into two ints
-        /// (e.g. "2-5" -&gt; {2, 5})
-        /// </summary>
-        /// <param name="minMaxString"></param>
-        /// <returns></returns>
-        public static int[] ParseMinMaxString(string minMaxString)
-        {
-            //Example input: 15-100
-            string[] minMax = minMaxString.Split('-');
-            return new int[] { int.Parse(minMax[0]), int.Parse(minMax[1]) };
-
         }
     }
 }

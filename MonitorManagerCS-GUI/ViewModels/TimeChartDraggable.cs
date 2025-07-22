@@ -16,7 +16,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 
-namespace MonitorManagerCS_GUI
+namespace MonitorManagerCS_GUI.ViewModels
 {
     public partial class TimeChartDraggable : INotifyPropertyChanged
     {

@@ -3,11 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MonitorManagerCS_GUI"
+        xmlns:vm="clr-namespace:MonitorManagerCS_GUI.ViewModels"
         xmlns:livecharts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=local:MainViewModel, IsDesignTimeCreatable=True}"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
         Title="Nathan's Monitor Manager"
         SizeToContent="WidthAndHeight"
         ContentRendered="Window_ContentRendered">
@@ -18,7 +18,7 @@
 
     <Window.Resources>
         <!-- Tab Templates -->
-        <DataTemplate DataType="{x:Type local:DisplayTab}">
+        <DataTemplate DataType="{x:Type vm:DisplayTab}">
             <!-- Display Tab Content -->
             <Grid Margin="5">
                 <Grid.RowDefinitions>
@@ -52,19 +52,26 @@
             </Grid>
         </DataTemplate>
         
-        <DataTemplate DataType="{x:Type local:SettingsTab}">
+        <DataTemplate DataType="{x:Type vm:SettingsTab}">
             <!-- Display Tab Content -->
             <TextBlock Text="{Binding Text}"/>
         </DataTemplate>
         
     </Window.Resources>
-
-    <TabControl ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
-        <TabControl.ItemTemplate>
-            <DataTemplate>
-                <!-- Tab Header -->
-                <TextBlock Text="{Binding TabName}"/>
-            </DataTemplate>
-        </TabControl.ItemTemplate>
-    </TabControl>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <Button Content="Get Displays!" 
+                    Margin="5" Width="Auto" HorizontalAlignment="Center"
+                    Command="{Binding GetDisplaysCommand}"/>
+        </StackPanel>
+        <TabControl DockPanel.Dock="Bottom"
+            ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <!-- Tab Header -->
+                    <TextBlock Text="{Binding TabName}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+        </TabControl>
+    </DockPanel>
 </Window>
