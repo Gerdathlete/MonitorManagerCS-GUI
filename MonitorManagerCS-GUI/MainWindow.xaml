@@ -59,7 +59,7 @@
         
     </Window.Resources>
 
-    <TabControl ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}">
+    <TabControl ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
         <TabControl.ItemTemplate>
             <DataTemplate>
                 <!-- Tab Header -->

@@ -26,17 +26,13 @@ namespace MonitorManagerCS_GUI
         private static readonly double initWidth = 800;
         private static readonly double initHeight = 450;
 
-        /// <summary>
-        /// Entry point of the program.
-        /// </summary>
         public MainWindow()
         {
-            //Mandatory line to make the main window work
+            //Mandatory line to load the main window
             InitializeComponent();
 
             InitializeTrayIcon();
 
-            //Run the MainWindow_StateChanged function when the window's state changes (e.g. when the window is opened, minimized, or closed)
             StateChanged += MainWindow_StateChanged;
 
             //MinimizeToTray();
@@ -190,18 +186,16 @@ namespace MonitorManagerCS_GUI
     public class MainViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<TabViewModel> Tabs { get; set; }
-        public TabViewModel SelectedTab { get; set; }
-        public DisplayTab Tab_Display1;
-        public SettingsTab Tab_Settings;
+        public int SelectedTabIndex { get; set; }
 
         public MainViewModel()
         {
-            Tab_Display1 = new DisplayTab
+            var Tab_DisplayTest = new DisplayTab
             {
-                TabName = "Display 1"
+                TabName = "Display Test"
             };
 
-            Tab_Settings = new SettingsTab
+            var Tab_Settings = new SettingsTab
             {
                 TabName = "Settings",
                 Text = "This is a settings tab."
@@ -209,11 +203,11 @@ namespace MonitorManagerCS_GUI
 
             Tabs = new ObservableCollection<TabViewModel>
             {
-                Tab_Display1,
+                Tab_DisplayTest,
                 Tab_Settings
             };
 
-            SelectedTab = Tab_Display1;
+            SelectedTabIndex = 0;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -224,15 +218,58 @@ namespace MonitorManagerCS_GUI
         }
     }
 
-    public class TabViewModel
+    public class TabViewModel : INotifyPropertyChanged
     {
-        public string TabName { get; set; }
+        private string _tabName;
+        public string TabName
+        {
+            get => _tabName;
+            set
+            {
+                if (_tabName != value)
+                {
+                    _tabName = value;
+                    OnPropertyChanged(nameof(TabName));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class DisplayTab : TabViewModel
     {
-        public ObservableCollection<VCPCode> VCPCodes { get; set; }
-        public VCPCode SelectedVCPCode { get; set; }
+        private ObservableCollection<VCPCode> _VCPCodes;
+        public ObservableCollection<VCPCode> VCPCodes
+        {
+            get => _VCPCodes;
+            set
+            {
+                if (_VCPCodes != value)
+                {
+                    _VCPCodes = value;
+                    OnPropertyChanged(nameof(VCPCodes));
+                }
+            }
+        }
+        private VCPCode _selectedVCPCode;
+        public VCPCode SelectedVCPCode
+        {
+            get => _selectedVCPCode;
+            set
+            {
+                if (value != _selectedVCPCode)
+                {
+                    _selectedVCPCode = value;
+                    OnPropertyChanged(nameof(SelectedVCPCode));
+                }
+            }
+        }
         public TimeChartDraggable Chart { get; set; }
         public DisplayTab()
         {
