@@ -61,7 +61,7 @@ namespace MonitorManagerCS_GUI
 
         private ObservablePoint _draggedPoint = null;
         private TooltipPosition _prevTooltipPos;
-        private double _wrappingPointOffset = 0.5;
+        private double _wrappingPointOffset = 10;
 
         public TimeChartDraggable()
         {
@@ -138,6 +138,9 @@ namespace MonitorManagerCS_GUI
                     var mouseChartPos = chart.ScalePixelsToData(mousePos);
 
                     var newPoint = AddPoint(mouseChartPos);
+
+                    UpdateWrappingPoints();
+
                     _draggedPoint = newPoint;
                 }
             }
@@ -149,12 +152,8 @@ namespace MonitorManagerCS_GUI
                 {
                     //Delete existing point
                     _points.Remove(clickedPoint);
+                    UpdateWrappingPoints();
                 }
-            }
-
-            if (originalArgs.ChangedButton == MouseButton.Middle)
-            {
-                UpdateWrappingPoints();
             }
         }
 
@@ -182,7 +181,7 @@ namespace MonitorManagerCS_GUI
             //Reorder points if needed
             UpdatePointIndex(_draggedPoint);
 
-
+            UpdateWrappingPoints();
         }
 
         /// <summary>
@@ -270,16 +269,9 @@ namespace MonitorManagerCS_GUI
 
             switch (points.Count)
             {
-                //Use the chart's middle Y coordinate if there aren't any points
+                //Don't do anything if there aren't any points
                 case 0:
-                    var minY = YAxis.MinLimit;
-                    var maxY = YAxis.MaxLimit;
-                    if (minY != null && maxY != null)
-                    {
-                        leftPointY = (double)(minY + maxY) / 2;
-                        rightPointY = leftPointY;
-                    }
-                    break;
+                    return;
 
                 case 1:
                     leftPointY = (double)points[0].Y;
@@ -304,8 +296,12 @@ namespace MonitorManagerCS_GUI
                     var leftDist = p1X - min;
                     var xDiff = leftDist + rightDist;
 
-                    //Can't have wrapping points if both points are against the edges of the chart
-                    if (xDiff == 0) { return; }
+                    //If the points are on the edges of the chart, make the wrapping points have the same Y to hide the line
+                    if (xDiff == 0) {
+                        leftPoint.Y = p1Y;
+                        rightPoint.Y = p2Y;
+                        return; 
+                    }
 
                     var leftScale = (leftDist + _wrappingPointOffset) / xDiff;
                     var rightScale = (rightDist + _wrappingPointOffset) / xDiff;
