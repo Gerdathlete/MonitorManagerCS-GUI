@@ -23,6 +23,8 @@ namespace MonitorManagerCS_GUI
         private CancellationTokenSource monitorServiceTokenSource;
         private static readonly string[] statusPrefixes = { "", "  ", "    " };
         private byte statusPrefixIndex;
+        private static readonly double initWidth = 800;
+        private static readonly double initHeight = 450;
 
         /// <summary>
         /// Entry point of the program.
@@ -172,6 +174,17 @@ namespace MonitorManagerCS_GUI
 
             EndMonitorService();
         }
+
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            MinWidth = ActualWidth;
+            MinHeight = ActualHeight;
+
+            SizeToContent = SizeToContent.Manual;
+
+            Width = initWidth;
+            Height = initHeight;
+        }
     }
 
     public class MainViewModel : INotifyPropertyChanged
@@ -263,7 +276,7 @@ namespace MonitorManagerCS_GUI
         /// <returns></returns>
         public static string GetReadableTime(int hour, int minute)
         {
-            string AMPM = hour < 12 ? "AM" : "PM";
+            string AMPM = (hour % 24) < 12 ? "AM" : "PM";
 
             hour %= 12;
             hour = hour == 0 ? 12 : hour;

@@ -8,7 +8,9 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel, IsDesignTimeCreatable=True}"
-        Title="Nathan's Monitor Manager" Height="450" Width="800">
+        Title="Nathan's Monitor Manager"
+        SizeToContent="WidthAndHeight"
+        ContentRendered="Window_ContentRendered">
 
     <Window.Icon>
         <BitmapImage UriSource="pack://siteoforigin:,,,/icon.ico"/>
@@ -39,7 +41,7 @@
                 </ComboBox>
 
                 <livecharts:CartesianChart 
-                    Grid.Row="1"
+                    Grid.Row="1" MinWidth="740" MinHeight="258"
                     Series ="{Binding Chart.Series}" XAxes="{Binding Chart.XAxes}" YAxes="{Binding Chart.YAxes}"
                     PointerReleasedCommand="{Binding Chart.PointerReleasedCommand}"
                     PointerMoveCommand="{Binding Chart.PointerMovedCommand}"

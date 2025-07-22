@@ -7,6 +7,8 @@ using LiveChartsCore.Kernel.Events;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -85,7 +87,12 @@ namespace MonitorManagerCS_GUI
                 Name = "Time",
                 MinLimit = 0,
                 MaxLimit = 24,
-                Labeler = v => DataFormatter.GetReadableTime(v)
+                Labeler = v => DataFormatter.GetReadableTime(v),
+                MinStep = 3,
+                SeparatorsPaint = new SolidColorPaint(SKColors.LightGray) { StrokeThickness = 2 },
+                SubseparatorsCount = 2,
+                SubseparatorsPaint = new SolidColorPaint(SKColors.LightGray) { StrokeThickness = 1 },
+                ForceStepToMin = true
             };
 
             YAxis = new Axis
