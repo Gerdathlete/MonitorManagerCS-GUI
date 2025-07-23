@@ -5,7 +5,7 @@ namespace MonitorManagerCS_GUI.Core
 {
     internal class DisplayManager
     {
-        public ObservableCollection<DisplayInfo> Displays { get; set; }
+        public ObservableCollection<DisplayInfo> Displays { get; set; } = new ObservableCollection<DisplayInfo>();
 
         internal void GetDisplays()
         {
@@ -20,24 +20,42 @@ namespace MonitorManagerCS_GUI.Core
 
             Programs.RunProgram(Programs.controlMyMonitor, $"/smonitors {filePath}");
 
+            Displays.Clear();
+            DisplayInfo display;
+            int displayIndex = 0;
+
             string[] lines = File.ReadAllLines(filePath);
             foreach (var line in lines)
             {
-                if (line.StartsWith("Monitor Device Name:"))
-                {
-                    
-                }
-                if (line.StartsWith("Monitor Name:"))
-                {
+                //Split the line at the first colon
+                var lineParts = line.Split(new[] { ':' }, 2);
+                if (lineParts.Length != 2) continue;
 
-                }
-                if (line.StartsWith("Serial Number:"))
-                {
+                //The first part of the line is the variable identifier
+                //The second part is the value of the variable in quotes
+                var key = lineParts[0].Trim();
+                var value = lineParts[1].Trim().Trim(new[] {'"'});
 
-                }
-                if (line.StartsWith("Short Monitor ID:"))
+                if (key == "Monitor Device Name")
                 {
-
+                    Displays.Add(new DisplayInfo
+                    {
+                        NumberID = value,
+                        Index = displayIndex
+                    });
+                }
+                if (key == "Monitor Name")
+                {
+                    Displays[displayIndex].Name = value;
+                }
+                if (key == "Serial Number")
+                {
+                    Displays[displayIndex].SerialNumber = value;
+                }
+                if (key == "Short Monitor ID")
+                {
+                    Displays[displayIndex].ShortID = value;
+                    displayIndex++;
                 }
             }
         }

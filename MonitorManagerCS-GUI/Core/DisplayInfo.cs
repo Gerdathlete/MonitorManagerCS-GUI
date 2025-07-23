@@ -5,9 +5,10 @@
     /// </summary>
     internal class DisplayInfo
     {
-        public string DisplayNumber { get; set; }
+        public string NumberID { get; set; }
         public string Name { get; set; }
         public string SerialNumber { get; set; }
         public string ShortID { get; set; }
+        public int Index { get; set; }
     }
 }

@@ -3,3 +3,4 @@ Completely overhauling this program now.
 Time to actually make the charts do something!
 
 To start, lets pull a list of the monitors and get a tab for each monitor.
+	You've just finished parsing the document and populating the Displays collection.
