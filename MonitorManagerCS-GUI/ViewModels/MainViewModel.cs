@@ -66,11 +66,6 @@ namespace MonitorManagerCS_GUI.ViewModels
                 });
             }
 
-            AddStaticTabs();
-        }
-
-        private void AddStaticTabs()
-        {
             foreach (var tab in _staticTabs)
             {
                 _tabs.Add(tab);

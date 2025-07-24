@@ -6,10 +6,12 @@ namespace MonitorManagerCS_GUI.Core
     internal class DisplayManager
     {
         public List<DisplayInfo> Displays { get; set; } = new List<DisplayInfo>();
+        
+        private string _outputFolder = "Temp";
 
         internal void GetDisplays()
         {
-            string fileDirectory = "Temp";
+            string fileDirectory = _outputFolder;
             string fileName = "smonitors.txt";
             string filePath = Path.Combine(fileDirectory, fileName);
 
@@ -20,7 +22,12 @@ namespace MonitorManagerCS_GUI.Core
 
             Programs.RunProgram(Programs.controlMyMonitor, $"/smonitors {filePath}");
 
-            Displays.Clear();
+            Displays = ParseSMonitorsFile(filePath);
+        }
+
+        private List<DisplayInfo> ParseSMonitorsFile(string filePath)
+        {
+            var displays = new List<DisplayInfo>();
             int displayIndex = 0;
 
             string[] lines = File.ReadAllLines(filePath);
@@ -33,11 +40,11 @@ namespace MonitorManagerCS_GUI.Core
                 //The first part of the line is the variable identifier
                 //The second part is the value of the variable in quotes
                 var key = lineParts[0].Trim();
-                var value = lineParts[1].Trim().Trim(new[] {'"'});
+                var value = lineParts[1].Trim().Trim(new[] { '"' });
 
                 if (key == "Monitor Device Name")
                 {
-                    Displays.Add(new DisplayInfo
+                    displays.Add(new DisplayInfo
                     {
                         NumberID = value,
                         Index = displayIndex
@@ -45,18 +52,20 @@ namespace MonitorManagerCS_GUI.Core
                 }
                 if (key == "Monitor Name")
                 {
-                    Displays[displayIndex].Name = value;
+                    displays[displayIndex].Name = value;
                 }
                 if (key == "Serial Number")
                 {
-                    Displays[displayIndex].SerialNumber = value;
+                    displays[displayIndex].SerialNumber = value;
                 }
                 if (key == "Short Monitor ID")
                 {
-                    Displays[displayIndex].ShortID = value;
+                    displays[displayIndex].ShortID = value;
                     displayIndex++;
                 }
             }
+
+            return displays;
         }
     }
 }
