@@ -62,7 +62,7 @@
         <StackPanel DockPanel.Dock="Top">
             <Button Content="Get Displays!" 
                     Margin="5" Width="Auto" HorizontalAlignment="Center"
-                    Command="{Binding GetDisplaysCommand}"/>
+                    Command="{Binding UpdateDisplayTabsCommand}"/>
         </StackPanel>
         <TabControl DockPanel.Dock="Bottom"
             ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">

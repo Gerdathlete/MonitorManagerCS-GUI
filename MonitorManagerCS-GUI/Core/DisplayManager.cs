@@ -1,11 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace MonitorManagerCS_GUI.Core
 {
     internal class DisplayManager
     {
-        public ObservableCollection<DisplayInfo> Displays { get; set; } = new ObservableCollection<DisplayInfo>();
+        public List<DisplayInfo> Displays { get; set; } = new List<DisplayInfo>();
 
         internal void GetDisplays()
         {
@@ -21,7 +21,6 @@ namespace MonitorManagerCS_GUI.Core
             Programs.RunProgram(Programs.controlMyMonitor, $"/smonitors {filePath}");
 
             Displays.Clear();
-            DisplayInfo display;
             int displayIndex = 0;
 
             string[] lines = File.ReadAllLines(filePath);

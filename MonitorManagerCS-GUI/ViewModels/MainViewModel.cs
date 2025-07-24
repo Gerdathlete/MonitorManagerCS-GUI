@@ -1,16 +1,32 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MonitorManagerCS_GUI.Core;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Net.NetworkInformation;
 using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<TabViewModel> Tabs { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private ObservableCollection<TabViewModel> _tabs;
+        public ObservableCollection<TabViewModel> Tabs
+        {
+            get => _tabs;
+            set
+            {
+                if (_tabs != value)
+                {
+                    _tabs = value;
+                    OnPropertyChanged(nameof(Tabs));
+                }
+            }
+        }
         public int SelectedTabIndex { get; set; }
         private readonly DisplayManager _displayManager = new DisplayManager();
+        private List<TabViewModel> _staticTabs;
 
         public MainViewModel()
         {
@@ -25,33 +41,58 @@ namespace MonitorManagerCS_GUI.ViewModels
                 Text = "This is a settings tab."
             };
 
-            Tabs = new ObservableCollection<TabViewModel>
+            _staticTabs = new List<TabViewModel>()
             {
                 Tab_DisplayTest,
                 Tab_Settings
             };
 
+            Tabs = new ObservableCollection<TabViewModel>(_staticTabs);
+
             SelectedTabIndex = 0;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public void UpdateDisplayTabs()
+        {
+            _tabs.Clear();
+
+            _displayManager.GetDisplays();
+            var displays = _displayManager.Displays;
+            foreach (var display in displays)
+            {
+                _tabs.Add(new DisplayTab()
+                {
+                    TabName = $"{display.ShortID} (SN: {display.SerialNumber})",
+                });
+            }
+
+            AddStaticTabs();
+        }
+
+        private void AddStaticTabs()
+        {
+            foreach (var tab in _staticTabs)
+            {
+                _tabs.Add(tab);
+            }
+        }
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private RelayCommand getDisplaysCommand;
-        public ICommand GetDisplaysCommand
+        private RelayCommand _updateDisplayTabsCommand;
+        public ICommand UpdateDisplayTabsCommand
         {
             get
             {
-                if (getDisplaysCommand == null)
+                if (_updateDisplayTabsCommand == null)
                 {
-                    getDisplaysCommand = new RelayCommand(_displayManager.GetDisplays);
+                    _updateDisplayTabsCommand = new RelayCommand(UpdateDisplayTabs);
                 }
 
-                return getDisplaysCommand;
+                return _updateDisplayTabsCommand;
             }
         }
     }
