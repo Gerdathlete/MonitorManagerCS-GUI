@@ -2,8 +2,6 @@ Completely overhauling this program now.
 
 Time to actually make the charts do something!
 
-Run Display and VCP code puller asynchronously so it doesn't freeze the whole program.
-
 Filter VCP codes to only reasonable codes
 
 Make the display tab chart associated with the VCP code
