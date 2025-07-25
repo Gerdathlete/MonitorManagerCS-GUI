@@ -102,11 +102,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             foreach (var display in displays)
             {
-                var displayTab = new DisplayTab()
-                {
-                    TabName = $"{display.ShortID} (SN: {display.SerialNumber})",
-                    VCPCodes = new ObservableCollection<VCPCode>(display.VCPCodes)
-                };
+                var displayTab = new DisplayTab(display);
 
                 Tabs.Insert(0, displayTab);
 

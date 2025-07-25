@@ -5,7 +5,7 @@ namespace MonitorManagerCS_GUI.Core
     /// <summary>
     /// Stores info about a display (monitor)
     /// </summary>
-    internal class DisplayInfo
+    public class DisplayInfo
     {
         public string NumberID { get; set; }
         public string Name { get; set; }
