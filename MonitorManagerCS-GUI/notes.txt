@@ -2,7 +2,5 @@ Completely overhauling this program now.
 
 Time to actually make the charts do something!
 
-Filter VCP codes to only reasonable codes
-
 Make the display tab chart associated with the VCP code
 	Add a checkbox that lets you enable/disable automating a given control.

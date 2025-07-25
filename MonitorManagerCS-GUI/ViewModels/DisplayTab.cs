@@ -15,6 +15,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 if (_VCPCodes != value)
                 {
                     _VCPCodes = value;
+                    FilterVCPCodes();
                     OnPropertyChanged(nameof(VCPCodes));
                 }
             }
@@ -56,6 +57,14 @@ namespace MonitorManagerCS_GUI.ViewModels
         public DisplayTab()
         {
             Chart = new TimeChartDraggable();
+        }
+
+        private void FilterVCPCodes()
+        {
+            foreach (var vcpCode in _VCPCodes.Where(vcpCode => !vcpCode.IsWritable).ToList())
+            {
+                _VCPCodes.Remove(vcpCode);
+            }
         }
 
         public static string GetTabName(DisplayInfo display)

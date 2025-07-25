@@ -21,5 +21,17 @@ namespace MonitorManagerCS_GUI
 
         [JsonPropertyName("Possible Values")]
         public string PossibleValues { get; set; }
+
+        private bool? _isWritable = null;
+        public bool IsWritable { get => GetIsWritable(); }
+        private bool GetIsWritable()
+        {
+            if (_isWritable is null)
+            {
+                _isWritable = ReadWrite != "Read Only";
+            }
+
+            return (bool)_isWritable;
+        }
     }
 }
