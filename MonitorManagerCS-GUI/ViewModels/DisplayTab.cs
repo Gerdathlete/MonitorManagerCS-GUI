@@ -55,7 +55,6 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         public DisplayTab()
         {
-            VCPCodes = new ObservableCollection<VCPCode>();
             Chart = new TimeChartDraggable();
         }
 
