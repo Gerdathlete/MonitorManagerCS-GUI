@@ -1,4 +1,6 @@
-﻿namespace MonitorManagerCS_GUI.Core
+﻿using System.Collections.Generic;
+
+namespace MonitorManagerCS_GUI.Core
 {
     /// <summary>
     /// Stores info about a display (monitor)
@@ -10,5 +12,6 @@
         public string SerialNumber { get; set; }
         public string ShortID { get; set; }
         public int Index { get; set; }
+        public List<VCPCode> VCPCodes { get; set; }
     }
 }

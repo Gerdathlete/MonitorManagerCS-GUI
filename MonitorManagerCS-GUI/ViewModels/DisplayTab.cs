@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
@@ -35,6 +36,28 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             VCPCodes = new ObservableCollection<VCPCode>();
             Chart = new TimeChartDraggable();
+        }
+
+        public void SelectVCPCode(string code)
+        {
+            if (_VCPCodes == null || !_VCPCodes.Any()) { return; }
+
+            bool hasCode = false;
+
+            foreach(var vcpCode in _VCPCodes)
+            {
+                if (vcpCode.Code == code)
+                {
+                    SelectedVCPCode = vcpCode;
+                    hasCode = true;
+                    return;
+                }
+            }
+
+            if (!hasCode)
+            {
+                SelectedVCPCode = _VCPCodes.First();
+            }
         }
     }
 }

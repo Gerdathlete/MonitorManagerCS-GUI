@@ -60,10 +60,15 @@ namespace MonitorManagerCS_GUI.ViewModels
             var displays = _displayManager.Displays;
             foreach (var display in displays)
             {
-                _tabs.Add(new DisplayTab()
+                var displayTab = new DisplayTab()
                 {
                     TabName = $"{display.ShortID} (SN: {display.SerialNumber})",
-                });
+                    VCPCodes = new ObservableCollection<VCPCode>(display.VCPCodes)
+                };
+
+                _tabs.Add(displayTab);
+
+                displayTab.SelectVCPCode("10");
             }
 
             foreach (var tab in _staticTabs)

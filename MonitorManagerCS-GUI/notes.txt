@@ -2,5 +2,7 @@ Completely overhauling this program now.
 
 Time to actually make the charts do something!
 
-Now pull the VCP codes for each monitor and put that in its displayinfo.
-	Update comboboxes with the view model
+Filter VCP codes to only reasonable codes
+
+Make the display tab chart associated with the VCP code
+	Add a checkbox that lets you enable/disable automating a given control.

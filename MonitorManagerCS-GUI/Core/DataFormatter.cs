@@ -1,4 +1,7 @@
-﻿namespace MonitorManagerCS_GUI
+﻿using System.IO;
+using System.Text.RegularExpressions;
+
+namespace MonitorManagerCS_GUI
 {
     public static class DataFormatter
     {
@@ -38,6 +41,11 @@
         public static string GetMinMaxString(int min, int max)
         {
             return $"{min}-{max}";
+        }
+
+        public static string GetSafeFileName(string fileName)
+        {
+            return Regex.Replace(fileName, $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]", "_");
         }
     }
 }

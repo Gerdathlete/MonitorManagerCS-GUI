@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
 namespace MonitorManagerCS_GUI.Core
 {
@@ -23,6 +24,20 @@ namespace MonitorManagerCS_GUI.Core
             Programs.RunProgram(Programs.controlMyMonitor, $"/smonitors {filePath}");
 
             Displays = ParseSMonitorsFile(filePath);
+
+            foreach ( var display in Displays )
+            {
+                var unsafeFileName = $"{display.ShortID}-SN{display.SerialNumber}.json";
+                fileName = DataFormatter.GetSafeFileName(unsafeFileName);
+                filePath = Path.Combine(fileDirectory, fileName);
+
+                //Get the display's VCP codes
+                //(/sjson generates a json file with the display's VCP codes given one of its identifiers)
+                Programs.RunProgram(Programs.controlMyMonitor, $"/sjson {filePath} {display.NumberID}");
+
+                string json = File.ReadAllText(filePath);
+                display.VCPCodes = JsonSerializer.Deserialize<List<VCPCode>>(json);
+            }
         }
 
         private List<DisplayInfo> ParseSMonitorsFile(string filePath)
