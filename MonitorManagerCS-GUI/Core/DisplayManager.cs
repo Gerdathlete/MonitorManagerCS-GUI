@@ -31,16 +31,16 @@ namespace MonitorManagerCS_GUI.Core
             var tasks = Displays.Select(async display =>
             {
                 var unsafeFileName = $"{display.ShortID}-SN{display.SerialNumber}.json";
-                fileName = DataFormatter.GetSafeFileName(unsafeFileName);
-                filePath = Path.Combine(fileDirectory, fileName);
+                var jsonFileName = DataFormatter.GetSafeFileName(unsafeFileName);
+                var jsonFilePath = Path.Combine(fileDirectory, jsonFileName);
 
                 //Get the display's VCP codes
                 //(/sjson generates a json file with the display's VCP codes given one of its identifiers)
-                await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/sjson {filePath} {display.NumberID}");
+                await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/sjson {jsonFilePath} {display.NumberID}");
 
                 //Read the file's text asynchronously with a stream reader
                 string json;
-                using (var reader = new StreamReader(filePath))
+                using (var reader = new StreamReader(jsonFilePath))
                 {
                     json = await reader.ReadToEndAsync();
                 }
