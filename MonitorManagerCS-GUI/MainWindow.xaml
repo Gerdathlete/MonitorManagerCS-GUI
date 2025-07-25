@@ -64,8 +64,11 @@
                     Margin="5" Width="Auto" HorizontalAlignment="Center"
                     Command="{Binding UpdateDisplayTabsCommand}"/>
         </StackPanel>
-        <TabControl DockPanel.Dock="Bottom"
-            ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
+        <TabControl 
+            DockPanel.Dock="Bottom" 
+            ItemsSource="{Binding Tabs}" 
+            SelectedItem="{Binding SelectedTab}" 
+            SelectedIndex="{Binding SelectedTabIndex}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <!-- Tab Header -->

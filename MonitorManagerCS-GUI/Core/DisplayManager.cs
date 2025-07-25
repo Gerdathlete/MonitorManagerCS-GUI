@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace MonitorManagerCS_GUI.Core
 {
@@ -10,7 +12,7 @@ namespace MonitorManagerCS_GUI.Core
         
         private string _outputFolder = "Temp";
 
-        internal void GetDisplays()
+        internal async Task<List<DisplayInfo>> GetDisplays()
         {
             string fileDirectory = _outputFolder;
             string fileName = "smonitors.txt";
@@ -21,11 +23,12 @@ namespace MonitorManagerCS_GUI.Core
                 Directory.CreateDirectory(fileDirectory);
             }
 
-            Programs.RunProgram(Programs.controlMyMonitor, $"/smonitors {filePath}");
+            await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/smonitors {filePath}");
 
             Displays = ParseSMonitorsFile(filePath);
 
-            foreach ( var display in Displays )
+            //Generate tasks to pull each display's VCP info so that we can run them in parallel
+            var tasks = Displays.Select(async display =>
             {
                 var unsafeFileName = $"{display.ShortID}-SN{display.SerialNumber}.json";
                 fileName = DataFormatter.GetSafeFileName(unsafeFileName);
@@ -33,11 +36,21 @@ namespace MonitorManagerCS_GUI.Core
 
                 //Get the display's VCP codes
                 //(/sjson generates a json file with the display's VCP codes given one of its identifiers)
-                Programs.RunProgram(Programs.controlMyMonitor, $"/sjson {filePath} {display.NumberID}");
+                await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/sjson {filePath} {display.NumberID}");
 
-                string json = File.ReadAllText(filePath);
+                //Read the file's text asynchronously with a stream reader
+                string json;
+                using (var reader = new StreamReader(filePath))
+                {
+                    json = await reader.ReadToEndAsync();
+                }
+
                 display.VCPCodes = JsonSerializer.Deserialize<List<VCPCode>>(json);
-            }
+            }).ToList();
+
+            await Task.WhenAll(tasks);
+
+            return Displays;
         }
 
         private List<DisplayInfo> ParseSMonitorsFile(string filePath)

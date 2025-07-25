@@ -1,10 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MonitorManagerCS_GUI.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
@@ -24,62 +29,55 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
-        public int SelectedTabIndex { get; set; }
+        private TabViewModel _selectedTab;
+        public TabViewModel SelectedTab
+        {
+            get => _selectedTab;
+            set
+            {
+                if (_selectedTab != value)
+                {
+                    _selectedTab = value;
+                    OnPropertyChanged(nameof(SelectedTab));
+                }
+            }
+        }
+        private int _selectedTabIndex;
+        public int SelectedTabIndex { 
+            get => _selectedTabIndex;
+            set
+            {
+                if (_selectedTabIndex != value)
+                {
+                    _selectedTabIndex = value;
+                    OnPropertyChanged(nameof(SelectedTabIndex));
+                }
+            }
+        }
         private readonly DisplayManager _displayManager = new DisplayManager();
-        private List<TabViewModel> _staticTabs;
 
         public MainViewModel()
         {
-            var Tab_DisplayTest = new DisplayTab
+            var tab_DisplayTest = new DisplayTab
             {
                 TabName = "Display Test"
             };
 
-            var Tab_Settings = new SettingsTab
+            var tab_Settings = new SettingsTab
             {
                 TabName = "Settings",
                 Text = "This is a settings tab."
             };
 
-            _staticTabs = new List<TabViewModel>()
+            var defaultTabs = new List<TabViewModel>()
             {
-                Tab_DisplayTest,
-                Tab_Settings
+                tab_DisplayTest,
+                tab_Settings
             };
 
-            Tabs = new ObservableCollection<TabViewModel>(_staticTabs);
+            Tabs = new ObservableCollection<TabViewModel>(defaultTabs);
 
             SelectedTabIndex = 0;
-        }
-
-        public void UpdateDisplayTabs()
-        {
-            _tabs.Clear();
-
-            _displayManager.GetDisplays();
-            var displays = _displayManager.Displays;
-            foreach (var display in displays)
-            {
-                var displayTab = new DisplayTab()
-                {
-                    TabName = $"{display.ShortID} (SN: {display.SerialNumber})",
-                    VCPCodes = new ObservableCollection<VCPCode>(display.VCPCodes)
-                };
-
-                _tabs.Add(displayTab);
-
-                displayTab.SelectVCPCode("10");
-            }
-
-            foreach (var tab in _staticTabs)
-            {
-                _tabs.Add(tab);
-            }
-        }
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private RelayCommand _updateDisplayTabsCommand;
@@ -94,6 +92,52 @@ namespace MonitorManagerCS_GUI.ViewModels
 
                 return _updateDisplayTabsCommand;
             }
+        }
+
+        public async void UpdateDisplayTabs()
+        {
+            var displays = await _displayManager.GetDisplays();
+
+            await RemoveDisplayTabs();
+
+            foreach (var display in displays)
+            {
+                var displayTab = new DisplayTab()
+                {
+                    TabName = $"{display.ShortID} (SN: {display.SerialNumber})",
+                    VCPCodes = new ObservableCollection<VCPCode>(display.VCPCodes)
+                };
+
+                Tabs.Insert(0, displayTab);
+
+                displayTab.SelectVCPCode("10");
+            }
+
+            SelectedTabIndex = 0;
+        }
+
+        private async Task RemoveDisplayTabs()
+        {
+            var displayTabs = Tabs.OfType<DisplayTab>().ToList();
+
+            if (SelectedTab is DisplayTab)
+            {
+                SelectedTab = null;
+            }
+
+            //Remove the tabs after WPF finishes doing things (this prevents binding errors)
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                foreach (var tab in displayTabs)
+                {
+                    Tabs.Remove(tab);
+                }
+            }, DispatcherPriority.Background);
+        }
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
