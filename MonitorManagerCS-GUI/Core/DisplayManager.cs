@@ -34,9 +34,12 @@ namespace MonitorManagerCS_GUI.Core
                 var jsonFileName = DataFormatter.GetSafeFileName(unsafeFileName);
                 var jsonFilePath = Path.Combine(fileDirectory, jsonFileName);
 
-                //Get the display's VCP codes
-                //(/sjson generates a json file with the display's VCP codes given one of its identifiers)
-                await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/sjson {jsonFilePath} {display.NumberID}");
+                if (!File.Exists(jsonFilePath))
+                {
+                    //Get the display's VCP codes
+                    //(/sjson generates a json file with the display's VCP codes given one of its identifiers)
+                    await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/sjson {jsonFilePath} {display.NumberID}");
+                }
 
                 //Read the file's text asynchronously with a stream reader
                 string json;
