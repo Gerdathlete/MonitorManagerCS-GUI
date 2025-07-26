@@ -10,4 +10,5 @@ Then, we need to run a service that controls the monitors
 	Set the VCP code to the value with ControlMyMonitor
 
 Make ControlMyMonitor part of the application by making it part of the App's resources.
-	This makes it so that you can just install this app without having to install ControlMyMonitor and without telling the program where ControlMyMonitor is installed.
+	This makes it so that you can just install this app without having to install ControlMyMonitor 
+	and without telling the program where ControlMyMonitor is installed.

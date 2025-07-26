@@ -140,6 +140,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include=".editorconfig" />
     <None Include="MonitorManagerCS-GUI_1_TemporaryKey.pfx" />
     <None Include="MonitorManagerCS-GUI_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
