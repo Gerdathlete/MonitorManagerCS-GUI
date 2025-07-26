@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
 
-namespace MonitorManagerCS_GUI
+namespace MonitorManagerCS_GUI.Core
 {
     public static class DataFormatter
     {

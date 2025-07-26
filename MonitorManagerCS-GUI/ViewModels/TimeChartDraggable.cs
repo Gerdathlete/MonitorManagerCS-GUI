@@ -8,6 +8,7 @@ using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using MonitorManagerCS_GUI.Core;
 using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;

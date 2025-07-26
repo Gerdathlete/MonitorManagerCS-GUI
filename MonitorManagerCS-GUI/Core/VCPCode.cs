@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace MonitorManagerCS_GUI
+namespace MonitorManagerCS_GUI.Core
 {
     public class VCPCode
     {
