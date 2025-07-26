@@ -58,11 +58,6 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public MainViewModel()
         {
-            var tab_DisplayTest = new DisplayTab
-            {
-                TabName = "Display Test"
-            };
-
             var tab_Settings = new SettingsTab
             {
                 TabName = "Settings",
@@ -71,7 +66,6 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             var defaultTabs = new List<TabViewModel>()
             {
-                tab_DisplayTest,
                 tab_Settings
             };
 
@@ -106,6 +100,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
                 Tabs.Insert(0, displayTab);
 
+                //Select brightness by default
                 displayTab.SelectVCPCode("10");
             }
 
