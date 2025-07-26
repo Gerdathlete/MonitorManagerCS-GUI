@@ -97,7 +97,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             YAxis = new Axis
             {
-                Name = "Brightness",
+                Name = "Value",
                 MinLimit = 0,
                 MaxLimit = 100,
             };
@@ -325,7 +325,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             rightPoint.Y = rightPointY;
         }
 
-        private LvcPointD? GetValidPointLocation(LvcPointD chartPos, ObservablePoint point = null)
+        public virtual LvcPointD? GetValidPointLocation(LvcPointD chartPos, ObservablePoint point = null)
         {
             LvcPointD pointLocation = new LvcPointD(chartPos.X, chartPos.Y);
 

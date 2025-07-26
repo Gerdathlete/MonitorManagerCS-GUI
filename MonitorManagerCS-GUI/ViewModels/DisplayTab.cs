@@ -1,4 +1,6 @@
 ﻿using MonitorManagerCS_GUI.Core;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -6,65 +8,70 @@ namespace MonitorManagerCS_GUI.ViewModels
 {
     public class DisplayTab : TabViewModel
     {
-        private ObservableCollection<VCPCode> _VCPCodes;
-        public ObservableCollection<VCPCode> VCPCodes
+        private ObservableCollection<VCPCodeChart> _vcpCodeCharts;
+        public ObservableCollection<VCPCodeChart> VCPCodeCharts
         {
-            get => _VCPCodes;
+            get => _vcpCodeCharts;
             set
             {
-                if (_VCPCodes != value)
+                if (_vcpCodeCharts != value)
                 {
-                    _VCPCodes = value;
-                    FilterVCPCodes();
-                    OnPropertyChanged(nameof(VCPCodes));
+                    _vcpCodeCharts = value;
+                    OnPropertyChanged(nameof(VCPCodeCharts));
                 }
             }
         }
-        private VCPCode _selectedVCPCode;
-        public VCPCode SelectedVCPCode
+        private VCPCodeChart _selectedVCPCodeChart;
+        public VCPCodeChart SelectedVCPCodeChart
         {
-            get => _selectedVCPCode;
+            get => _selectedVCPCodeChart;
             set
             {
-                if (value != _selectedVCPCode)
+                if (value != _selectedVCPCodeChart)
                 {
-                    _selectedVCPCode = value;
-                    OnPropertyChanged(nameof(SelectedVCPCode));
+                    _selectedVCPCodeChart = value;
+                    OnPropertyChanged(nameof(SelectedVCPCodeChart));
                 }
             }
         }
-        public TimeChartDraggable Chart { get; set; }
+        //public TimeChartDraggable Chart { get; }
         private DisplayInfo _display;
-        public DisplayInfo Display 
-        { 
-            get => _display; 
+        public DisplayInfo Display
+        {
+            get => _display;
             set
             {
                 if (_display != value)
                 {
                     _display = value;
                     TabName = GetTabName(_display);
-                    VCPCodes = new ObservableCollection<VCPCode>(_display.VCPCodes);
                 }
-            } 
+            }
         }
 
         public DisplayTab(DisplayInfo display)
-            :this()
+            : this()
         {
             Display = display;
+            MakeVCPCodeCharts(display.VCPCodes);
         }
         public DisplayTab()
         {
-            Chart = new TimeChartDraggable();
+
         }
 
-        private void FilterVCPCodes()
+        private void MakeVCPCodeCharts(List<VCPCode> vcpCodes)
         {
-            foreach (var vcpCode in _VCPCodes.Where(vcpCode => !vcpCode.IsWritable).ToList())
+            var writableCodes = vcpCodes.Where(vcpCode => vcpCode.IsWritable).ToList();
+
+            var codeCharts = new List<VCPCodeChart>();
+            foreach (var vcpCode in writableCodes)
             {
-                _VCPCodes.Remove(vcpCode);
+                var codeControl = new VCPCodeControl(vcpCode);
+                codeCharts.Add(new VCPCodeChart(codeControl));
             }
+
+            VCPCodeCharts = new ObservableCollection<VCPCodeChart>(codeCharts);
         }
 
         public static string GetTabName(DisplayInfo display)
@@ -74,15 +81,15 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public void SelectVCPCode(string code)
         {
-            if (_VCPCodes == null || !_VCPCodes.Any()) { return; }
+            if (_vcpCodeCharts == null || !_vcpCodeCharts.Any()) { return; }
 
             bool hasCode = false;
 
-            foreach(var vcpCode in _VCPCodes)
+            foreach (var vcpCodeChart in _vcpCodeCharts)
             {
-                if (vcpCode.Code == code)
+                if (vcpCodeChart.VCPCode.Code == code)
                 {
-                    SelectedVCPCode = vcpCode;
+                    SelectedVCPCodeChart = vcpCodeChart;
                     hasCode = true;
                     return;
                 }
@@ -90,7 +97,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             if (!hasCode)
             {
-                SelectedVCPCode = _VCPCodes.First();
+                SelectedVCPCodeChart = _vcpCodeCharts.First();
             }
         }
     }

@@ -94,6 +94,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\VCPCodeChart.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -108,6 +109,7 @@
     <Compile Include="Core\VCPCode.cs" />
     <Compile Include="Core\DataFormatter.cs" />
     <Compile Include="Core\DataInterpreter.cs" />
+    <Compile Include="Core\VCPCodeControl.cs" />
     <Compile Include="ViewModels\TimeChartDraggable.cs" />
     <Compile Include="Core\MouseClickBehavior.cs" />
     <Compile Include="ViewModels\DisplayTab.cs" />
