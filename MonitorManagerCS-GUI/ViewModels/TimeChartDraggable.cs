@@ -230,9 +230,10 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public void UpdateWrappingPoints()
         {
-            if (TimeAxis.MinLimit == null || TimeAxis.MaxLimit == null) {
+            if (TimeAxis.MinLimit == null || TimeAxis.MaxLimit == null)
+            {
                 Debug.WriteLine("Tried to update wrapping points, but the X axis didn't have its limits set.");
-                return; 
+                return;
             }
 
             var minX = (double)TimeAxis.MinLimit;
@@ -304,10 +305,11 @@ namespace MonitorManagerCS_GUI.ViewModels
                     var xDiff = leftDist + rightDist;
 
                     //If the points are on the edges of the chart, make the wrapping points have the same Y to hide the line
-                    if (xDiff == 0) {
+                    if (xDiff == 0)
+                    {
                         leftPoint.Y = p1Y;
                         rightPoint.Y = p2Y;
-                        return; 
+                        return;
                     }
 
                     var leftScale = (leftDist + _wrappingPointOffset) / xDiff;

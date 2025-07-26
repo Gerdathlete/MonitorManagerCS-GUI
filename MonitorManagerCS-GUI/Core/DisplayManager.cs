@@ -9,7 +9,7 @@ namespace MonitorManagerCS_GUI.Core
     internal class DisplayManager
     {
         public List<DisplayInfo> Displays { get; set; } = new List<DisplayInfo>();
-        
+
         private string _outputFolder = "Temp";
 
         internal async Task<List<DisplayInfo>> GetDisplays()

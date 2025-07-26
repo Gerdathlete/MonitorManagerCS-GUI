@@ -1,3 +1,4 @@
 # All files
 [*]
+max_line_length = 100
 guidelines = 100

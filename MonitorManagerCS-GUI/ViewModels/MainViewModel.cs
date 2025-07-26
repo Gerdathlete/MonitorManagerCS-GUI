@@ -43,7 +43,8 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
         private int _selectedTabIndex;
-        public int SelectedTabIndex { 
+        public int SelectedTabIndex
+        {
             get => _selectedTabIndex;
             set
             {

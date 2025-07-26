@@ -27,7 +27,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                     this._vcpCode.IsActive = value;
                     OnPropertyChanged(nameof(Enabled));
                 }
-                }
+            }
         }
 
         private List<double> _possibleValues;
