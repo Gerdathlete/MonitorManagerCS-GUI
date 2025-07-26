@@ -26,19 +26,26 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <ComboBox ItemsSource="{Binding VCPCodeCharts}" SelectedItem="{Binding SelectedVCPCodeChart}" 
-                          Grid.Row="0" MaxWidth="200" Height="25">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding VCPCode.Name}"/>
-                                <TextBlock Text=" ("/>
-                                <TextBlock Text="{Binding VCPCode.Code}"/>
-                                <TextBlock Text=")"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <StackPanel Grid.Row="0" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <ComboBox Grid.Column="0"
+                        ItemsSource="{Binding VCPCodeCharts}" SelectedItem="{Binding SelectedVCPCodeChart}" 
+                        MaxWidth="200" Height="25">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" DataContext="{Binding VCPCode}">
+                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock Text=" ("/>
+                                    <TextBlock Text="{Binding Code}"/>
+                                    <TextBlock Text=")"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Text="Automated?" Margin="5,5,0,5"/>
+                    <CheckBox Margin ="5" 
+                              DataContext="{Binding SelectedVCPCodeChart}" 
+                              IsChecked="{Binding Enabled}"/>
+                </StackPanel>
 
                 <Grid Grid.Row="1" 
                       DataContext="{Binding SelectedVCPCodeChart}"
