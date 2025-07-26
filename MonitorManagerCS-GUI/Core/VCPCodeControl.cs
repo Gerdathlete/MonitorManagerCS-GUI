@@ -12,6 +12,7 @@ namespace MonitorManagerCS_GUI.Core
         public int? MaximumValue { get; set; }
         public List<int> PossibleValues { get; set; }
         public List<TimedValue> TimedValues { get; set; } = new List<TimedValue>();
+        public bool IsActive { get; set; } = false;
 
         public VCPCodeControl(VCPCode vcpCode)
         {
