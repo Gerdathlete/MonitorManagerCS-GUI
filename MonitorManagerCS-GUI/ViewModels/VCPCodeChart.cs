@@ -24,6 +24,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 _possibleValues = vcpCode.PossibleValues.Select(x => (double)x).ToList();
                 YAxis.CustomSeparators = _possibleValues;
                 YAxis.MaxLimit = _possibleValues.Max();
+                YAxis.MinLimit = _possibleValues.Min();
             }
             else
             {
