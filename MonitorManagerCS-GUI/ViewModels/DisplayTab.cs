@@ -55,10 +55,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             Display = display;
             MakeVCPCodeCharts(display.VCPCodes);
         }
-        public DisplayTab()
-        {
-
-        }
+        public DisplayTab() { }
 
         private void MakeVCPCodeCharts(List<VCPCode> vcpCodes)
         {
