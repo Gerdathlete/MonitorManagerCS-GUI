@@ -10,6 +10,8 @@ namespace MonitorManagerCS_GUI.ViewModels
     public class VCPCodeChart : TimeChartDraggable
     {
         public VCPCodeControl VCPCode { get; set; }
+        public bool Enabled { get; set; } = true;
+
         private List<double> _possibleValues;
 
         public VCPCodeChart(VCPCodeControl vcpCode)
