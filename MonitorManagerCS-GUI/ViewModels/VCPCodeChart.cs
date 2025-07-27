@@ -55,163 +55,35 @@ namespace MonitorManagerCS_GUI.ViewModels
                 YAxis.MaxLimit = vcpController.MaximumValue;
             }
 
-            //Points.CollectionChanged += OnPointsChanged;
-            //PointModified += OnPointChanged;
+            PointsChanged += OnPointsChanged;
         }
 
-        //private void OnPointsChanged(object sender, NotifyCollectionChangedEventArgs e)
-        //{
-        //    var controlValues = _vcpController.TimedValues;
-
-        //    switch (e.Action)
-        //    {
-        //        case NotifyCollectionChangedAction.Add:
-        //            if (e.NewItems is null) return;
-
-        //            AddTimedValue();
-
-        //            break;
-        //        case NotifyCollectionChangedAction.Remove:
-        //            if (e.OldItems is null) return;
-
-        //            RemoveTimedValue();
-
-        //            break;
-        //        case NotifyCollectionChangedAction.Replace:
-        //            if (e.NewItems is null) return;
-
-        //            ReplaceTimedValue();
-
-        //            break;
-        //        case NotifyCollectionChangedAction.Move:
-        //            if (e.OldItems is null) return;
-
-        //            MoveTimedValues();
-
-        //            break;
-        //        case NotifyCollectionChangedAction.Reset:
-
-        //            ResetTimedValues();
-
-        //            break;
-        //    }
-
-        //    void AddTimedValue()
-        //    {
-        //        foreach (ObservablePoint point in e.NewItems)
-        //        {
-        //            var timedValue = new TimedValue(point.X, point.Y);
-        //            controlValues.Insert(e.NewStartingIndex, timedValue);
-        //        }
-        //    }
-
-        //    void RemoveTimedValue()
-        //    {
-        //        for (int i = 0; i < e.OldItems.Count; i++)
-        //        {
-        //            controlValues.RemoveAt(e.OldStartingIndex);
-        //        }
-        //    }
-
-        //    void ReplaceTimedValue()
-        //    {
-        //        if (e.NewItems.Count > 1)
-        //        {
-        //            //This code is designed to only handle individual replace commands
-        //            throw new InvalidOperationException("More than one point was replaced at once!");
-        //        }
-
-        //        var point = (ObservablePoint)e.NewItems[0];
-        //        var timedValue = new TimedValue(point.X, point.Y);
-
-        //        controlValues[e.NewStartingIndex] = timedValue;
-        //    }
-
-        //    void MoveTimedValues()
-        //    {
-        //        var movedItem = controlValues[e.OldStartingIndex];
-        //        controlValues.Insert(e.NewStartingIndex, movedItem);
-        //    }
-
-        //    void ResetTimedValues()
-        //    {
-        //        controlValues = new List<TimedValue>();
-
-        //        var points = (ObservableCollection<ObservablePoint>)sender;
-
-        //        foreach (var point in points)
-        //        {
-        //            var timedValue = new TimedValue(point.X, point.Y);
-        //            controlValues.Add(timedValue);
-        //        }
-        //    }
-
-        //    CheckTimedValues();
-        //}
-
-        //private void OnPointChanged(object sender, IndexedPropertyChangedArgs e)
-        //{
-        //    var point = (ObservablePoint)sender;
-
-        //    var timedValue = _vcpController.TimedValues[e.Index];
-
-        //    if (e.PropertyName == nameof(ObservablePoint.X))
-        //    {
-        //        timedValue.Hour = point.X;
-        //    }
-
-        //    if (e.PropertyName == nameof(ObservablePoint.Y))
-        //    {
-        //        timedValue.Value = point.Y;
-        //    }
-
-        //    CheckTimedValues(point, timedValue, e.PropertyName);
-        //}
-
-        public override void OnMousePressed(PointerCommandArgs args)
+        private void OnPointsChanged(object sender, EventArgs e)
         {
-            base.OnMousePressed(args);
-
-            var originalArgs = (MouseButtonEventArgs)args.OriginalEventArgs;
-
-            if (originalArgs.ChangedButton == MouseButton.Right)
-            {
-
-            }
-        }
-
-        public override void OnMouseReleased(PointerCommandArgs args)
-        {
-            base.OnMouseReleased(args);
-
             _vcpController.TimedValues = GetTimedValues(Points);
+            //CheckTimedValues(); //Enable if debugging
         }
 
         private List<TimedValue> GetTimedValues(ObservableCollection<ObservablePoint> points)
         {
-            
+            var values = new List<TimedValue>();
+
+            foreach (var point in points)
+            {
+                bool isWithinBounds = point.X >= TimeAxis.MinLimit && point.X <= TimeAxis.MaxLimit;
+                if (isWithinBounds)
+                {
+                    var timedValue = new TimedValue(point.X, point.Y);
+                    values.Add(timedValue);
+                }
+            }
+
+            return values;
         }
 
-        private void CheckTimedValues(ObservablePoint point, TimedValue timedValue, 
-            string propertyName)
-        {
-            CheckTimedValues();
-
-            if (propertyName == nameof(ObservablePoint.X) && point.X != timedValue.Hour)
-            {
-                ThrowException();
-            }
-
-            if (propertyName == nameof(ObservablePoint.Y) && point.Y != timedValue.Value)
-            {
-                ThrowException();
-            }
-
-            void ThrowException()
-            {
-                throw new Exception("TimedValue was set improperly!");
-            }
-        }
+        /// <summary>
+        /// Prints information about the vcp controller's TimedValues for debug purposes
+        /// </summary>
         private void CheckTimedValues()
         {
             StringBuilder debugMessage = new StringBuilder();
@@ -238,13 +110,11 @@ namespace MonitorManagerCS_GUI.ViewModels
             void EnsureValidValue(TimedValue timedValue)
             {
                 var value = (double)timedValue.Value;
-                if (i == 0 || i == indexOfLast) return;
-                
-                //If the value isn't really close to an integer
+
+                //If the value isn't really close to an integer, let the user know
                 if (value - Math.Round(value) > 1e-10)
                 {
                     Debug.WriteLine("Invalid TimeValue detected!");
-                    throw new Exception("TimedValue has invalid value!");
                 }
             }
         }

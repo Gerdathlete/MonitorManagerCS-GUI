@@ -63,7 +63,6 @@ namespace MonitorManagerCS_GUI.ViewModels
         public IRelayCommand<PointerCommandArgs> PointerReleasedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerMovedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerPressedCommand { get; }
-        public event IndexedPropertyChangedEventHandler PointsChanged;
 
         private ObservablePoint _draggedPoint = null;
         private readonly TooltipPosition _prevTooltipPos;
@@ -76,7 +75,6 @@ namespace MonitorManagerCS_GUI.ViewModels
             PointerPressedCommand = new RelayCommand<PointerCommandArgs>(OnMousePressed);
 
             _points = new ObservableCollection<ObservablePoint>();
-            _points.CollectionChanged += OnPointsCollectionChanged;
 
             var lineSeries = new LineSeries<ObservablePoint>
             {
@@ -112,115 +110,6 @@ namespace MonitorManagerCS_GUI.ViewModels
             YAxes = new[] { YAxis };
 
             _prevTooltipPos = TooltipPos;
-        }
-
-        private ObservableCollection<ObservablePoint> _linkedPoints;
-        private readonly Dictionary<ObservablePoint, PropertyChangedEventHandler>
-            _pointChangedHandlers = new Dictionary<ObservablePoint, PropertyChangedEventHandler>();
-        private void OnPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                case NotifyCollectionChangedAction.Replace:
-                    if (e.NewItems is null) return;
-
-                    OnAddPoint();
-
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    if (e.OldItems is null) return;
-
-                    OnRemovePoint();
-
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-
-                    OnResetPoints();
-
-                    break;
-            }
-
-            void OnAddPoint()
-            {
-                int i = 0;
-                foreach (ObservablePoint point in e.NewItems)
-                {
-                    if (point.X == 34)
-                    {
-                        Debug.Write("");
-                    }
-
-                    int pointIndex = i + e.NewStartingIndex;
-
-                    AttachHandlerToPoint(point, pointIndex);
-
-                    i++;
-                }
-            }
-
-            void OnRemovePoint()
-            {
-                foreach (ObservablePoint point in e.OldItems)
-                {
-                    if (point.X == 34)
-                    {
-                        Debug.Write("");
-                    }
-
-                    RemoveHandlerFromPoint(point);
-                }
-            }
-
-            void OnResetPoints()
-            {
-                if (_linkedPoints != null)
-                {
-                    foreach (var oldPoint in _linkedPoints)
-                    {
-                        RemoveHandlerFromPoint(oldPoint);
-                    }
-                }
-
-                var newPoints = (ObservableCollection<ObservablePoint>)sender;
-
-                int i = 0;
-                foreach (var newPoint in newPoints)
-                {
-                    int index = i;
-
-                    AttachHandlerToPoint(newPoint, index);
-
-                    i++;
-                }
-
-                _linkedPoints = newPoints;
-            }
-
-            void AttachHandlerToPoint(ObservablePoint point, int pointIndex)
-            {
-                void handler(object s, PropertyChangedEventArgs baseArgs)
-                {
-                    OnPointChanged(s, baseArgs, pointIndex);
-                }
-
-                point.PropertyChanged += handler;
-
-                _pointChangedHandlers[point] = handler;
-            }
-
-            void RemoveHandlerFromPoint(ObservablePoint point)
-            {
-                if (_pointChangedHandlers.ContainsKey(point))
-                {
-                    point.PropertyChanged -= _pointChangedHandlers[point];
-                }
-            }
-        }
-
-        private void OnPointChanged(object sender, PropertyChangedEventArgs e, int index)
-        {
-            PointsChanged?.Invoke(sender, new IndexedPropertyChangedArgs(e.PropertyName, index));
         }
 
         /// <summary>
@@ -274,6 +163,8 @@ namespace MonitorManagerCS_GUI.ViewModels
                     //Delete existing point
                     _points.Remove(clickedPoint);
                     UpdateWrappingPoints();
+
+                    InvokePointsChanged();
                 }
             }
         }
@@ -315,6 +206,8 @@ namespace MonitorManagerCS_GUI.ViewModels
             if (_draggedPoint == null) return;
 
             _draggedPoint = null;
+
+            InvokePointsChanged();
         }
 
         /// <summary>
@@ -589,6 +482,18 @@ namespace MonitorManagerCS_GUI.ViewModels
             if (TooltipPos == _prevTooltipPos) return;
 
             TooltipPos = _prevTooltipPos;
+        }
+
+        /// <summary>
+        /// Occurs when the chart's points have been modified (does not occur while dragging)
+        /// </summary>
+        public event EventHandler PointsChanged;
+        /// <summary>
+        /// Invokes the PointsChanged event. Used to notify others when they should pull point data
+        /// </summary>
+        private void InvokePointsChanged()
+        {
+            PointsChanged?.Invoke(this, new EventArgs());
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

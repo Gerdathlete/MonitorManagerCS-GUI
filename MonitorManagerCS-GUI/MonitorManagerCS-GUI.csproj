@@ -95,8 +95,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Core\IndexedPropertyChangedEventHandler.cs" />
-    <Compile Include="Core\IndexedPropertyChangedArgs.cs" />
     <Compile Include="Core\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="ViewModels\VCPCodeChart.cs" />
     <Page Include="MainWindow.xaml">
