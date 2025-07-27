@@ -92,7 +92,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             var displays = await DisplayRetriever.GetDisplayList();
 
-            await RemoveDisplayTabs();
+            RemoveDisplayTabs();
 
             foreach (var display in displays)
             {
@@ -115,23 +115,23 @@ namespace MonitorManagerCS_GUI.ViewModels
             SelectedTabIndex = 0;
         }
 
-        private async Task RemoveDisplayTabs()
+        private void RemoveDisplayTabs()
         {
             var displayTabs = Tabs.OfType<DisplayTab>().ToList();
 
-            if (SelectedTab is DisplayTab)
+            foreach (var tab in displayTabs)
             {
-                SelectedTab = null;
+                RemoveTab(tab);
             }
+        }
 
-            //Remove the tabs after WPF finishes doing things (this prevents binding errors)
-            await Application.Current.Dispatcher.InvokeAsync(() =>
-            {
-                foreach (var tab in displayTabs)
-                {
-                    Tabs.Remove(tab);
-                }
-            }, DispatcherPriority.Background);
+        public void RemoveTab(TabViewModel tab)
+        {
+            BindingErrors.Hide();
+
+            Tabs.Remove(tab);
+
+            BindingErrors.Show();
         }
 
         protected virtual void OnPropertyChanged(string propertyName)

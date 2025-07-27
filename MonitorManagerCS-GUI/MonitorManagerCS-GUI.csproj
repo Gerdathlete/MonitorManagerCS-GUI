@@ -98,6 +98,7 @@
     <Compile Include="Core\DisplayManager.cs" />
     <Compile Include="Core\TimedValue.cs" />
     <Compile Include="Core\InverseBooleanToVisibilityConverter.cs" />
+    <Compile Include="ViewModels\BindingErrors.cs" />
     <Compile Include="ViewModels\VCPCodeChart.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

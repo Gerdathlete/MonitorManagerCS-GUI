@@ -1,7 +1,5 @@
 Completely overhauling this program now.
 
-Fix data binding issue when loading display tabs with button.
-
 Run a service that controls the monitors
 	Update values periodically (global setting for update period)
 	Interpolate between points to find desired value
