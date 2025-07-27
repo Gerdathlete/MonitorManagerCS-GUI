@@ -69,7 +69,7 @@
         </DataTemplate>
         
         <DataTemplate DataType="{x:Type vm:SettingsTab}">
-            <!-- Display Tab Content -->
+            <!-- Settings Tab Content -->
             <TextBlock Text="{Binding Text}"/>
         </DataTemplate>
         
