@@ -10,7 +10,7 @@ namespace MonitorManagerCS_GUI.Core
     {
         public List<DisplayInfo> Displays { get; set; } = new List<DisplayInfo>();
 
-        private string _outputFolder = "Temp";
+        private const string _outputFolder = "Temp";
 
         internal async Task<List<DisplayInfo>> GetDisplays()
         {
