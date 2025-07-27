@@ -95,6 +95,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\TimedValue.cs" />
     <Compile Include="Core\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="ViewModels\VCPCodeChart.cs" />
     <Page Include="MainWindow.xaml">
