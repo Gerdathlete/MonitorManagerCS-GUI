@@ -64,7 +64,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             var codeCharts = new List<VCPCodeChart>();
             foreach (var vcpCode in writableCodes)
             {
-                var codeControl = new VCPCodeControl(vcpCode);
+                var codeControl = new VCPCodeController(vcpCode);
                 codeCharts.Add(new VCPCodeChart(codeControl));
             }
 
@@ -84,7 +84,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             foreach (var vcpCodeChart in _vcpCodeCharts)
             {
-                if (vcpCodeChart.VCPCode.Code == code)
+                if (vcpCodeChart.VCPController.Code == code)
                 {
                     SelectedVCPCodeChart = vcpCodeChart;
                     hasCode = true;

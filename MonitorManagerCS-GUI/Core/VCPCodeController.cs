@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MonitorManagerCS_GUI.Core
 {
-    public class VCPCodeControl
+    public class VCPCodeController
     {
         public string Code { get; set; }
         public string Name { get; set; }
@@ -14,7 +14,7 @@ namespace MonitorManagerCS_GUI.Core
         public List<TimedValue> TimedValues { get; set; } = new List<TimedValue>();
         public bool IsActive { get; set; } = false;
 
-        public VCPCodeControl(VCPCode vcpCode)
+        public VCPCodeController(VCPCode vcpCode)
         {
             if (vcpCode is null) { throw new ArgumentNullException(nameof(vcpCode)); }
 
@@ -48,9 +48,26 @@ namespace MonitorManagerCS_GUI.Core
         }
     }
 
-    public struct TimedValue
+    public class TimedValue
     {
         internal double? Hour { get; set; }
         internal double? Value { get; set; }
+
+        public TimedValue(double? hour, double? value)
+        {
+            Hour = hour;
+            Value = value;
+        }
+
+        public override string ToString()
+        {
+            string value = Value.ToString();
+            if (Value != null)
+            {
+                value = Math.Round((double)Value, 4).ToString();
+            }
+
+            return $"({Hour}, {value})";
+        }
     }
 }

@@ -11,7 +11,9 @@ using LiveChartsCore.SkiaSharpView.Painting;
 using MonitorManagerCS_GUI.Core;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -38,7 +40,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
-        public ISeries[] Series { get; }
+        public ISeries[] DraggableSeries { get; }
         public Axis TimeAxis { get; }
         public Axis YAxis { get; set; }
         public Axis[] XAxes { get; }
@@ -61,10 +63,11 @@ namespace MonitorManagerCS_GUI.ViewModels
         public IRelayCommand<PointerCommandArgs> PointerReleasedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerMovedCommand { get; }
         public IRelayCommand<PointerCommandArgs> PointerPressedCommand { get; }
+        public event IndexedPropertyChangedEventHandler PointsChanged;
 
         private ObservablePoint _draggedPoint = null;
-        private TooltipPosition _prevTooltipPos;
-        private double _wrappingPointOffset = 10;
+        private readonly TooltipPosition _prevTooltipPos;
+        private const double _wrappingPointOffset = 10;
 
         public TimeChartDraggable()
         {
@@ -73,6 +76,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             PointerPressedCommand = new RelayCommand<PointerCommandArgs>(OnMousePressed);
 
             _points = new ObservableCollection<ObservablePoint>();
+            _points.CollectionChanged += OnPointsCollectionChanged;
 
             var lineSeries = new LineSeries<ObservablePoint>
             {
@@ -81,7 +85,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 LineSmoothness = 0,
             };
 
-            Series = new ISeries[] { lineSeries };
+            DraggableSeries = new ISeries[] { lineSeries };
 
             TimeAxis = new Axis
             {
@@ -110,11 +114,120 @@ namespace MonitorManagerCS_GUI.ViewModels
             _prevTooltipPos = TooltipPos;
         }
 
+        private ObservableCollection<ObservablePoint> _linkedPoints;
+        private readonly Dictionary<ObservablePoint, PropertyChangedEventHandler>
+            _pointChangedHandlers = new Dictionary<ObservablePoint, PropertyChangedEventHandler>();
+        private void OnPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Replace:
+                    if (e.NewItems is null) return;
+
+                    OnAddPoint();
+
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    if (e.OldItems is null) return;
+
+                    OnRemovePoint();
+
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+
+                    OnResetPoints();
+
+                    break;
+            }
+
+            void OnAddPoint()
+            {
+                int i = 0;
+                foreach (ObservablePoint point in e.NewItems)
+                {
+                    if (point.X == 34)
+                    {
+                        Debug.Write("");
+                    }
+
+                    int pointIndex = i + e.NewStartingIndex;
+
+                    AttachHandlerToPoint(point, pointIndex);
+
+                    i++;
+                }
+            }
+
+            void OnRemovePoint()
+            {
+                foreach (ObservablePoint point in e.OldItems)
+                {
+                    if (point.X == 34)
+                    {
+                        Debug.Write("");
+                    }
+
+                    RemoveHandlerFromPoint(point);
+                }
+            }
+
+            void OnResetPoints()
+            {
+                if (_linkedPoints != null)
+                {
+                    foreach (var oldPoint in _linkedPoints)
+                    {
+                        RemoveHandlerFromPoint(oldPoint);
+                    }
+                }
+
+                var newPoints = (ObservableCollection<ObservablePoint>)sender;
+
+                int i = 0;
+                foreach (var newPoint in newPoints)
+                {
+                    int index = i;
+
+                    AttachHandlerToPoint(newPoint, index);
+
+                    i++;
+                }
+
+                _linkedPoints = newPoints;
+            }
+
+            void AttachHandlerToPoint(ObservablePoint point, int pointIndex)
+            {
+                void handler(object s, PropertyChangedEventArgs baseArgs)
+                {
+                    OnPointChanged(s, baseArgs, pointIndex);
+                }
+
+                point.PropertyChanged += handler;
+
+                _pointChangedHandlers[point] = handler;
+            }
+
+            void RemoveHandlerFromPoint(ObservablePoint point)
+            {
+                if (_pointChangedHandlers.ContainsKey(point))
+                {
+                    point.PropertyChanged -= _pointChangedHandlers[point];
+                }
+            }
+        }
+
+        private void OnPointChanged(object sender, PropertyChangedEventArgs e, int index)
+        {
+            PointsChanged?.Invoke(sender, new IndexedPropertyChangedArgs(e.PropertyName, index));
+        }
+
         /// <summary>
         /// Runs when a mouse button is pressed. Handles dragging points, adding new points, and deleting points.
         /// </summary>
         /// <param name="args"></param>
-        private void OnMousePressed(PointerCommandArgs args)
+        public virtual void OnMousePressed(PointerCommandArgs args)
         {
             HideTooltips();
 
@@ -169,7 +282,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         /// Runs when the mouse is moved. Updates the position of points when they are dragged.
         /// </summary>
         /// <param name="args"></param>
-        private void OnMouseMoved(PointerCommandArgs args)
+        public virtual void OnMouseMoved(PointerCommandArgs args)
         {
             if (_draggedPoint == null) return;
 
@@ -196,7 +309,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         /// Runs when the left mouse button is released. Releases dragged points.
         /// </summary>
         /// <param name="args"></param>
-        private void OnMouseReleased(PointerCommandArgs args)
+        public virtual void OnMouseReleased(PointerCommandArgs args)
         {
             ShowTooltips();
             if (_draggedPoint == null) return;

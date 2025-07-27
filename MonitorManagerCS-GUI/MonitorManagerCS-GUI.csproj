@@ -95,6 +95,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\IndexedPropertyChangedEventHandler.cs" />
+    <Compile Include="Core\IndexedPropertyChangedArgs.cs" />
     <Compile Include="Core\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="ViewModels\VCPCodeChart.cs" />
     <Page Include="MainWindow.xaml">
@@ -111,7 +113,7 @@
     <Compile Include="Core\VCPCode.cs" />
     <Compile Include="Core\DataFormatter.cs" />
     <Compile Include="Core\DataInterpreter.cs" />
-    <Compile Include="Core\VCPCodeControl.cs" />
+    <Compile Include="Core\VCPCodeController.cs" />
     <Compile Include="ViewModels\TimeChartDraggable.cs" />
     <Compile Include="Core\MouseClickBehavior.cs" />
     <Compile Include="ViewModels\DisplayTab.cs" />

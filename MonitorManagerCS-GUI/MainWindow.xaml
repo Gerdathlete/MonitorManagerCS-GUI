@@ -32,7 +32,7 @@
                         MaxWidth="200" Height="25">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" DataContext="{Binding VCPCode}">
+                                <StackPanel Orientation="Horizontal" DataContext="{Binding VCPController}">
                                     <TextBlock Text="{Binding Name}"/>
                                     <TextBlock Text=" ("/>
                                     <TextBlock Text="{Binding Code}"/>
@@ -52,7 +52,7 @@
                       Margin="5">
                     <livecharts:CartesianChart 
                         MinWidth="740" MinHeight="258" Margin="5"
-                        Series ="{Binding Series}" 
+                        Series ="{Binding DraggableSeries}" 
                         XAxes="{Binding XAxes}" YAxes="{Binding YAxes}"
                         PointerReleasedCommand="{Binding PointerReleasedCommand}"
                         PointerMoveCommand="{Binding PointerMovedCommand}"
