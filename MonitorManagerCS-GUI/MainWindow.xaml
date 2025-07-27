@@ -26,30 +26,40 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" HorizontalAlignment="Center" Orientation="Horizontal">
-                    <ComboBox Grid.Column="0"
-                        ItemsSource="{Binding VCPCodeCharts}" SelectedItem="{Binding SelectedVCPCodeChart}" 
-                        MaxWidth="200" Height="25">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" DataContext="{Binding VCPController}">
-                                    <TextBlock Text="{Binding Name}"/>
-                                    <TextBlock Text=" ("/>
-                                    <TextBlock Text="{Binding Code}"/>
-                                    <TextBlock Text=")"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <TextBlock Text="Automated?" Margin="5,5,0,5"/>
-                    <CheckBox Margin ="5" 
-                              DataContext="{Binding SelectedVCPCodeChart}" 
-                              IsChecked="{Binding Enabled}"/>
-                </StackPanel>
+                <Grid Grid.Row="0" Margin="5">
+                    <!-- Combobox and activation checkbox -->
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Center" 
+                                Orientation="Horizontal">
+                        <ComboBox Grid.Column="0" 
+                                  ItemsSource="{Binding VCPCodeCharts}" SelectedItem="{Binding SelectedVCPCodeChart}" 
+                                  MaxWidth="200" Height="25">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" DataContext="{Binding VCPController}">
+                                        <TextBlock Text="{Binding Name}"/>
+                                        <TextBlock Text=" ("/>
+                                        <TextBlock Text="{Binding Code}"/>
+                                        <TextBlock Text=")"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Text="Automated?" Margin="5,5,0,5"/>
+                        <CheckBox Margin ="5" 
+              DataContext="{Binding SelectedVCPCodeChart}" 
+              IsChecked="{Binding Enabled}"/>
+                    </StackPanel>
 
+                    <Button Grid.Column="0" HorizontalAlignment="Right" 
+                            Content="Save and Apply"
+                            Command="{Binding SaveAndApplyCommand}"/>
+                </Grid>
+                
+                <!-- Interactive Chart -->
                 <Grid Grid.Row="1" 
                       DataContext="{Binding SelectedVCPCodeChart}"
                       Margin="5">
+                    
                     <livecharts:CartesianChart 
                         MinWidth="740" MinHeight="258" Margin="5"
                         Series ="{Binding DraggableSeries}" 
@@ -61,10 +71,13 @@
                         TooltipPosition="{Binding TooltipPos}"
                         IsEnabled="{Binding Enabled}">
                     </livecharts:CartesianChart>
+                    
                     <!-- Rectangle that indicates the chart is disabled -->
                     <Rectangle Fill="Gray" Opacity="0.25" IsHitTestVisible="False" 
                                Visibility="{Binding Enabled, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                 </Grid>
+                
+                
             </Grid>
         </DataTemplate>
         
@@ -78,7 +91,7 @@
         <StackPanel DockPanel.Dock="Top">
             <Button Content="Get Displays!" 
                     Margin="5" Width="Auto" HorizontalAlignment="Center"
-                    Command="{Binding UpdateDisplayTabsCommand}"/>
+                    Command="{Binding LoadDisplayTabsCommand}"/>
         </StackPanel>
         <TabControl 
             DockPanel.Dock="Bottom" 

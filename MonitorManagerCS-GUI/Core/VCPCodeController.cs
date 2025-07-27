@@ -24,15 +24,16 @@ namespace MonitorManagerCS_GUI.Core
             MaximumValue = ParseNullableInt(vcpCode.MaximumValue);
             PossibleValues = GetPossibleValues(vcpCode);
         }
+        public VCPCodeController() { }
 
-        private int? ParseNullableInt(string intString)
+        private static int? ParseNullableInt(string intString)
         {
             if (string.IsNullOrEmpty(intString)) { return null; }
 
             return int.Parse(intString);
         }
 
-        private List<int> GetPossibleValues(VCPCode vcpCode)
+        private static List<int> GetPossibleValues(VCPCode vcpCode)
         {
             var possibleValuesStr = vcpCode.PossibleValues;
             if (string.IsNullOrEmpty(possibleValuesStr))

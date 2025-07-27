@@ -95,6 +95,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\DisplayManager.cs" />
     <Compile Include="Core\TimedValue.cs" />
     <Compile Include="Core\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="ViewModels\VCPCodeChart.cs" />
@@ -108,7 +109,7 @@
     </Compile>
     <Compile Include="Core\DisplayInfo.cs" />
     <Compile Include="Core\Programs.cs" />
-    <Compile Include="Core\DisplayManager.cs" />
+    <Compile Include="Core\DisplayRetriever.cs" />
     <Compile Include="Core\VCPCode.cs" />
     <Compile Include="Core\DataFormatter.cs" />
     <Compile Include="Core\DataInterpreter.cs" />
@@ -186,6 +187,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
       <Version>1.1.135</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="System.Memory">
       <Version>4.6.3</Version>

@@ -43,6 +43,11 @@ namespace MonitorManagerCS_GUI.Core
             return $"{min}-{max}";
         }
 
+        /// <summary>
+        /// Replaces file name characters with underscores
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public static string GetSafeFileName(string fileName)
         {
             return Regex.Replace(fileName,

@@ -55,7 +55,6 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
-        private readonly DisplayManager _displayManager = new DisplayManager();
 
         public MainViewModel()
         {
@@ -75,29 +74,37 @@ namespace MonitorManagerCS_GUI.ViewModels
             SelectedTabIndex = 0;
         }
 
-        private RelayCommand _updateDisplayTabsCommand;
-        public ICommand UpdateDisplayTabsCommand
+        private RelayCommand _LoadDisplayTabsCommand;
+        public ICommand LoadDisplayTabsCommand
         {
             get
             {
-                if (_updateDisplayTabsCommand == null)
+                if (_LoadDisplayTabsCommand == null)
                 {
-                    _updateDisplayTabsCommand = new RelayCommand(UpdateDisplayTabs);
+                    _LoadDisplayTabsCommand = new RelayCommand(LoadDisplayTabs);
                 }
 
-                return _updateDisplayTabsCommand;
+                return _LoadDisplayTabsCommand;
             }
         }
 
-        public async void UpdateDisplayTabs()
+        public async void LoadDisplayTabs()
         {
-            var displays = await _displayManager.GetDisplays();
+            var displays = await DisplayRetriever.GetDisplayList();
 
             await RemoveDisplayTabs();
 
             foreach (var display in displays)
             {
-                var displayTab = new DisplayTab(display);
+                var displayManager = DisplayManager.Load(display);
+
+                if (displayManager == null)
+                {
+                    var vcpCodes = await DisplayRetriever.GetVCPCodes(display);
+                    displayManager = new DisplayManager(display, vcpCodes);
+                }
+
+                var displayTab = new DisplayTab(displayManager);
 
                 Tabs.Insert(0, displayTab);
 

@@ -36,11 +36,13 @@ namespace MonitorManagerCS_GUI.ViewModels
                     if (_points != sortedPoints)
                     {
                         _points = sortedPoints;
+                        _series1.Values = _points;
                         OnPropertyChanged(nameof(Points));
                     }
                 }
             }
         }
+        private LineSeries<ObservablePoint> _series1;
         public ISeries[] DraggableSeries { get; }
         public Axis TimeAxis { get; }
         public Axis YAxis { get; set; }
@@ -77,14 +79,14 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             _points = new ObservableCollection<ObservablePoint>();
 
-            var lineSeries = new LineSeries<ObservablePoint>
+            _series1 = new LineSeries<ObservablePoint>
             {
                 Values = Points,
                 GeometrySize = 10,
                 LineSmoothness = 0,
             };
 
-            DraggableSeries = new ISeries[] { lineSeries };
+            DraggableSeries = new ISeries[] { _series1 };
 
             TimeAxis = new Axis
             {
@@ -241,6 +243,8 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public void UpdateWrappingPoints()
         {
+            if (_points.Count < 1) return;
+
             if (TimeAxis.MinLimit == null || TimeAxis.MaxLimit == null)
             {
                 Debug.WriteLine("Tried to update wrapping points, but the X axis didn't have its " +
@@ -258,6 +262,14 @@ namespace MonitorManagerCS_GUI.ViewModels
             ObservablePoint rightPoint;
 
             bool hasWrappingPoints = _points.Any(p => p.X == leftPointX);
+            bool onlyHasWrappingPoints = hasWrappingPoints && _points.Count < 3;
+
+            if (onlyHasWrappingPoints)
+            {
+                _points.Clear();
+                return;
+            }
+
             if (!hasWrappingPoints)
             {
                 leftPoint = new ObservablePoint(leftPointX, 0);

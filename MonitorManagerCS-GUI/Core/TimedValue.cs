@@ -8,8 +8,8 @@ namespace MonitorManagerCS_GUI.Core
 {
     public class TimedValue
     {
-        internal double? Hour { get; set; }
-        internal double? Value { get; set; }
+        public double? Hour { get; set; }
+        public double? Value { get; set; }
 
         public TimedValue(double? hour, double? value)
         {

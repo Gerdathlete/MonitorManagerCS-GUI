@@ -1,13 +1,13 @@
 Completely overhauling this program now.
 
-You can now do everything you would want in the UI basically.
-The next step is to save the settings you made for each VCP code.
-	Save & Apply button?
+Fix data binding issue when loading display tabs with button.
 
-Then, we need to run a service that controls the monitors
+Run a service that controls the monitors
 	Update values periodically (global setting for update period)
 	Interpolate between points to find desired value
 	Set the VCP code to the value with ControlMyMonitor
+
+Make the Save&Apply button update the monitor controlling service (make it pull the new TimedValues).
 
 Make ControlMyMonitor part of the application by making it part of the App's resources.
 	This makes it so that you can just install this app without having to install ControlMyMonitor 

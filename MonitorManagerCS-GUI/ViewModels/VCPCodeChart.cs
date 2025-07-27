@@ -21,7 +21,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             get => _vcpController;
             set => _vcpController = value;
         }
-        private bool _enabled = false;
+        private bool _enabled;
         public bool Enabled
         {
             get => _enabled;
@@ -30,7 +30,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 if (_enabled != value)
                 {
                     _enabled = value;
-                    this._vcpController.IsActive = value;
+                    _vcpController.IsActive = value;
                     OnPropertyChanged(nameof(Enabled));
                 }
             }
@@ -55,6 +55,10 @@ namespace MonitorManagerCS_GUI.ViewModels
                 YAxis.MaxLimit = vcpController.MaximumValue;
             }
 
+            LoadTimedValues(vcpController.TimedValues);
+
+            Enabled = vcpController.IsActive;
+
             PointsChanged += OnPointsChanged;
         }
 
@@ -62,6 +66,19 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             _vcpController.TimedValues = GetTimedValues(Points);
             //CheckTimedValues(); //Enable if debugging
+        }
+
+        private void LoadTimedValues(List<TimedValue> timedValues)
+        {
+            var points = new List<ObservablePoint>();
+            foreach (var timedValue in timedValues)
+            {
+                var point = new ObservablePoint(timedValue.Hour, timedValue.Value);
+                points.Add(point);
+            }
+
+            Points = new ObservableCollection<ObservablePoint>(points);
+            UpdateWrappingPoints();
         }
 
         private List<TimedValue> GetTimedValues(ObservableCollection<ObservablePoint> points)

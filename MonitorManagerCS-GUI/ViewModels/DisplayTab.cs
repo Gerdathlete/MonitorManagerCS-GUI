@@ -1,8 +1,10 @@
-﻿using MonitorManagerCS_GUI.Core;
+﻿using CommunityToolkit.Mvvm.Input;
+using MonitorManagerCS_GUI.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
@@ -34,41 +36,35 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
-        //public TimeChartDraggable Chart { get; }
-        private DisplayInfo _display;
-        public DisplayInfo Display
+        private DisplayManager _displayManager;
+        public DisplayManager DisplayManager
         {
-            get => _display;
+            get => _displayManager;
             set
             {
-                if (_display != value)
+                if (_displayManager != value)
                 {
-                    _display = value;
-                    TabName = GetTabName(_display);
+                    _displayManager = value;
+                    TabName = GetTabName(_displayManager.Display);
+                    MakeVCPCodeCharts(_displayManager.VCPCodeControllers);
                 }
             }
         }
 
-        public DisplayTab(DisplayInfo display)
-            : this()
+        public DisplayTab(DisplayManager displayManager)
         {
-            Display = display;
-            MakeVCPCodeCharts(display.VCPCodes);
+            DisplayManager = displayManager;
         }
-        public DisplayTab() { }
 
-        private void MakeVCPCodeCharts(List<VCPCode> vcpCodes)
+        private void MakeVCPCodeCharts(List<VCPCodeController> vcpControllers)
         {
-            var writableCodes = vcpCodes.Where(vcpCode => vcpCode.IsWritable).ToList();
-
-            var codeCharts = new List<VCPCodeChart>();
-            foreach (var vcpCode in writableCodes)
+            var vcpCharts = new List<VCPCodeChart>();
+            foreach (var vcpController in vcpControllers)
             {
-                var codeControl = new VCPCodeController(vcpCode);
-                codeCharts.Add(new VCPCodeChart(codeControl));
+                vcpCharts.Add(new VCPCodeChart(vcpController));
             }
 
-            VCPCodeCharts = new ObservableCollection<VCPCodeChart>(codeCharts);
+            VCPCodeCharts = new ObservableCollection<VCPCodeChart>(vcpCharts);
         }
 
         public static string GetTabName(DisplayInfo display)
@@ -96,6 +92,25 @@ namespace MonitorManagerCS_GUI.ViewModels
             {
                 SelectedVCPCodeChart = _vcpCodeCharts.First();
             }
+        }
+
+        private RelayCommand saveAndApplyCommand;
+        public ICommand SaveAndApplyCommand
+        {
+            get
+            {
+                if (saveAndApplyCommand == null)
+                {
+                    saveAndApplyCommand = new RelayCommand(SaveAndApply);
+                }
+
+                return saveAndApplyCommand;
+            }
+        }
+
+        private void SaveAndApply()
+        {
+            _displayManager.Save();
         }
     }
 }
