@@ -15,7 +15,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 #endif
 
 #if DEBUG
-        private static SourceLevels _defaultLevel = 
+        private static SourceLevels _defaultLevel =
             PresentationTraceSources.DataBindingSource.Switch.Level;
 
         private static bool _isHiding = false;

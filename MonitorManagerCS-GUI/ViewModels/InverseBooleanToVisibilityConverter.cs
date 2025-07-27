@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace MonitorManagerCS_GUI.Core
+namespace MonitorManagerCS_GUI.ViewModels
 {
     public class InverseBooleanToVisibilityConverter : IValueConverter
     {

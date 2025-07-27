@@ -42,7 +42,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
-        private LineSeries<ObservablePoint> _series1;
+        private readonly LineSeries<ObservablePoint> _series1;
         public ISeries[] DraggableSeries { get; }
         public Axis TimeAxis { get; }
         public Axis YAxis { get; set; }

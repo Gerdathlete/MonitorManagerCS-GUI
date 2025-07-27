@@ -74,7 +74,8 @@
                     
                     <!-- Rectangle that indicates the chart is disabled -->
                     <Rectangle Fill="Gray" Opacity="0.25" IsHitTestVisible="False" 
-                               Visibility="{Binding Enabled, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                               Visibility="{Binding Enabled, 
+                        Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                 </Grid>
                 
                 

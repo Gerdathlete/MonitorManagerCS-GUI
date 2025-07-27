@@ -2,9 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:MonitorManagerCS_GUI"
-             xmlns:core="clr-namespace:MonitorManagerCS_GUI.Core"
+             xmlns:vm="clr-namespace:MonitorManagerCS_GUI.ViewModels"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <core:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+        <vm:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
     </Application.Resources>
 </Application>
