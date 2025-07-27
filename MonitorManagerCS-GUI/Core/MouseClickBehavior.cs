@@ -13,7 +13,8 @@ namespace MonitorManagerCS_GUI.Core
         }
 
         public static readonly DependencyProperty LeftClickCommandProperty =
-            DependencyProperty.Register(nameof(LeftClickCommand), typeof(ICommand), typeof(MouseClickBehavior));
+            DependencyProperty.Register(nameof(LeftClickCommand), typeof(ICommand),
+                typeof(MouseClickBehavior));
 
         public ICommand RightClickCommand
         {
@@ -22,7 +23,8 @@ namespace MonitorManagerCS_GUI.Core
         }
 
         public static readonly DependencyProperty RightClickCommandProperty =
-            DependencyProperty.Register(nameof(RightClickCommand), typeof(ICommand), typeof(MouseClickBehavior));
+            DependencyProperty.Register(nameof(RightClickCommand), typeof(ICommand),
+                typeof(MouseClickBehavior));
 
         protected override void OnAttached()
         {

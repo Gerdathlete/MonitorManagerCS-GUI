@@ -9,11 +9,12 @@ namespace MonitorManagerCS_GUI.Core
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool bValue = value is bool && (bool)value;
+            bool bValue = value is bool v && v;
             return bValue ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter,
+            CultureInfo culture)
         {
             return (value is Visibility visibility && visibility != Visibility.Visible);
         }

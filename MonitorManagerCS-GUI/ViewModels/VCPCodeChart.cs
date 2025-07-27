@@ -119,7 +119,8 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-        public override LvcPointD? GetValidPointLocation(LvcPointD chartPos, ObservablePoint point = null)
+        public override LvcPointD? GetValidPointLocation(LvcPointD chartPos,
+            ObservablePoint point = null)
         {
             LvcPointD? baseOutput = base.GetValidPointLocation(chartPos, point);
             if (_possibleValues is null || baseOutput is null) { return baseOutput; }

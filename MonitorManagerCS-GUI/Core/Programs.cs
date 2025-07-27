@@ -6,7 +6,8 @@ namespace MonitorManagerCS_GUI.Core
 {
     internal static class Programs
     {
-        internal const string controlMyMonitor = @"C:\PortableApplications\controlmymonitor\ControlMyMonitor.exe";
+        internal const string controlMyMonitor =
+            @"C:\PortableApplications\controlmymonitor\ControlMyMonitor.exe";
 
         /// <summary>
         /// Runs the given program and returns the text output

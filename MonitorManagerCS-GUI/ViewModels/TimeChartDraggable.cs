@@ -31,7 +31,8 @@ namespace MonitorManagerCS_GUI.ViewModels
             {
                 if (_points != value)
                 {
-                    var sortedPoints = new ObservableCollection<ObservablePoint>(value.OrderBy(p => p.X));
+                    var sortedPoints = new ObservableCollection<ObservablePoint>
+                        (value.OrderBy(p => p.X));
                     if (_points != sortedPoints)
                     {
                         _points = sortedPoints;
@@ -113,7 +114,8 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
 
         /// <summary>
-        /// Runs when a mouse button is pressed. Handles dragging points, adding new points, and deleting points.
+        /// Runs when a mouse button is pressed. Handles dragging points, adding new points,
+        /// and deleting points.
         /// </summary>
         /// <param name="args"></param>
         public virtual void OnMousePressed(PointerCommandArgs args)
@@ -211,12 +213,14 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
 
         /// <summary>
-        /// Adds a point to the chart at the correct index so that the lines connect in order of X value
+        /// Adds a point to the chart at the correct index so that the lines connect in order of 
+        /// X value
         /// </summary>
         /// <param name="chartPos"></param>
         public ObservablePoint AddPoint(LvcPointD chartPos) => AddPoint(chartPos.X, chartPos.Y);
         /// <summary>
-        /// Adds a point to the chart at the correct index so that the lines connect in order of X value
+        /// Adds a point to the chart at the correct index so that the lines connect in order of 
+        /// X value
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -239,7 +243,8 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             if (TimeAxis.MinLimit == null || TimeAxis.MaxLimit == null)
             {
-                Debug.WriteLine("Tried to update wrapping points, but the X axis didn't have its limits set.");
+                Debug.WriteLine("Tried to update wrapping points, but the X axis didn't have its " +
+                    "limits set.");
                 return;
             }
 
@@ -311,7 +316,8 @@ namespace MonitorManagerCS_GUI.ViewModels
                     var leftDist = p1X - min;
                     var xDiff = leftDist + rightDist;
 
-                    //If the points are on the edges of the chart, make the wrapping points have the same Y to hide the line
+                    //If the points are on the edges of the chart, make the wrapping points have the
+                    //same Y to hide the line
                     if (xDiff == 0)
                     {
                         leftPoint.Y = p1Y;
@@ -334,7 +340,8 @@ namespace MonitorManagerCS_GUI.ViewModels
             rightPoint.Y = rightPointY;
         }
 
-        public virtual LvcPointD? GetValidPointLocation(LvcPointD chartPos, ObservablePoint point = null)
+        public virtual LvcPointD? GetValidPointLocation(LvcPointD chartPos,
+            ObservablePoint point = null)
         {
             LvcPointD pointLocation = new LvcPointD(chartPos.X, chartPos.Y);
 

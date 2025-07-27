@@ -45,7 +45,8 @@ namespace MonitorManagerCS_GUI.Core
 
         public static string GetSafeFileName(string fileName)
         {
-            return Regex.Replace(fileName, $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]", "_");
+            return Regex.Replace(fileName,
+                $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]", "_");
         }
     }
 }

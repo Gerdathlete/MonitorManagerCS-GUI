@@ -26,7 +26,8 @@ namespace MonitorManagerCS_GUI.Core
                     continue;
                 }
 
-                //If we reach a space, the content of the buffer is the minute, possibly with a leading zero
+                //If we reach a space, the content of the buffer is the minute, possibly with a
+                //leading zero
                 if (c == ' ')
                 {
                     //If there is a leading zero (ie. buffer == "0#"), remove it
