@@ -7,11 +7,9 @@ namespace MonitorManagerCS_GUI.Core
 {
     public static class DisplayRetriever
     {
-        private const string _outputFolder = "Temp";
-
         public static async Task<List<DisplayInfo>> GetDisplayList()
         {
-            string fileDirectory = _outputFolder;
+            string fileDirectory = Folders.CMMonitorOutput;
             string fileName = "smonitors.txt";
             string filePath = Path.Combine(fileDirectory, fileName);
 
@@ -29,7 +27,7 @@ namespace MonitorManagerCS_GUI.Core
 
         public static async Task<List<VCPCode>> GetVCPCodes(DisplayInfo display)
         {
-            string fileDirectory = _outputFolder;
+            string fileDirectory = Folders.CMMonitorOutput;
             var fileName = display.ConfigFileName;
             var filePath = Path.Combine(fileDirectory, fileName);
 

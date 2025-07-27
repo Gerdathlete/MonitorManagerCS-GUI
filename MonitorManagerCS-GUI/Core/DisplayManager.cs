@@ -12,7 +12,6 @@ namespace MonitorManagerCS_GUI.Core
         public DisplayInfo Display { get; }
         [JsonProperty]
         public List<VCPCodeController> VCPCodeControllers { get; set; }
-        private const string _configFolder = "Config";
 
         [JsonConstructor]
         public DisplayManager(DisplayInfo display, List<VCPCodeController> vcpCodeControllers)
@@ -44,11 +43,11 @@ namespace MonitorManagerCS_GUI.Core
         public void Save()
         {
             var fileName = Display.ConfigFileName;
-            var filePath = Path.Combine(_configFolder, fileName);
+            var filePath = Path.Combine(Folders.Config, fileName);
 
-            if (!Directory.Exists(_configFolder))
+            if (!Directory.Exists(Folders.Config))
             {
-                Directory.CreateDirectory(_configFolder);
+                Directory.CreateDirectory(Folders.Config);
             }
 
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
@@ -58,7 +57,7 @@ namespace MonitorManagerCS_GUI.Core
         public static DisplayManager Load(DisplayInfo display)
         {
             var fileName = display.ConfigFileName;
-            var filePath = Path.Combine(_configFolder, fileName);
+            var filePath = Path.Combine(Folders.Config, fileName);
 
             if (!File.Exists(filePath)) { return null; }
 
