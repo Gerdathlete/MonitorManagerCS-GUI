@@ -1,15 +1,12 @@
 ﻿using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
-using LiveChartsCore.Kernel.Events;
 using MonitorManagerCS_GUI.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
