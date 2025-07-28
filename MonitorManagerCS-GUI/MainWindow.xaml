@@ -13,7 +13,7 @@
         ContentRendered="Window_ContentRendered">
 
     <Window.Icon>
-        <BitmapImage UriSource="pack://siteoforigin:,,,/icon.ico"/>
+        <BitmapImage UriSource="pack://application:,,,/Resources/icon.ico"/>
     </Window.Icon>
 
     <Window.Resources>
@@ -86,7 +86,11 @@
             <!-- Settings Tab Content -->
             <TextBlock Text="{Binding Text}"/>
         </DataTemplate>
-        
+
+        <DataTemplate DataType="{x:Type vm:DisplaysTab}">
+
+        </DataTemplate>
+
     </Window.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">

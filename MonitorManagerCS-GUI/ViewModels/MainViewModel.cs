@@ -1,15 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MonitorManagerCS_GUI.Core;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
@@ -72,8 +68,11 @@ namespace MonitorManagerCS_GUI.ViewModels
                 Text = "This is a settings tab."
             };
 
+            //var tab_Displays = new DisplaysTab();
+
             var defaultTabs = new List<TabViewModel>()
             {
+                //tab_Displays,
                 tab_Settings
             };
 
