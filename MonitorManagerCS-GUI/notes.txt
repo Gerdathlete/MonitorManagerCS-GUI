@@ -8,6 +8,8 @@ Make ControlMyMonitor part of the application by making it part of the App's res
 
 Improvements:
 Are you sure you want to exit? message
+Start in system tray setting. - default on
+Minimize to tray setting. - default on
 Zoom in on chart for accurate placement
 Adjust snapping
 Copy VCP automation points and paste onto another VCP chart
