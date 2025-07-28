@@ -63,7 +63,7 @@ namespace MonitorManagerCS_GUI.Core
 
             string json = File.ReadAllText(filePath);
             var displayManager = JsonConvert.DeserializeObject<DisplayManager>(json);
-            
+
             displayManager.Display.NumberID = display.NumberID;
 
             return displayManager;

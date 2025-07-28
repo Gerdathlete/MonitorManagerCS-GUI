@@ -26,7 +26,9 @@ namespace MonitorManagerCS_GUI
 
             StateChanged += MainWindow_StateChanged;
 
-            //MinimizeToTray();
+#if !DEBUG
+            MinimizeToTray();
+#endif
 
             ViewModel = new MainViewModel();
             DataContext = ViewModel;
