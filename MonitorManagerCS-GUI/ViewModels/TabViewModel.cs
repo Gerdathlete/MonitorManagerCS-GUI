@@ -2,7 +2,7 @@
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
-    public class TabViewModel : INotifyPropertyChanged
+    public abstract class TabViewModel : INotifyPropertyChanged
     {
         private string _tabName;
         public string TabName
