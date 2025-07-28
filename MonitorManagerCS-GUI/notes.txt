@@ -1,12 +1,13 @@
 Completely overhauling this program now.
 
-Run a service that controls the monitors
-	Update values periodically (global setting for update period)
-	Interpolate between points to find desired value
-	Set the VCP code to the value with ControlMyMonitor
-
-Make the Save&Apply button update the monitor controlling service (make it pull the new TimedValues).
+Add a way to identify which monitor is where.
 
 Make ControlMyMonitor part of the application by making it part of the App's resources.
 	This makes it so that you can just install this app without having to install ControlMyMonitor 
 	and without telling the program where ControlMyMonitor is installed.
+
+Improvements:
+Zoom in on chart for accurate placement
+Adjust snapping
+Copy VCP automation points and paste onto another VCP chart
+Allow VCP codes to be 'linked' so that they are set in parallel and have the same values.

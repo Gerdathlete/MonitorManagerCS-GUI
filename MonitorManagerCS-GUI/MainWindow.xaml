@@ -89,10 +89,19 @@
         
     </Window.Resources>
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top">
-            <Button Content="Get Displays!" 
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Content="Reload Displays" 
                     Margin="5" Width="Auto" HorizontalAlignment="Center"
                     Command="{Binding LoadDisplayTabsCommand}"/>
+            <Button Content="Start Service" 
+                    Margin="5" Width="Auto" HorizontalAlignment="Center"
+                    Command="{Binding StartServiceCommand}"/>
+            <Button Content="End Service" 
+                    Margin="5" Width="Auto" HorizontalAlignment="Center"
+                    Command="{Binding EndServiceCommand}"/>
+            <Button Content="Restart Service" 
+                    Margin="5" Width="Auto" HorizontalAlignment="Center"
+                    Command="{Binding RestartServiceCommand}"/>
         </StackPanel>
         <TabControl 
             DockPanel.Dock="Bottom" 

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI.ViewModels
@@ -110,6 +111,13 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         private void SaveAndApply()
         {
+            //Store all the values that were changed
+            foreach (var vcpCodeChart in VCPCodeCharts)
+            {
+                vcpCodeChart.UpdateVCPController();
+            }
+
+            //Save to config file
             _displayManager.Save();
         }
     }

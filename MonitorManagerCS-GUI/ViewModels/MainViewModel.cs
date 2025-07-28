@@ -55,8 +55,16 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
+        private readonly MonitorService _monitorService;
 
         public MainViewModel()
+        {
+            _monitorService = MonitorService.Instance();
+
+            Init();
+        }
+
+        public async void Init()
         {
             var tab_Settings = new SettingsTab
             {
@@ -72,28 +80,94 @@ namespace MonitorManagerCS_GUI.ViewModels
             Tabs = new ObservableCollection<TabViewModel>(defaultTabs);
 
             SelectedTabIndex = 0;
+
+            var displayManagers = await LoadDisplayTabsAsync();
+
+            _monitorService.DisplayManagers = displayManagers;
+            _monitorService.UpdatePeriodMillis = 5 * 1000;
+
+            _monitorService.Start();
         }
 
-        private RelayCommand _LoadDisplayTabsCommand;
+        private RelayCommand _startServiceCommand;
+        public ICommand StartServiceCommand
+        {
+            get
+            {
+                if (_startServiceCommand == null)
+                {
+                    _startServiceCommand = new RelayCommand(StartService);
+                }
+
+                return _startServiceCommand;
+            }
+        }
+        public void StartService()
+        {
+            _monitorService.Start();
+        }
+
+        private RelayCommand _endServiceCommand;
+        public ICommand EndServiceCommand
+        {
+            get
+            {
+                if (_endServiceCommand == null)
+                {
+                    _endServiceCommand = new RelayCommand(EndService);
+                }
+
+                return _endServiceCommand;
+            }
+        }
+        public async void EndService()
+        {
+            await _monitorService.End();
+        }
+
+        private RelayCommand _restartServiceCommand;
+        public ICommand RestartServiceCommand
+        {
+            get
+            {
+                if (_restartServiceCommand == null)
+                {
+                    _restartServiceCommand = new RelayCommand(RestartService);
+                }
+
+                return _restartServiceCommand;
+            }
+        }
+        public async void RestartService()
+        {
+            await _monitorService.Restart();
+        }
+
+        private RelayCommand _loadDisplayTabsCommand;
         public ICommand LoadDisplayTabsCommand
         {
             get
             {
-                if (_LoadDisplayTabsCommand == null)
+                if (_loadDisplayTabsCommand == null)
                 {
-                    _LoadDisplayTabsCommand = new RelayCommand(LoadDisplayTabs);
+                    _loadDisplayTabsCommand = new RelayCommand(LoadDisplayTabs);
                 }
 
-                return _LoadDisplayTabsCommand;
+                return _loadDisplayTabsCommand;
             }
         }
-
         public async void LoadDisplayTabs()
+        {
+            _monitorService.DisplayManagers = await LoadDisplayTabsAsync();
+        }
+
+        public async Task<List<DisplayManager>> LoadDisplayTabsAsync()
         {
             var displays = await DisplayRetriever.GetDisplayList();
 
             RemoveDisplayTabs();
 
+            var displayManagers = new List<DisplayManager>();
             foreach (var display in displays)
             {
                 var displayManager = DisplayManager.Load(display);
@@ -104,6 +178,8 @@ namespace MonitorManagerCS_GUI.ViewModels
                     displayManager = new DisplayManager(display, vcpCodes);
                 }
 
+                displayManagers.Add(displayManager);
+
                 var displayTab = new DisplayTab(displayManager);
 
                 Tabs.Insert(0, displayTab);
@@ -113,6 +189,8 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
 
             SelectedTabIndex = 0;
+
+            return displayManagers;
         }
 
         private void RemoveDisplayTabs()

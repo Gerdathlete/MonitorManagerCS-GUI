@@ -30,7 +30,6 @@ namespace MonitorManagerCS_GUI.ViewModels
                 if (_enabled != value)
                 {
                     _enabled = value;
-                    _vcpController.IsActive = value;
                     OnPropertyChanged(nameof(Enabled));
                 }
             }
@@ -64,7 +63,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         private void OnPointsChanged(object sender, EventArgs e)
         {
-            _vcpController.TimedValues = GetTimedValues(Points);
+            //UpdateVCPValues();
             //CheckTimedValues(); //Enable if debugging
         }
 
@@ -81,6 +80,17 @@ namespace MonitorManagerCS_GUI.ViewModels
             UpdateWrappingPoints();
         }
 
+        public void UpdateVCPController()
+        {
+            _vcpController.IsActive = _enabled;
+            _vcpController.TimedValues = GetTimedValues(Points);
+        }
+
+        /// <summary>
+        /// Creates a new list of TimedValues based on the current location of the chart points
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
         private List<TimedValue> GetTimedValues(ObservableCollection<ObservablePoint> points)
         {
             var values = new List<TimedValue>();
