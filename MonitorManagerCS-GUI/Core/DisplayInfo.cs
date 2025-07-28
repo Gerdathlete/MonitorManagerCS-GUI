@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace MonitorManagerCS_GUI.Core
 {
@@ -7,12 +8,13 @@ namespace MonitorManagerCS_GUI.Core
     /// </summary>
     public class DisplayInfo
     {
+        [JsonIgnore]
         public string NumberID { get; set; }
         public string Name { get; set; }
         public string SerialNumber { get; set; }
         public string ShortID { get; set; }
-        public int Index { get; set; }
         public string LongID { get => $"{ShortID}-SN{SerialNumber}"; }
+        [JsonIgnore]
         public string ConfigFileName { get => DataFormatter.GetSafeFileName(LongID) + ".json"; }
     }
 }

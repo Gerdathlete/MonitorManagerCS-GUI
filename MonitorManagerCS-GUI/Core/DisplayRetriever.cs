@@ -79,7 +79,6 @@ namespace MonitorManagerCS_GUI.Core
                     displays.Add(new DisplayInfo
                     {
                         NumberID = value,
-                        Index = displayIndex
                     });
                 }
                 if (key == "Monitor Name")

@@ -139,7 +139,7 @@ namespace MonitorManagerCS_GUI.Core
 
         private static void SetVCPValue(DisplayInfo Display, VCPCodeController vcpController, int value)
         {
-            Debug.WriteLine($"Setting VCP code {vcpController.Code} to {value} for {Display.LongID}");
+            Debug.WriteLine($"Setting VCP code {vcpController.Code} to {value} for {Display.LongID} ({Display.NumberID})");
 
             Task.Run(() =>
             {

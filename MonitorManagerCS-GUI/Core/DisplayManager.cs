@@ -62,7 +62,11 @@ namespace MonitorManagerCS_GUI.Core
             if (!File.Exists(filePath)) { return null; }
 
             string json = File.ReadAllText(filePath);
-            return JsonConvert.DeserializeObject<DisplayManager>(json);
+            var displayManager = JsonConvert.DeserializeObject<DisplayManager>(json);
+            
+            displayManager.Display.NumberID = display.NumberID;
+
+            return displayManager;
         }
     }
 }
