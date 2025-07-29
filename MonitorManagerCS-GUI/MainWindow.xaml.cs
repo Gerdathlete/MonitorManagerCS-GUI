@@ -106,6 +106,7 @@ namespace MonitorManagerCS_GUI
         {
             base.OnClosed(e);
             _trayIcon.Dispose();
+            ViewModel.EndService();
         }
 
         private string StatusPrefix()

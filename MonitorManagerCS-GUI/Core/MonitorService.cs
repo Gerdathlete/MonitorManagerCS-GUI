@@ -94,10 +94,22 @@ namespace MonitorManagerCS_GUI.Core
                 return false;
             }
 
-            Debug.WriteLine("Shutting down monitor service...");
-            _cancellationTokenSource.Cancel();
-            await _serviceTask;
-            return true;
+            try
+            {
+                Debug.WriteLine("Shutting down monitor service...");
+                _cancellationTokenSource.Cancel();
+                await _serviceTask;
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Monitor service shutdown error: {ex}");
+                return false;
+            }
 
             void DebugLogFailure(string reason)
             {

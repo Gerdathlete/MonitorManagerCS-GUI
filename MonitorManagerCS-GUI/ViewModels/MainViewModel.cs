@@ -119,9 +119,9 @@ namespace MonitorManagerCS_GUI.ViewModels
                 return _endServiceCommand;
             }
         }
-        public async void EndService()
+        public void EndService()
         {
-            await _monitorService.End();
+            _ = _monitorService.End();
         }
 
         private RelayCommand _restartServiceCommand;
