@@ -21,6 +21,10 @@ namespace MonitorManagerCS_GUI.Controls
         private bool _isPanning = false;
         private double _maxXPan = 0.0;
         private double _maxYPan = 0.0;
+        private double _minScaleFactor = 1.0;
+        private Size _providedSpace;
+        private Size _size;
+        private Size _transformedSize;
 
         static ExplorableCanvas()
         {
@@ -54,11 +58,7 @@ namespace MonitorManagerCS_GUI.Controls
 
             var mousePos = e.GetPosition(this);
 
-            ZoomScale.CenterX = mousePos.X;
-            ZoomScale.CenterY = mousePos.Y;
-
-            ZoomScale.ScaleX *= zoomFactor;
-            ZoomScale.ScaleY *= zoomFactor;
+            ZoomAbout( mousePos, zoomFactor);
 
             InvalidateArrange(); //this didn't fix the issue
 
@@ -111,6 +111,19 @@ namespace MonitorManagerCS_GUI.Controls
             }
         }
 
+        public void ZoomAbout(Point pos, double scalingMultiplier)
+        {
+            ScaleAbout(pos, ZoomScale.ScaleX*scalingMultiplier);
+        }
+        public void ScaleAbout(Point pos, double scalingFactor)
+        {
+            ZoomScale.CenterX = pos.X;
+            ZoomScale.CenterY = pos.Y;
+
+            ZoomScale.ScaleX = scalingFactor;
+            ZoomScale.ScaleY = scalingFactor;
+        }
+
         public static void SetX(UIElement element, double value)
         {
             if (element == null)
@@ -155,8 +168,10 @@ namespace MonitorManagerCS_GUI.Controls
         /// <returns>The total size used after positioning child elements</returns>
         protected override Size ArrangeOverride(Size arrangeSize)
         {
-            double maxX = arrangeSize.Width;
-            double maxY = arrangeSize.Height;
+            _providedSpace = arrangeSize;
+
+            double maxX = _providedSpace.Width; //default if no children
+            double maxY = _providedSpace.Height;
 
             foreach (UIElement internalChild in InternalChildren)
             {
@@ -192,15 +207,15 @@ namespace MonitorManagerCS_GUI.Controls
                 maxY = Math.Max(maxY, childMaxY);
             }
 
-            var newArrangeSize = new Size(maxX, maxY);
+            _size = new Size(maxX, maxY);
 
-            _maxXPan = arrangeSize.Width-maxX;
-            _maxYPan = arrangeSize.Height - maxY;
+            _maxXPan = _providedSpace.Width - maxX;
+            _maxYPan = _providedSpace.Height - maxY;
 
             if (PanTransform.X < _maxXPan) PanTransform.X = _maxXPan;
             if (PanTransform.Y < _maxYPan) PanTransform.Y = _maxYPan;
 
-            return newArrangeSize;
+            return _size;
         }
 
         /// <summary>
