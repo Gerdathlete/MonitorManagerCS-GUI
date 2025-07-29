@@ -95,14 +95,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ExplorableCanvas.xaml.cs">
+      <DependentUpon>ExplorableCanvas.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Core\DisplayManager.cs" />
     <Compile Include="Core\Folders.cs" />
     <Compile Include="Core\MonitorService.cs" />
     <Compile Include="Core\TimedValue.cs" />
     <Compile Include="ViewModels\DisplaysTab.cs" />
+    <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="ViewModels\BindingErrors.cs" />
     <Compile Include="ViewModels\VCPCodeChart.cs" />
+    <Page Include="Controls\ExplorableCanvas.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

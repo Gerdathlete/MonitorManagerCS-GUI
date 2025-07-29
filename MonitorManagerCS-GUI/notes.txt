@@ -1,6 +1,7 @@
 Completely overhauling this program now.
 
 Add a way to identify which monitor is where.
+	Make ExplorableCanvas resize itself to its contents
 
 Make ControlMyMonitor part of the application by making it part of the App's resources.
 	This makes it so that you can just install this app without having to install ControlMyMonitor 

@@ -3,14 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MonitorManagerCS_GUI"
         xmlns:vm="clr-namespace:MonitorManagerCS_GUI.ViewModels"
+        xmlns:ctrls="clr-namespace:MonitorManagerCS_GUI.Controls"
         xmlns:livecharts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
         Title="Nathan's Monitor Manager"
-        SizeToContent="WidthAndHeight"
-        ContentRendered="Window_ContentRendered">
+        Width="800" Height="450">
 
     <Window.Icon>
         <BitmapImage UriSource="pack://application:,,,/Resources/icon.ico"/>
@@ -84,11 +85,35 @@
         
         <DataTemplate DataType="{x:Type vm:SettingsTab}">
             <!-- Settings Tab Content -->
-            <TextBlock Text="{Binding Text}"/>
+            <!--<TextBlock Text="{Binding Text}"/> -->
+            <ctrls:ExplorableCanvas>
+                <Rectangle Canvas.Top="0" Canvas.Left="0" Width="100" Height="100" Fill="Blue"/>
+            </ctrls:ExplorableCanvas>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaysTab}">
+            <ItemsControl ItemsSource="{Binding Displays}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="LightGray" BorderBrush="Gray" BorderThickness="4">
+                            <TextBlock Text="{Binding Label}"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
 
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ctrls:ExplorableCanvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
         </DataTemplate>
 
     </Window.Resources>

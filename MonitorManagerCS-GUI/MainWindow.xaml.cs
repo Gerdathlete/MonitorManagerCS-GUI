@@ -18,8 +18,6 @@ namespace MonitorManagerCS_GUI
         public MainViewModel ViewModel { get; set; }
         private static readonly string[] _statusPrefixes = { "", "  ", "    " };
         private int _statusPrefixIndex;
-        private static readonly double _initWidth = 800;
-        private static readonly double _initHeight = 450;
 
         public MainWindow()
         {
@@ -115,17 +113,6 @@ namespace MonitorManagerCS_GUI
             string output = _statusPrefixes[_statusPrefixIndex++];
             if (_statusPrefixIndex >= _statusPrefixes.Length) _statusPrefixIndex = 0;
             return output;
-        }
-
-        private void Window_ContentRendered(object sender, EventArgs e)
-        {
-            MinWidth = ActualWidth;
-            MinHeight = ActualHeight;
-
-            SizeToContent = SizeToContent.Manual;
-
-            Width = _initWidth;
-            Height = _initHeight;
         }
     }
 }
