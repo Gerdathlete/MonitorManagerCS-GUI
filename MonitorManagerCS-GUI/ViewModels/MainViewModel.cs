@@ -137,9 +137,9 @@ namespace MonitorManagerCS_GUI.ViewModels
                 return _restartServiceCommand;
             }
         }
-        public async void RestartService()
+        public void RestartService()
         {
-            await _monitorService.Restart();
+            _ = _monitorService.Restart();
         }
 
         private RelayCommand _loadDisplayTabsCommand;

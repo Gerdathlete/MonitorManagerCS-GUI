@@ -87,7 +87,10 @@
             <!-- Settings Tab Content -->
             <!--<TextBlock Text="{Binding Text}"/> -->
             <ctrls:ExplorableCanvas>
-                <Rectangle Canvas.Top="0" Canvas.Left="0" Width="100" Height="100" Fill="Blue"/>
+                <Rectangle ctrls:ExplorableCanvas.X="0" ctrls:ExplorableCanvas.Y="0" 
+                           Width="100" Height="100" Fill="Blue"/>
+                <Rectangle ctrls:ExplorableCanvas.X="200" ctrls:ExplorableCanvas.Y="200" 
+                           Width="100" Height="100" Fill="Red"/>
             </ctrls:ExplorableCanvas>
         </DataTemplate>
 
@@ -103,8 +106,8 @@
 
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
-                        <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                        <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding X}"/>
+                        <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding Y}"/>
                     </Style>
                 </ItemsControl.ItemContainerStyle>
 
