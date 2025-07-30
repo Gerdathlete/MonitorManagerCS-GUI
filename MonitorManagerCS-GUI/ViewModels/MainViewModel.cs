@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI.ViewModels
@@ -55,6 +56,13 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public MainViewModel()
         {
+            //Skip the rest of the constructor to prevent running the monitor service
+            //in the design window
+            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+            {
+                return;
+            }
+
             _monitorService = MonitorService.Instance();
 
             Init();
