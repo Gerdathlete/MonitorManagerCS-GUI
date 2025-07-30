@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace MonitorManagerCS_GUI.Core
                 Directory.CreateDirectory(fileDirectory);
             }
 
-            await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/smonitors {filePath}");
+            await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/smonitors \"{filePath}\"");
 
             var displays = ParseSMonitorsFile(filePath);
 
@@ -42,7 +43,7 @@ namespace MonitorManagerCS_GUI.Core
                 //(/sjson generates a json file with the display's VCP codes given one of its
                 //identifiers)
                 await Programs.RunProgramAsync(Programs.controlMyMonitor,
-                    $"/sjson {filePath} {display.NumberID}");
+                    $"/sjson \"{filePath}\" \"{display.NumberID}\"");
             }
 
             //Read the file's text asynchronously with a stream reader
