@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,12 +20,11 @@ namespace MonitorManagerCS_GUI.Controls
 
         private Point _lastMousePos;
         private bool _isPanning = false;
-        private double _maxXPan = 0.0;
-        private double _maxYPan = 0.0;
         private double _minScaleFactor = 1.0;
-        private Size _providedSpace;
+        private Rect _providedBounds;
         private Size _size;
-        private Size _transformedSize;
+        private Rect _transformedBounds;
+        private double _currentScale;
 
         static ExplorableCanvas()
         {
@@ -58,9 +58,7 @@ namespace MonitorManagerCS_GUI.Controls
 
             var mousePos = e.GetPosition(this);
 
-            ZoomAbout( mousePos, zoomFactor);
-
-            InvalidateArrange(); //this didn't fix the issue
+            ZoomAboutPoint(mousePos, zoomFactor);
 
             e.Handled = true;
         }
@@ -75,6 +73,8 @@ namespace MonitorManagerCS_GUI.Controls
                 _lastMousePos = e.GetPosition(null);
                 Mouse.Capture(this);
             }
+
+            e.Handled = true;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -88,18 +88,10 @@ namespace MonitorManagerCS_GUI.Controls
                 PanTransform.X += delta.X;
                 PanTransform.Y += delta.Y;
 
-                if (PanTransform.X > 0) PanTransform.X = 0;
-                if (PanTransform.Y > 0) PanTransform.Y = 0;
-
-                Debug.WriteLine(
-                    new string('-', 45) + Environment.NewLine +
-                    $"PanTransform.X = {PanTransform.X}, PanTransform.Y = {PanTransform.Y}" + Environment.NewLine +
-                    $"ActualWidth = {ActualWidth}, ActualHeight = {ActualHeight}" + Environment.NewLine +
-                    $"X{_maxXPan} Y{_maxYPan}");
-
-                if (PanTransform.X < _maxXPan) PanTransform.X = _maxXPan;
-                if (PanTransform.Y < _maxYPan) PanTransform.Y = _maxYPan;
+                MoveInBounds();
             }
+
+            e.Handled = true;
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
@@ -109,19 +101,78 @@ namespace MonitorManagerCS_GUI.Controls
                 _isPanning = false;
                 Mouse.Capture(null);
             }
+
+            e.Handled = true;
         }
 
-        public void ZoomAbout(Point pos, double scalingMultiplier)
+        public void ZoomAboutPoint(Point pos, double zoomFactor)
         {
-            ScaleAbout(pos, ZoomScale.ScaleX*scalingMultiplier);
+            var scalingFactor = _currentScale * zoomFactor;
+            ScaleAboutPoint(pos, scalingFactor);
         }
-        public void ScaleAbout(Point pos, double scalingFactor)
+
+        public void ScaleAboutPoint(Point pos, double scalingFactor)
         {
-            ZoomScale.CenterX = pos.X;
-            ZoomScale.CenterY = pos.Y;
+            if (scalingFactor < _minScaleFactor)
+            {
+                scalingFactor = _minScaleFactor;
+            }
 
             ZoomScale.ScaleX = scalingFactor;
             ZoomScale.ScaleY = scalingFactor;
+
+            _currentScale = scalingFactor;
+
+            CenterAboutPoint(pos);
+
+            MoveInBounds();
+        }
+
+        public void CenterAboutPoint(Point pos)
+        {
+            var transformedPos = RenderTransform.Transform(pos);
+
+            PanTransform.X -= transformedPos.X;
+            PanTransform.Y -= transformedPos.Y;
+
+            PanTransform.X += _providedBounds.Width / 2;
+            PanTransform.Y += _providedBounds.Height / 2;
+
+            MoveInBounds();
+        }
+
+        private void MoveInBounds()
+        {
+            _transformedBounds = GetTransformedBounds();
+
+            if (_transformedBounds.Left > _providedBounds.Left)
+            {
+                double diff = _providedBounds.Left - _transformedBounds.Left;
+                PanTransform.X += diff;
+            }
+
+            if (_transformedBounds.Top > _providedBounds.Top)
+            {
+                double diff = _providedBounds.Top - _transformedBounds.Top;
+                PanTransform.Y += diff;
+            }
+
+            if (_transformedBounds.Right < _providedBounds.Right)
+            {
+                double diff = _providedBounds.Right - _transformedBounds.Right;
+                PanTransform.X += diff;
+            }
+
+            if (_transformedBounds.Bottom < _providedBounds.Bottom)
+            {
+                double diff = _providedBounds.Bottom - _transformedBounds.Bottom;
+                PanTransform.Y += diff;
+            }
+        }
+
+        private Rect GetTransformedBounds()
+        {
+            return RenderTransform.TransformBounds(new Rect(_size));
         }
 
         public static void SetX(UIElement element, double value)
@@ -168,10 +219,10 @@ namespace MonitorManagerCS_GUI.Controls
         /// <returns>The total size used after positioning child elements</returns>
         protected override Size ArrangeOverride(Size arrangeSize)
         {
-            _providedSpace = arrangeSize;
+            _providedBounds = new Rect(arrangeSize);
 
-            double maxX = _providedSpace.Width; //default if no children
-            double maxY = _providedSpace.Height;
+            double maxX = _providedBounds.Width; //default if no children
+            double maxY = _providedBounds.Height;
 
             foreach (UIElement internalChild in InternalChildren)
             {
@@ -209,11 +260,11 @@ namespace MonitorManagerCS_GUI.Controls
 
             _size = new Size(maxX, maxY);
 
-            _maxXPan = _providedSpace.Width - maxX;
-            _maxYPan = _providedSpace.Height - maxY;
+            _minScaleFactor = Math.Max(
+                _providedBounds.Width/_size.Width, 
+                _providedBounds.Height/_size.Height);
 
-            if (PanTransform.X < _maxXPan) PanTransform.X = _maxXPan;
-            if (PanTransform.Y < _maxYPan) PanTransform.Y = _maxYPan;
+            ScaleAboutPoint(new Point(0,0), _minScaleFactor);
 
             return _size;
         }

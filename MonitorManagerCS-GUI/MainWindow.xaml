@@ -85,13 +85,7 @@
         
         <DataTemplate DataType="{x:Type vm:SettingsTab}">
             <!-- Settings Tab Content -->
-            <!--<TextBlock Text="{Binding Text}"/> -->
-            <ctrls:ExplorableCanvas>
-                <Rectangle ctrls:ExplorableCanvas.X="0" ctrls:ExplorableCanvas.Y="0" 
-                           Width="100" Height="100" Fill="Blue"/>
-                <Rectangle ctrls:ExplorableCanvas.X="200" ctrls:ExplorableCanvas.Y="200" 
-                           Width="100" Height="100" Fill="Red"/>
-            </ctrls:ExplorableCanvas>
+            <TextBlock Text="{Binding Text}"/>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaysTab}">
