@@ -95,6 +95,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\DebugAdorner.cs" />
     <Compile Include="Controls\ExplorableCanvas.xaml.cs">
       <DependentUpon>ExplorableCanvas.xaml</DependentUpon>
     </Compile>

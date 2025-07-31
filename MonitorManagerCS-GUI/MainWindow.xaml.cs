@@ -9,7 +9,7 @@ namespace MonitorManagerCS_GUI
 {
     public partial class MainWindow : Window
     {
-        private static readonly Uri _iconUri = new Uri("pack://application:,,,/Resources/icon.ico", 
+        private static readonly Uri _iconUri = new Uri("pack://application:,,,/Resources/icon.ico",
             UriKind.Absolute);
         private NotifyIcon _trayIcon;
         private ContextMenuStrip _trayMenuStrip;

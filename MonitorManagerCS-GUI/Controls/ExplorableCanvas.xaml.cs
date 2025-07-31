@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -50,6 +49,8 @@ namespace MonitorManagerCS_GUI.Controls
         public ExplorableCanvas()
         {
             InitializeComponent();
+
+            Loaded += OnLoaded;
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
@@ -69,8 +70,8 @@ namespace MonitorManagerCS_GUI.Controls
             {
                 _isPanning = true;
 
-                // Store mouse pos in screen coordinates
-                _lastMousePos = e.GetPosition(null);
+                var globalMousePos = e.GetPosition(null);
+                _lastMousePos = globalMousePos;
                 Mouse.Capture(this);
             }
 
@@ -81,14 +82,14 @@ namespace MonitorManagerCS_GUI.Controls
         {
             if (_isPanning)
             {
-                Point currentMousePos = e.GetPosition(null);
-                Vector delta = currentMousePos - _lastMousePos;
-                _lastMousePos = currentMousePos;
+                Point globalMousePos = e.GetPosition(null);
+                Vector delta = globalMousePos - _lastMousePos;
+                _lastMousePos = globalMousePos;
 
                 PanTransform.X += delta.X;
                 PanTransform.Y += delta.Y;
 
-                MoveInBounds();
+                MoveViewInBounds();
             }
 
             e.Handled = true;
@@ -118,14 +119,23 @@ namespace MonitorManagerCS_GUI.Controls
                 scalingFactor = _minScaleFactor;
             }
 
+            Point firstScreenSpacePos = RenderTransform.Transform(pos);
+
             ZoomScale.ScaleX = scalingFactor;
             ZoomScale.ScaleY = scalingFactor;
 
             _currentScale = scalingFactor;
 
-            CenterAboutPoint(pos);
+            Point secondScreenSpacePos = RenderTransform.Transform(pos);
 
-            MoveInBounds();
+            //this is how much the camera panned when zooming
+            Vector screenSpaceDelta = secondScreenSpacePos - firstScreenSpacePos;
+
+            //undo the pan
+            PanTransform.X -= screenSpaceDelta.X;
+            PanTransform.Y -= screenSpaceDelta.Y;
+
+            MoveViewInBounds();
         }
 
         public void CenterAboutPoint(Point pos)
@@ -138,10 +148,10 @@ namespace MonitorManagerCS_GUI.Controls
             PanTransform.X += _providedBounds.Width / 2;
             PanTransform.Y += _providedBounds.Height / 2;
 
-            MoveInBounds();
+            MoveViewInBounds();
         }
 
-        private void MoveInBounds()
+        private void MoveViewInBounds()
         {
             _transformedBounds = GetTransformedBounds();
 
@@ -261,10 +271,15 @@ namespace MonitorManagerCS_GUI.Controls
             _size = new Size(maxX, maxY);
 
             _minScaleFactor = Math.Max(
-                _providedBounds.Width/_size.Width, 
-                _providedBounds.Height/_size.Height);
+                _providedBounds.Width / _size.Width,
+                _providedBounds.Height / _size.Height);
 
-            ScaleAboutPoint(new Point(0,0), _minScaleFactor);
+            ZoomScale.ScaleX = _minScaleFactor;
+            ZoomScale.ScaleY = _minScaleFactor;
+
+            _currentScale = _minScaleFactor;
+
+            MoveViewInBounds();
 
             return _size;
         }
@@ -305,16 +320,82 @@ namespace MonitorManagerCS_GUI.Controls
             return null;
         }
 
-        private static void OnPositioningChanged(DependencyObject d,
-            DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
         private static bool IsDoubleFiniteOrNaN(object value)
         {
             double d = (double)value;
             return !double.IsInfinity(d);
         }
+
+        #region Debugging Tools
+
+#if DEBUG
+        private bool _debug = true;
+#else
+        private bool _debug = false;
+#endif
+
+        private DebugAdorner _debugAdorner;
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (!_debug) return;
+
+            var adornerLayer = AdornerLayer.GetAdornerLayer(this);
+            if (adornerLayer != null)
+            {
+                _debugAdorner = new DebugAdorner(this);
+                adornerLayer.Add(_debugAdorner);
+            }
+        }
+
+        public void DebugDrawPointOnCanvas(Point pt, Brush brush, double radius = 3)
+        {
+            if (!_debug) return;
+
+            pt = RenderTransform.Transform(pt);
+
+            DebugDrawPoint(pt, brush, radius);
+        }
+        public void DebugDrawPoint(Point pt, Brush brush, double radius = 3)
+        {
+            if (!_debug) return;
+
+            _debugAdorner?.DrawActions.Add(dc =>
+            {
+                dc.DrawEllipse(brush, new Pen(Brushes.Black, 1), pt, radius, radius);
+            });
+            _debugAdorner?.Invalidate();
+        }
+
+        public void DebugDrawLineOnCanvas(Point from, Point to, Brush brush, double thickness = 1)
+        {
+            if (!_debug) return;
+
+            from = RenderTransform.Transform(from);
+            to = RenderTransform.Transform(to);
+
+            DebugDrawLine(from, to, brush, thickness);
+        }
+        public void DebugDrawLine(Point from, Point to, Brush brush, double thickness = 1)
+        {
+            if (!_debug) return;
+
+            _debugAdorner?.DrawActions.Add(dc =>
+            {
+                var pen = new Pen(brush, thickness) { DashStyle = DashStyles.Dash };
+                dc.DrawLine(pen, from, to);
+            });
+            _debugAdorner?.Invalidate();
+        }
+
+        public void ClearDebugDrawings()
+        {
+            if (!_debug) return;
+
+            _debugAdorner?.DrawActions.Clear();
+            _debugAdorner?.Invalidate();
+        }
+
+        #endregion
     }
 }

@@ -89,28 +89,31 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaysTab}">
-            <ItemsControl ItemsSource="{Binding Displays}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Background="LightGray" BorderBrush="Gray" BorderThickness="4">
-                            <TextBlock Text="{Binding Label}"/>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
+            <AdornerDecorator>
+                <ItemsControl ItemsSource="{Binding Displays}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="LightGray" BorderBrush="Gray" BorderThickness="4"
+                                    Width="{Binding Width}" Height="{Binding Height}">
+                                <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
 
-                <ItemsControl.ItemContainerStyle>
-                    <Style TargetType="ContentPresenter">
-                        <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding X}"/>
-                        <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding Y}"/>
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding X}"/>
+                            <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding Y}"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
 
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <ctrls:ExplorableCanvas/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ctrls:ExplorableCanvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </AdornerDecorator>
         </DataTemplate>
 
     </Window.Resources>

@@ -76,12 +76,12 @@ namespace MonitorManagerCS_GUI.ViewModels
                 Text = "This is a settings tab."
             };
 
-            //var tab_Displays = new DisplaysTab();
+            var tab_Displays = new DisplaysTab();
 
             var defaultTabs = new List<TabViewModel>()
             {
-                //tab_Displays,
-                tab_Settings
+                tab_Displays,
+                tab_Settings,
             };
 
             Tabs = new ObservableCollection<TabViewModel>(defaultTabs);

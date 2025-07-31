@@ -1,11 +1,24 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Documents;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
     public class DisplaysTab : TabViewModel
     {
-        public ObservableCollection<DisplayViewModel> Displays;
+        private ObservableCollection<DisplayViewModel> _displays;
+        public ObservableCollection<DisplayViewModel> Displays
+        {
+            get { return _displays; }
+            set
+            {
+                if (_displays != value)
+                {
+                    _displays = value;
+                    OnPropertyChanged(nameof(Displays));
+                }
+            }
+        }
         public DisplaysTab()
         {
             Displays = new ObservableCollection<DisplayViewModel>()
@@ -13,14 +26,17 @@ namespace MonitorManagerCS_GUI.ViewModels
                 new DisplayViewModel()
                 {
                     Label = "Display 1",
-                    X = 100,
-                    Y = 100,
+                    Bounds = new Rect(0.0,0.0,1920.0,1080.0)
                 },
                 new DisplayViewModel()
                 {
                     Label = "Display 2",
-                    X = 300,
-                    Y = 100,
+                    Bounds = new Rect(1920.0+20.0, 0.0, 1920.0, 1080.0)
+                },
+                new DisplayViewModel()
+                {
+                    Label = "CenterDisplay",
+                    Bounds = new Rect(1920.0+10.0-50.0, 1080.0/2.0-50.0, 100.0, 100.0)
                 },
             };
         }
