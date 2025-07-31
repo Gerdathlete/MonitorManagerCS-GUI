@@ -1,6 +1,10 @@
 Completely overhauling this program now.
 
 Add a way to identify which monitor is where.
+	Add scale property to DisplaysTab, and pass a reference of DisplaysTab to each DisplayViewModel
+	so that they can get that scale and scale themselves with it.
+	Then, bind to the scaled versions of the DisplayViewModel's properties for the item sizes and
+	positions
 
 Make ControlMyMonitor part of the application by making it part of the App's resources.
 	This makes it so that you can just install this app without having to install ControlMyMonitor 
