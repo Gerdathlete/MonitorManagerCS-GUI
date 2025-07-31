@@ -135,7 +135,6 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-
         private string _label;
         public string Label
         {

@@ -22,7 +22,7 @@ namespace MonitorManagerCS_GUI.Controls
         private double _minScaleFactor = 1.0;
         private Rect _providedBounds;
         private Size _size;
-        private Rect _transformedBounds;
+        private Rect _bounds;
         private double _currentScale;
 
         static ExplorableCanvas()
@@ -111,20 +111,11 @@ namespace MonitorManagerCS_GUI.Controls
             var scalingFactor = _currentScale * zoomFactor;
             ScaleAboutPoint(pos, scalingFactor);
         }
-
         public void ScaleAboutPoint(Point pos, double scalingFactor)
         {
-            if (scalingFactor < _minScaleFactor)
-            {
-                scalingFactor = _minScaleFactor;
-            }
-
             Point firstScreenSpacePos = RenderTransform.Transform(pos);
 
-            ZoomScale.ScaleX = scalingFactor;
-            ZoomScale.ScaleY = scalingFactor;
-
-            _currentScale = scalingFactor;
+            SetScale(scalingFactor);
 
             Point secondScreenSpacePos = RenderTransform.Transform(pos);
 
@@ -136,6 +127,18 @@ namespace MonitorManagerCS_GUI.Controls
             PanTransform.Y -= screenSpaceDelta.Y;
 
             MoveViewInBounds();
+        }
+        private void SetScale(double scalingFactor)
+        {
+            if (scalingFactor < _minScaleFactor)
+            {
+                scalingFactor = _minScaleFactor;
+            }
+
+            ZoomScale.ScaleX = scalingFactor;
+            ZoomScale.ScaleY = scalingFactor;
+
+            _currentScale = scalingFactor;
         }
 
         public void CenterAboutPoint(Point pos)
@@ -153,34 +156,36 @@ namespace MonitorManagerCS_GUI.Controls
 
         private void MoveViewInBounds()
         {
-            _transformedBounds = GetTransformedBounds();
+            _bounds = GetBounds();
 
-            if (_transformedBounds.Left > _providedBounds.Left)
+            if (_bounds.Left > _providedBounds.Left)
             {
-                double diff = _providedBounds.Left - _transformedBounds.Left;
+                double diff = _providedBounds.Left - _bounds.Left;
                 PanTransform.X += diff;
             }
 
-            if (_transformedBounds.Top > _providedBounds.Top)
+            if (_bounds.Top > _providedBounds.Top)
             {
-                double diff = _providedBounds.Top - _transformedBounds.Top;
+                double diff = _providedBounds.Top - _bounds.Top;
                 PanTransform.Y += diff;
             }
 
-            if (_transformedBounds.Right < _providedBounds.Right)
+            if (_bounds.Right < _providedBounds.Right)
             {
-                double diff = _providedBounds.Right - _transformedBounds.Right;
+                double diff = _providedBounds.Right - _bounds.Right;
                 PanTransform.X += diff;
             }
 
-            if (_transformedBounds.Bottom < _providedBounds.Bottom)
+            if (_bounds.Bottom < _providedBounds.Bottom)
             {
-                double diff = _providedBounds.Bottom - _transformedBounds.Bottom;
+                double diff = _providedBounds.Bottom - _bounds.Bottom;
                 PanTransform.Y += diff;
             }
+
+            _bounds = GetBounds();
         }
 
-        private Rect GetTransformedBounds()
+        private Rect GetBounds()
         {
             return RenderTransform.TransformBounds(new Rect(_size));
         }
@@ -231,8 +236,8 @@ namespace MonitorManagerCS_GUI.Controls
         {
             _providedBounds = new Rect(arrangeSize);
 
-            double maxX = _providedBounds.Width; //default if no children
-            double maxY = _providedBounds.Height;
+            double maxX = 0; //default if no children
+            double maxY = 0;
 
             foreach (UIElement internalChild in InternalChildren)
             {
@@ -274,14 +279,10 @@ namespace MonitorManagerCS_GUI.Controls
                 _providedBounds.Width / _size.Width,
                 _providedBounds.Height / _size.Height);
 
-            ZoomScale.ScaleX = _minScaleFactor;
-            ZoomScale.ScaleY = _minScaleFactor;
+            SetScale(_minScaleFactor);
+            CenterAboutPoint(new Point(maxX / 2, maxY / 2));
 
-            _currentScale = _minScaleFactor;
-
-            MoveViewInBounds();
-
-            return _size;
+            return arrangeSize;
         }
 
         /// <summary>
@@ -384,6 +385,26 @@ namespace MonitorManagerCS_GUI.Controls
             {
                 var pen = new Pen(brush, thickness) { DashStyle = DashStyles.Dash };
                 dc.DrawLine(pen, from, to);
+            });
+            _debugAdorner?.Invalidate();
+        }
+
+        public void DebugDrawRectOnCanvas(Rect rect, Brush fill, Brush outline, double thickness = 1)
+        {
+            if (!_debug) return;
+
+            rect = RenderTransform.TransformBounds(rect);
+
+            DebugDrawRect(rect, fill, outline, thickness);
+        }
+        public void DebugDrawRect(Rect rect, Brush fill, Brush outline, double thickness = 1)
+        {
+            if (!_debug) return;
+
+            _debugAdorner?.DrawActions.Add(dc =>
+            {
+                var pen = new Pen(outline, thickness) { DashStyle = DashStyles.Dash };
+                dc.DrawRectangle(fill, pen, rect);
             });
             _debugAdorner?.Invalidate();
         }

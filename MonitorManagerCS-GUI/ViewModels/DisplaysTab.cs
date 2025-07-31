@@ -21,22 +21,19 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         public DisplaysTab()
         {
+            double scale = 0.1;
+
             Displays = new ObservableCollection<DisplayViewModel>()
             {
                 new DisplayViewModel()
                 {
                     Label = "Display 1",
-                    Bounds = new Rect(0.0,0.0,1920.0,1080.0)
+                    Bounds = new Rect(0.0,0.0,1920.0*scale,1080.0*scale)
                 },
                 new DisplayViewModel()
                 {
                     Label = "Display 2",
-                    Bounds = new Rect(1920.0+20.0, 0.0, 1920.0, 1080.0)
-                },
-                new DisplayViewModel()
-                {
-                    Label = "CenterDisplay",
-                    Bounds = new Rect(1920.0+10.0-50.0, 1080.0/2.0-50.0, 100.0, 100.0)
+                    Bounds = new Rect((1920.0+20.0)*scale, 0.0, 1920.0*scale, 1080.0*scale)
                 },
             };
         }
