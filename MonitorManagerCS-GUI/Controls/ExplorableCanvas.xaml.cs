@@ -230,11 +230,11 @@ namespace MonitorManagerCS_GUI.Controls
         /// <summary>
         /// Positions the child elements of this ExplorableCanvas
         /// </summary>
-        /// <param name="arrangeSize">The size allocated for positioning child elements</param>
+        /// <param name="availableSpace">The size allocated for positioning child elements</param>
         /// <returns>The total size used after positioning child elements</returns>
-        protected override Size ArrangeOverride(Size arrangeSize)
+        protected override Size ArrangeOverride(Size availableSpace)
         {
-            _providedBounds = new Rect(arrangeSize);
+            _providedBounds = new Rect(availableSpace);
 
             double maxX = 0; //default if no children
             double maxY = 0;
@@ -281,6 +281,9 @@ namespace MonitorManagerCS_GUI.Controls
 
             SetScale(_minScaleFactor);
             CenterAboutPoint(new Point(maxX / 2, maxY / 2));
+
+            var arrangeSize = new Size(Math.Max(availableSpace.Width,_size.Width), 
+                Math.Max(availableSpace.Height,_size.Height));
 
             return arrangeSize;
         }
@@ -330,9 +333,9 @@ namespace MonitorManagerCS_GUI.Controls
         #region Debugging Tools
 
 #if DEBUG
-        private bool _debug = true;
+        private readonly bool _debug = true;
 #else
-        private bool _debug = false;
+        private readonly bool _debug = false;
 #endif
 
         private DebugAdorner _debugAdorner;
