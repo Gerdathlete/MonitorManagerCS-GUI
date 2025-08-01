@@ -11,10 +11,11 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
         Title="Nathan's Monitor Manager"
-        Width="800" Height="450">
+        Width="800" Height="450"
+        FontFamily="pack://application:,,,/Assets/Fonts/#Inter Variable">
 
     <Window.Icon>
-        <BitmapImage UriSource="pack://application:,,,/Resources/icon.ico"/>
+        <BitmapImage UriSource="pack://application:,,,/Assets/icon.ico"/>
     </Window.Icon>
 
     <Window.Resources>
