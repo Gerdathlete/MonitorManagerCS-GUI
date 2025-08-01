@@ -20,6 +20,7 @@ namespace MonitorManagerCS_GUI.Controls
         private Point _lastMousePos;
         private bool _isPanning = false;
         private double _minScaleFactor = 1.0;
+        private const double _maxScaleFactor = 100.0;
         private Rect _providedBounds;
         private Size _size;
         private Rect _bounds;
@@ -135,6 +136,11 @@ namespace MonitorManagerCS_GUI.Controls
                 scalingFactor = _minScaleFactor;
             }
 
+            if (scalingFactor > _maxScaleFactor)
+            {
+                scalingFactor = _maxScaleFactor;
+            }
+
             ZoomScale.ScaleX = scalingFactor;
             ZoomScale.ScaleY = scalingFactor;
 
@@ -236,8 +242,8 @@ namespace MonitorManagerCS_GUI.Controls
         {
             _providedBounds = new Rect(availableSpace);
 
-            double maxX = 0; //default if no children
-            double maxY = 0;
+            double maxX = ContentsPadding.Left + ContentsPadding.Right; //default if no children
+            double maxY = ContentsPadding.Top + ContentsPadding.Bottom;
 
             foreach (UIElement internalChild in InternalChildren)
             {
@@ -275,6 +281,11 @@ namespace MonitorManagerCS_GUI.Controls
 
             _size = new Size(maxX, maxY);
 
+            if (_size.Width <= 0 || _size.Height <= 0)
+            {
+                throw new Exception("ExplorableCanvas._size has a zero or negative dimension!");
+            }
+
             _minScaleFactor = Math.Max(
                 _providedBounds.Width / _size.Width,
                 _providedBounds.Height / _size.Height);
@@ -282,8 +293,10 @@ namespace MonitorManagerCS_GUI.Controls
             SetScale(_minScaleFactor);
             CenterAboutPoint(new Point(maxX / 2, maxY / 2));
 
-            var arrangeSize = new Size(Math.Max(availableSpace.Width,_size.Width), 
-                Math.Max(availableSpace.Height,_size.Height));
+            //Always take up the full available space, even if the contents are smaller, because
+            //the canvas is scaled to fit in the window
+            var arrangeSize = new Size(Math.Max(availableSpace.Width, _size.Width),
+                Math.Max(availableSpace.Height, _size.Height));
 
             return arrangeSize;
         }
