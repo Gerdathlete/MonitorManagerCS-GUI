@@ -28,12 +28,14 @@ namespace MonitorManagerCS_GUI.ViewModels
                 new DisplayViewModel()
                 {
                     Label = "Display 1",
-                    Bounds = new Rect(0.0,0.0,1920.0*scale,1080.0*scale)
+                    Scale = scale,
+                    Bounds = new Rect(0.0,0.0,1920.0,1080.0),
                 },
                 new DisplayViewModel()
                 {
                     Label = "Display 2",
-                    Bounds = new Rect((1920.0+20.0)*scale, 0.0, 1920.0*scale, 1080.0*scale)
+                    Scale = scale,
+                    Bounds = new Rect(1920.0+20.0, 0.0, 1920.0, 1080.0),
                 },
             };
         }

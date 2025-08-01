@@ -1,16 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
     public class DisplayViewModel : INotifyPropertyChanged
     {
+        private double _scale = 1;
+        public double Scale
+        {
+            get { return _scale; }
+            set { 
+                if (_scale != value)
+                {
+                    _scale = value;
+                    OnPropertyChanged();
+
+                    UpdateScaledBounds();
+                }
+                    }
+        }
+
         private double _x;
         public double X
         {
@@ -116,24 +126,13 @@ namespace MonitorManagerCS_GUI.ViewModels
                 if (_bounds != value)
                 {
                     _bounds = value;
-                    OnPropertyChanged();
-
-                    _x = _bounds.Left;
-                    _y = _bounds.Top;
-                    _width = _bounds.Width;
-                    _height = _bounds.Height;
-                    _position = _bounds.Location;
-                    _size = _bounds.Size;
-
-                    OnPropertyChanged(nameof(X));
-                    OnPropertyChanged(nameof(Y));
-                    OnPropertyChanged(nameof(Width));
-                    OnPropertyChanged(nameof(Height));
-                    OnPropertyChanged(nameof(Position));
-                    OnPropertyChanged(nameof(Size));
+                    SetBounds(_bounds);
                 }
             }
         }
+
+        private Rect _scaledBounds;
+        public Rect ScaledBounds { get =>  _scaledBounds; }
 
         private string _label;
         public string Label
@@ -147,6 +146,37 @@ namespace MonitorManagerCS_GUI.ViewModels
                     OnPropertyChanged();
                 }
             }
+        }
+
+        private void UpdateScaledBounds()
+        {
+            if (Bounds == Rect.Empty) return;
+
+            _scaledBounds = new Rect(_bounds.Left * _scale, _bounds.Top * _scale,
+                _bounds.Width * _scale, _bounds.Height * _scale);
+
+            OnPropertyChanged(nameof(ScaledBounds));
+        }
+        private void SetBounds(Rect newBounds)
+        {
+            _bounds = newBounds;
+            OnPropertyChanged(nameof(Bounds));
+
+            UpdateScaledBounds();
+
+            _x = _bounds.Left;
+            _y = _bounds.Top;
+            _width = _bounds.Width;
+            _height = _bounds.Height;
+            _position = _bounds.Location;
+            _size = _bounds.Size;
+
+            OnPropertyChanged(nameof(X));
+            OnPropertyChanged(nameof(Y));
+            OnPropertyChanged(nameof(Width));
+            OnPropertyChanged(nameof(Height));
+            OnPropertyChanged(nameof(Position));
+            OnPropertyChanged(nameof(Size));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -94,7 +94,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Background="LightGray" BorderBrush="Gray" BorderThickness="4"
-                                    Width="{Binding Width}" Height="{Binding Height}">
+                                    Width="{Binding ScaledBounds.Width}" Height="{Binding ScaledBounds.Height}">
                                 <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </DataTemplate>
@@ -102,8 +102,8 @@
 
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
-                            <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding X}"/>
-                            <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding Y}"/>
+                            <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding ScaledBounds.Left}"/>
+                            <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding ScaledBounds.Top}"/>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
 
