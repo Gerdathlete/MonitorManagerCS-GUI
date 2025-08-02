@@ -42,6 +42,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         public DisplaysTab()
         {
             DisplayViewModels = new ObservableCollection<DisplayViewModel>();
+            TabName = "Displays";
         }
 
         private ObservableCollection<DisplayViewModel> GetVMsFromDisplays(List<DisplayInfo> displays)
