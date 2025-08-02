@@ -27,34 +27,34 @@ namespace MonitorManagerCS_GUI.Core
         [JsonIgnore]
         public string ConfigFileName { get => DataFormatter.GetSafeFileName(LongID) + ".json"; }
 
-        private int? _number = null;
-        public int Number
+        private string _number = string.Empty;
+        public string Number
         {
             get
             {
-                if (_number == null)
+                if (_number == string.Empty)
                 {
                     try
                     {
-                        var numIDParts = NumberID.Split('\\');
+                        string[] numIDParts = NumberID.Split('\\');
 
-                        int outputNumber = int.Parse(Regex.Replace(numIDParts[3], "[^0-9]", ""));
+                        string outputNumber = Regex.Replace(numIDParts[3], "[^0-9]", "");
                         int outputSubNumber = int.Parse(Regex.Replace(numIDParts[4], "[^0-9]", ""));
 
                         if (outputSubNumber > 0)
                         {
-                            outputNumber += outputSubNumber * 100;
+                            outputNumber += $".{outputSubNumber}";
                         }
 
                         _number = outputNumber;
                     }
                     catch
                     {
-                        _number = 0;
+                        _number = "X";
                     }
                 }
 
-                return (int)_number;
+                return _number;
             }
         }
 
