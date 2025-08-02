@@ -94,8 +94,11 @@
                 <ItemsControl ItemsSource="{Binding DisplayViewModels}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="#DADADA" BorderBrush="Black" BorderThickness="1"
-                                    Width="{Binding ScaledBounds.Width}" Height="{Binding ScaledBounds.Height}"
+                            <Border Background="{Binding Background}" 
+                                    BorderBrush="{Binding BorderBrush}" 
+                                    BorderThickness="{Binding BorderThickness}"
+                                    Width="{Binding ScaledBounds.Width}" 
+                                    Height="{Binding ScaledBounds.Height}"
                                     CornerRadius="5">
                                 <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>

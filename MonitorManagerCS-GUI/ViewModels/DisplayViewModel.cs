@@ -1,8 +1,10 @@
-﻿using MonitorManagerCS_GUI.Core;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MonitorManagerCS_GUI.Core;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
@@ -12,7 +14,8 @@ namespace MonitorManagerCS_GUI.ViewModels
         public double Scale
         {
             get { return _scale; }
-            set { 
+            set
+            {
                 if (_scale != value)
                 {
                     _scale = value;
@@ -20,7 +23,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
                     UpdateScaledBounds();
                 }
-                    }
+            }
         }
 
         private double _x;
@@ -134,7 +137,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
 
         private Rect _scaledBounds;
-        public Rect ScaledBounds { get =>  _scaledBounds; }
+        public Rect ScaledBounds { get => _scaledBounds; }
 
         private string _label;
         public string Label
@@ -146,6 +149,48 @@ namespace MonitorManagerCS_GUI.ViewModels
                 {
                     _label = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        private Brush _background = new SolidColorBrush(Color.FromArgb(255, 0xDA, 0xDA, 0xDA));
+        public Brush Background
+        {
+            get { return _background; }
+            set
+            {
+                if (_background != value)
+                {
+                    _background = value; 
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Brush _borderBrush = Brushes.Black;
+        public Brush BorderBrush
+        {
+            get => _borderBrush;
+            set
+            {
+                if (!Equals(_borderBrush, value))
+                {
+                    _borderBrush = value;
+                    OnPropertyChanged(nameof(BorderBrush));
+                }
+            }
+        }
+
+        private Thickness _borderThickness = new Thickness(1);
+        public Thickness BorderThickness
+        {
+            get => _borderThickness;
+            set
+            {
+                if (!Equals(_borderThickness, value))
+                {
+                    _borderThickness = value;
+                    OnPropertyChanged(nameof(BorderThickness));
                 }
             }
         }
@@ -185,11 +230,11 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             _scale = scale;
 
-            string serial = displayInfo.SerialNumber == string.Empty 
-                ? "(Not Set)" 
+            string serial = displayInfo.SerialNumber == string.Empty
+                ? "(Not Set)"
                 : displayInfo.SerialNumber;
 
-            _label = displayInfo.ToString() + Environment.NewLine 
+            _label = displayInfo.ToString() + Environment.NewLine
                 + $"SN: {serial}";
 
             System.Drawing.Rectangle rect = displayInfo.Bounds;
