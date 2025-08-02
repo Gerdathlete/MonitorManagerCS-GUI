@@ -21,7 +21,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                     _scale = value;
                     OnPropertyChanged();
 
-                    UpdateScaledBounds();
+                    UpdateActualBounds();
                 }
             }
         }
@@ -136,8 +136,8 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-        private Rect _scaledBounds;
-        public Rect ScaledBounds { get => _scaledBounds; }
+        private Rect _actualBounds;
+        public Rect ActualBounds { get => _actualBounds; }
 
         private string _label;
         public string Label
@@ -195,21 +195,38 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-        private void UpdateScaledBounds()
+        private Thickness _padding = new Thickness(2);
+        public Thickness Padding
+        {
+            get => _padding;
+            set
+            {
+                if (!Equals(_padding, value))
+                {
+                    _padding = value;
+                    UpdateActualBounds();
+                }
+            }
+        }
+
+        private void UpdateActualBounds()
         {
             if (Bounds == Rect.Empty) return;
 
-            _scaledBounds = new Rect(_bounds.Left * _scale, _bounds.Top * _scale,
-                _bounds.Width * _scale, _bounds.Height * _scale);
+            _actualBounds = new Rect(
+                _bounds.Left * _scale + _padding.Left, 
+                _bounds.Top * _scale + _padding.Top,
+                _bounds.Width * _scale - _padding.Left - _padding.Right, 
+                _bounds.Height * _scale - _padding.Top - _padding.Bottom);
 
-            OnPropertyChanged(nameof(ScaledBounds));
+            OnPropertyChanged(nameof(ActualBounds));
         }
         private void SetBounds(Rect newBounds)
         {
             _bounds = newBounds;
             OnPropertyChanged(nameof(Bounds));
 
-            UpdateScaledBounds();
+            UpdateActualBounds();
 
             _x = _bounds.Left;
             _y = _bounds.Top;

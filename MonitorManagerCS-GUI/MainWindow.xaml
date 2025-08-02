@@ -97,8 +97,8 @@
                             <Border Background="{Binding Background}" 
                                     BorderBrush="{Binding BorderBrush}" 
                                     BorderThickness="{Binding BorderThickness}"
-                                    Width="{Binding ScaledBounds.Width}" 
-                                    Height="{Binding ScaledBounds.Height}"
+                                    Width="{Binding ActualBounds.Width}" 
+                                    Height="{Binding ActualBounds.Height}"
                                     CornerRadius="5">
                                 <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
@@ -107,8 +107,8 @@
 
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
-                            <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding ScaledBounds.Left}"/>
-                            <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding ScaledBounds.Top}"/>
+                            <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding ActualBounds.Left}"/>
+                            <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding ActualBounds.Top}"/>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
 
