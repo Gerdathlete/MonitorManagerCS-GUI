@@ -1,13 +1,16 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Documents;
+﻿using MonitorManagerCS_GUI.Core;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
     public class DisplaysTab : TabViewModel
     {
-        private ObservableCollection<DisplayViewModel> _displays;
-        public ObservableCollection<DisplayViewModel> Displays
+        private List<DisplayInfo> _displays;
+        public List<DisplayInfo> Displays
         {
             get { return _displays; }
             set
@@ -15,29 +18,36 @@ namespace MonitorManagerCS_GUI.ViewModels
                 if (_displays != value)
                 {
                     _displays = value;
-                    OnPropertyChanged(nameof(Displays));
+                    DisplayViewModels = GetVMsFromDisplays(value);
                 }
             }
         }
+
+        private ObservableCollection<DisplayViewModel> _displayViewModels;
+        public ObservableCollection<DisplayViewModel> DisplayViewModels
+        {
+            get { return _displayViewModels; }
+            set
+            {
+                if (_displayViewModels != value)
+                {
+                    _displayViewModels = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public double Scale { get; set; } = 0.1;
+
         public DisplaysTab()
         {
-            double scale = 0.1;
+            DisplayViewModels = new ObservableCollection<DisplayViewModel>();
+        }
 
-            Displays = new ObservableCollection<DisplayViewModel>()
-            {
-                new DisplayViewModel()
-                {
-                    Label = "Display 1",
-                    Scale = scale,
-                    Bounds = new Rect(0.0,0.0,1920.0,1080.0),
-                },
-                new DisplayViewModel()
-                {
-                    Label = "Display 2",
-                    Scale = scale,
-                    Bounds = new Rect(1920.0+20.0, 0.0, 1920.0, 1080.0),
-                },
-            };
+        private ObservableCollection<DisplayViewModel> GetVMsFromDisplays(List<DisplayInfo> displays)
+        {
+            return new ObservableCollection<DisplayViewModel>(
+                displays.Select(d => new DisplayViewModel(d, Scale)));
         }
     }
 }

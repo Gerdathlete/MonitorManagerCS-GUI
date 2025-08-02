@@ -54,6 +54,9 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         private readonly MonitorService _monitorService;
 
+        private SettingsTab _settingsTab;
+        private DisplaysTab _displaysTab;
+
         public MainViewModel()
         {
             //Skip the rest of the constructor to prevent running the monitor service
@@ -70,25 +73,25 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public async void Init()
         {
-            var tab_Settings = new SettingsTab
+            _settingsTab = new SettingsTab
             {
                 TabName = "Settings",
                 Text = "This is a settings tab."
             };
 
-            var tab_Displays = new DisplaysTab();
+            _displaysTab = new DisplaysTab();
 
             var defaultTabs = new List<TabViewModel>()
             {
-                tab_Displays,
-                tab_Settings,
+                _displaysTab,
+                _settingsTab,
             };
 
             Tabs = new ObservableCollection<TabViewModel>(defaultTabs);
 
             SelectedTabIndex = 0;
 
-            var displayManagers = await LoadDisplayTabsAsync();
+            var displayManagers = await LoadDisplaysAsync();
 
             _monitorService.DisplayManagers = displayManagers;
             _monitorService.UpdatePeriodMillis = 5 * 1000;
@@ -150,27 +153,29 @@ namespace MonitorManagerCS_GUI.ViewModels
             _ = _monitorService.Restart();
         }
 
-        private RelayCommand _loadDisplayTabsCommand;
-        public ICommand LoadDisplayTabsCommand
+        private RelayCommand _loadDisplaysCommand;
+        public ICommand LoadDisplaysCommand
         {
             get
             {
-                if (_loadDisplayTabsCommand == null)
+                if (_loadDisplaysCommand == null)
                 {
-                    _loadDisplayTabsCommand = new RelayCommand(LoadDisplayTabs);
+                    _loadDisplaysCommand = new RelayCommand(LoadDisplays);
                 }
 
-                return _loadDisplayTabsCommand;
+                return _loadDisplaysCommand;
             }
         }
-        public async void LoadDisplayTabs()
+        public async void LoadDisplays()
         {
-            _monitorService.DisplayManagers = await LoadDisplayTabsAsync();
+            _monitorService.DisplayManagers = await LoadDisplaysAsync();
         }
 
-        public async Task<List<DisplayManager>> LoadDisplayTabsAsync()
+        public async Task<List<DisplayManager>> LoadDisplaysAsync()
         {
             var displays = await DisplayRetriever.GetDisplayList();
+
+            _displaysTab.Displays = displays;
 
             RemoveDisplayTabs();
 

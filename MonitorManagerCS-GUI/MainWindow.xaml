@@ -91,11 +91,12 @@
 
         <DataTemplate DataType="{x:Type vm:DisplaysTab}">
             <AdornerDecorator>
-                <ItemsControl ItemsSource="{Binding Displays}">
+                <ItemsControl ItemsSource="{Binding DisplayViewModels}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="LightGray" BorderBrush="Gray" BorderThickness="4"
-                                    Width="{Binding ScaledBounds.Width}" Height="{Binding ScaledBounds.Height}">
+                            <Border Background="#DADADA" BorderBrush="Black" BorderThickness="1"
+                                    Width="{Binding ScaledBounds.Width}" Height="{Binding ScaledBounds.Height}"
+                                    CornerRadius="5">
                                 <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </DataTemplate>
@@ -122,7 +123,7 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
             <Button Content="Reload Displays" 
                     Margin="5" Width="Auto" HorizontalAlignment="Center"
-                    Command="{Binding LoadDisplayTabsCommand}"/>
+                    Command="{Binding LoadDisplaysCommand}"/>
             <Button Content="Start Service" 
                     Margin="5" Width="Auto" HorizontalAlignment="Center"
                     Command="{Binding StartServiceCommand}"/>

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using MonitorManagerCS_GUI.Core;
+using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
@@ -177,6 +179,26 @@ namespace MonitorManagerCS_GUI.ViewModels
             OnPropertyChanged(nameof(Height));
             OnPropertyChanged(nameof(Position));
             OnPropertyChanged(nameof(Size));
+        }
+
+        public DisplayViewModel(DisplayInfo displayInfo, double scale)
+        {
+            _scale = scale;
+
+            string serial = displayInfo.SerialNumber == string.Empty 
+                ? "(Not Set)" 
+                : displayInfo.SerialNumber;
+
+            _label = displayInfo.ToString() + Environment.NewLine 
+                + $"SN: {serial}";
+
+            System.Drawing.Rectangle rect = displayInfo.Bounds;
+            SetBounds(new Rect(rect.X, rect.Y, rect.Width, rect.Height));
+        }
+        public DisplayViewModel(double x, double y, double width, double height, double scale)
+        {
+            _scale = scale;
+            SetBounds(new Rect(x, y, width, height));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

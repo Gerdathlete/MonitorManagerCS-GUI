@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace MonitorManagerCS_GUI.Core
 {
@@ -22,6 +24,20 @@ namespace MonitorManagerCS_GUI.Core
             await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/smonitors \"{filePath}\"");
 
             var displays = ParseSMonitorsFile(filePath);
+
+            foreach (var display in displays)
+            {
+                IEnumerable<Screen> screens = Screen.AllScreens
+                    .Where(s => display.NumberID.Contains(s.DeviceName));
+
+                if (screens.Any())
+                {
+                    var screen = screens.First();
+
+                    display.Bounds = screen.Bounds;
+                    display.IsPrimary = screen.Primary;
+                }
+            }
 
             return displays;
         }
