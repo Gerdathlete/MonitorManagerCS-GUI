@@ -37,6 +37,7 @@ namespace MonitorManagerCS_GUI.Core
         internal static async Task<string> RunProgramAsync(string program, string args)
         {
             var tcs = new TaskCompletionSource<string>();
+            string output = "";
 
             var process = new Process
             {
@@ -46,30 +47,40 @@ namespace MonitorManagerCS_GUI.Core
                     Arguments = args,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
                 },
                 EnableRaisingEvents = true
             };
 
-            string output = "";
-
             process.OutputDataReceived += (sender, e) =>
             {
                 if (e.Data != null)
-                {
                     output += e.Data + Environment.NewLine;
-                }
+            };
+
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (e.Data != null)
+                    output += "[stderr] " + e.Data + Environment.NewLine;
             };
 
             process.Exited += (sender, e) =>
             {
-                tcs.SetResult(output);
+                tcs.TrySetResult(output);
                 process.Dispose();
             };
 
-            process.Start();
-            process.BeginOutputReadLine();
+            bool started = process.Start();
+            if (!started)
+            {
+                throw new InvalidOperationException("Failed to start process.");
+            }
 
-            return await tcs.Task;
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            return await tcs.Task.ConfigureAwait(false);
         }
     }
 }
