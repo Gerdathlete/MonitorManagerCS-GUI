@@ -100,6 +100,16 @@
                                     Width="{Binding ActualBounds.Width}" 
                                     Height="{Binding ActualBounds.Height}"
                                     CornerRadius="5">
+
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseEnter">
+                                        <i:InvokeCommandAction Command="{Binding MouseEnterCommand}"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeave">
+                                        <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                
                                 <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </DataTemplate>

@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MonitorManagerCS_GUI.Core;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace MonitorManagerCS_GUI.ViewModels
@@ -167,17 +169,16 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-        private Brush _borderBrush = Brushes.Black;
         public Brush BorderBrush
         {
-            get => _borderBrush;
-            set
+            get
             {
-                if (!Equals(_borderBrush, value))
+                if (_isHighlighted)
                 {
-                    _borderBrush = value;
-                    OnPropertyChanged(nameof(BorderBrush));
+                    return BorderBrushHighlight;
                 }
+                
+                return BorderBrushNormal;
             }
         }
 
@@ -208,6 +209,37 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
+
+        private Brush _borderBrushNormal = Brushes.Transparent;
+        public Brush BorderBrushNormal
+        {
+            get => _borderBrushNormal;
+            set
+            {
+                if (!Equals(_borderBrushNormal, value))
+                {
+                    _borderBrushNormal = value;
+                    OnPropertyChanged(nameof(BorderBrush));
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Brush _borderBrushHighlight = Brushes.Black;
+        public Brush BorderBrushHighlight
+        {
+            get => _borderBrushHighlight;
+            set
+            {
+                if (Equals(_borderBrushHighlight, value))
+                {
+                    _borderBrushHighlight = value;
+                    OnPropertyChanged(nameof(BorderBrush));
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private bool _isHighlighted = false;
 
         private void UpdateActualBounds()
         {
@@ -261,6 +293,44 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             _scale = scale;
             SetBounds(new Rect(x, y, width, height));
+        }
+
+        private RelayCommand _mouseEnterCommand;
+        public ICommand MouseEnterCommand
+        {
+            get
+            {
+                if (_mouseEnterCommand == null)
+                {
+                    _mouseEnterCommand = new RelayCommand(OnMouseEnter);
+                }
+
+                return _mouseEnterCommand;
+            }
+        }
+        private void OnMouseEnter()
+        {
+            _isHighlighted = true;
+            OnPropertyChanged(nameof(BorderBrush));
+        }
+
+        private RelayCommand _mouseLeaveCommand;
+        public ICommand MouseLeaveCommand
+        {
+            get
+            {
+                if (_mouseLeaveCommand == null)
+                {
+                    _mouseLeaveCommand = new RelayCommand(OnMouseLeave);
+                }
+
+                return _mouseLeaveCommand;
+            }
+        }
+        private void OnMouseLeave()
+        {
+            _isHighlighted = false;
+            OnPropertyChanged(nameof(BorderBrush));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
