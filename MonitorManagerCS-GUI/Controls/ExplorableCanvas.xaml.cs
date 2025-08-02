@@ -12,7 +12,19 @@ namespace MonitorManagerCS_GUI.Controls
     /// </summary>
     public partial class ExplorableCanvas : Panel
     {
-        public Thickness ContentsPadding { get; set; } = new Thickness(100);
+        private Thickness _contentsPadding = new Thickness(100);
+        public Thickness ContentsPadding
+        {
+            get => _contentsPadding;
+            set
+            {
+                if (_contentsPadding != value)
+                {
+                    _contentsPadding = value;
+                    InvalidateArrange();
+                }
+            }
+        }
 
         public static readonly DependencyProperty XProperty;
         public static readonly DependencyProperty YProperty;
@@ -22,9 +34,11 @@ namespace MonitorManagerCS_GUI.Controls
         private double _minScaleFactor = 1.0;
         private const double _maxScaleFactor = 100.0;
         private Rect _providedBounds;
-        private Size _size;
+        private Rect _untransformedBounds;
         private Rect _bounds;
         private double _currentScale;
+        private double _xOffset = 0.0;
+        private double _yOffset = 0.0;
 
         static ExplorableCanvas()
         {
@@ -193,7 +207,7 @@ namespace MonitorManagerCS_GUI.Controls
 
         private Rect GetBounds()
         {
-            return RenderTransform.TransformBounds(new Rect(_size));
+            return RenderTransform.TransformBounds(_untransformedBounds);
         }
 
         public static void SetX(UIElement element, double value)
@@ -233,17 +247,42 @@ namespace MonitorManagerCS_GUI.Controls
             return (double)element.GetValue(YProperty);
         }
 
-        /// <summary>
-        /// Positions the child elements of this ExplorableCanvas
-        /// </summary>
-        /// <param name="availableSpace">The size allocated for positioning child elements</param>
-        /// <returns>The total size used after positioning child elements</returns>
-        protected override Size ArrangeOverride(Size availableSpace)
+        public double GetPaddedX(UIElement element)
         {
-            _providedBounds = new Rect(availableSpace);
+            double x = 0.0;
 
-            double maxX = ContentsPadding.Left + ContentsPadding.Right; //default if no children
-            double maxY = ContentsPadding.Top + ContentsPadding.Bottom;
+            double newX = GetX(element);
+            if (!double.IsNaN(newX))
+            {
+                x = newX + ContentsPadding.Left;
+            }
+
+            return x;
+        }
+        public double GetPaddedY(UIElement element)
+        {
+            double y = 0.0;
+
+            double newY = GetY(element);
+            if (!double.IsNaN(newY))
+            {
+                y = newY + ContentsPadding.Top;
+            }
+
+            return y;
+        }
+
+        private Rect GetChildrenBounds()
+        {
+            //default bounds if no children
+            Rect bounds = new Rect(0, 0,
+                ContentsPadding.Left + ContentsPadding.Right,
+                ContentsPadding.Top + ContentsPadding.Bottom);
+
+            var minX = bounds.Left;
+            var minY = bounds.Top;
+            var maxX = bounds.Right;
+            var maxY = bounds.Bottom;
 
             foreach (UIElement internalChild in InternalChildren)
             {
@@ -252,23 +291,14 @@ namespace MonitorManagerCS_GUI.Controls
                     continue;
                 }
 
-                double childX = 0.0;
-                double childY = 0.0;
+                double childX = GetPaddedX(internalChild);
+                double childY = GetPaddedY(internalChild);
 
-                double newX = GetX(internalChild) + ContentsPadding.Left;
-                if (!double.IsNaN(newX))
-                {
-                    childX = newX;
-                }
+                double childMinX = GetX(internalChild);
+                double childMinY = GetY(internalChild);
 
-                double newY = GetY(internalChild) + ContentsPadding.Top;
-                if (!double.IsNaN(newY))
-                {
-                    childY = newY;
-                }
-
-                internalChild.Arrange(new Rect(new Point(childX, childY),
-                    internalChild.DesiredSize));
+                minX = Math.Min(minX, childMinX);
+                minY = Math.Min(minY, childMinY);
 
                 double childMaxX = childX + internalChild.DesiredSize.Width
                     + ContentsPadding.Right;
@@ -279,24 +309,59 @@ namespace MonitorManagerCS_GUI.Controls
                 maxY = Math.Max(maxY, childMaxY);
             }
 
-            _size = new Size(maxX, maxY);
-
-            if (_size.Width <= 0 || _size.Height <= 0)
+            if (minX < 0)
             {
-                throw new Exception("ExplorableCanvas._size has a zero or negative dimension!");
+                _xOffset = -minX;
+            }
+
+            if (minY < 0)
+            {
+                _yOffset = -minY;
+            }
+
+            bounds = new Rect(_xOffset + minX, _yOffset + minY, maxX - minX, maxY - minY);
+
+            if (bounds.Width <= 0 || bounds.Height <= 0)
+            {
+                throw new Exception($"{nameof(ExplorableCanvas)}.{nameof(GetChildrenBounds)} " +
+                    $"returned an invalid width or height!");
+            }
+
+            return bounds;
+        }
+
+        /// <summary>
+        /// Positions the child elements of this ExplorableCanvas
+        /// </summary>
+        /// <param name="availableSpace">The size allocated for positioning child elements</param>
+        /// <returns>The total size used after positioning child elements</returns>
+        protected override Size ArrangeOverride(Size availableSpace)
+        {
+            _providedBounds = new Rect(availableSpace);
+
+            _untransformedBounds = GetChildrenBounds();
+            var bounds = _untransformedBounds;
+
+            foreach (UIElement internalChild in InternalChildren)
+            {
+                double childX = GetPaddedX(internalChild) + _xOffset;
+                double childY = GetPaddedY(internalChild) + _yOffset;
+
+                internalChild.Arrange(new Rect(new Point(childX, childY),
+                    internalChild.DesiredSize));
             }
 
             _minScaleFactor = Math.Max(
-                _providedBounds.Width / _size.Width,
-                _providedBounds.Height / _size.Height);
+                _providedBounds.Width / bounds.Width,
+                _providedBounds.Height / bounds.Height);
 
             SetScale(_minScaleFactor);
-            CenterAboutPoint(new Point(maxX / 2, maxY / 2));
+            CenterAboutPoint(new Point(bounds.Right / 2, bounds.Left / 2));
 
             //Always take up the full available space, even if the contents are smaller, because
             //the canvas is scaled to fit in the window
-            var arrangeSize = new Size(Math.Max(availableSpace.Width, _size.Width),
-                Math.Max(availableSpace.Height, _size.Height));
+            var arrangeSize = new Size(Math.Max(availableSpace.Width, bounds.Width),
+                Math.Max(availableSpace.Height, bounds.Height));
 
             return arrangeSize;
         }
