@@ -188,9 +188,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Assets\icon.ico" />
   </ItemGroup>
   <ItemGroup />
