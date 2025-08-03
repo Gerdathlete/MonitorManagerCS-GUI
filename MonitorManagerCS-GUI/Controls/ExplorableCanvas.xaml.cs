@@ -31,6 +31,8 @@ namespace MonitorManagerCS_GUI.Controls
 
         private Point _lastMousePos;
         private bool _isPanning = false;
+        private bool _isHoldingLeftMouse = false;
+        private double _panDeadzone = 10.0;
         private double _minScaleFactor = 1.0;
         private const double _maxScaleFactor = 100.0;
         private Rect _providedBounds;
@@ -83,20 +85,22 @@ namespace MonitorManagerCS_GUI.Controls
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                _isPanning = true;
+                _isHoldingLeftMouse = true;
 
                 var globalMousePos = e.GetPosition(null);
                 _lastMousePos = globalMousePos;
-                Mouse.Capture(this, CaptureMode.SubTree);
             }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
+            if (!_isHoldingLeftMouse) return;
+
+            Point globalMousePos = e.GetPosition(null);
+            Vector delta = globalMousePos - _lastMousePos;
+
             if (_isPanning)
             {
-                Point globalMousePos = e.GetPosition(null);
-                Vector delta = globalMousePos - _lastMousePos;
                 _lastMousePos = globalMousePos;
 
                 PanTransform.X += delta.X;
@@ -104,14 +108,34 @@ namespace MonitorManagerCS_GUI.Controls
 
                 MoveViewInBounds();
             }
+            else
+            {
+                DebugDrawPointOnCanvas(e.GetPosition(this), Brushes.Transparent, _panDeadzone);
+                _canRedrawDebug = false;
+
+
+                if (delta.Length > _panDeadzone)
+                {
+                    ClearDebugDrawings();
+
+                    _isPanning = true;
+                    Mouse.Capture(this);
+                }
+            }
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                _isPanning = false;
-                Mouse.Capture(null);
+                _isHoldingLeftMouse = false;
+                ClearDebugDrawings();
+
+                if (_isPanning)
+                {
+                    _isPanning = false;
+                    Mouse.Capture(null);
+                }
             }
         }
 
@@ -411,6 +435,7 @@ namespace MonitorManagerCS_GUI.Controls
 #endif
 
         private DebugAdorner _debugAdorner;
+        private bool _canRedrawDebug = true;
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -426,7 +451,7 @@ namespace MonitorManagerCS_GUI.Controls
 
         public void DebugDrawPointOnCanvas(Point pt, Brush brush, double radius = 3)
         {
-            if (!_debug) return;
+            if (!_debug || !_canRedrawDebug) return;
 
             pt = RenderTransform.Transform(pt);
 
@@ -434,7 +459,7 @@ namespace MonitorManagerCS_GUI.Controls
         }
         public void DebugDrawPoint(Point pt, Brush brush, double radius = 3)
         {
-            if (!_debug) return;
+            if (!_debug || !_canRedrawDebug) return;
 
             _debugAdorner?.DrawActions.Add(dc =>
             {
@@ -445,7 +470,7 @@ namespace MonitorManagerCS_GUI.Controls
 
         public void DebugDrawLineOnCanvas(Point from, Point to, Brush brush, double thickness = 1)
         {
-            if (!_debug) return;
+            if (!_debug || !_canRedrawDebug) return;
 
             from = RenderTransform.Transform(from);
             to = RenderTransform.Transform(to);
@@ -454,7 +479,7 @@ namespace MonitorManagerCS_GUI.Controls
         }
         public void DebugDrawLine(Point from, Point to, Brush brush, double thickness = 1)
         {
-            if (!_debug) return;
+            if (!_debug || !_canRedrawDebug) return;
 
             _debugAdorner?.DrawActions.Add(dc =>
             {
@@ -466,7 +491,7 @@ namespace MonitorManagerCS_GUI.Controls
 
         public void DebugDrawRectOnCanvas(Rect rect, Brush fill, Brush outline, double thickness = 1)
         {
-            if (!_debug) return;
+            if (!_debug || !_canRedrawDebug) return;
 
             rect = RenderTransform.TransformBounds(rect);
 
@@ -474,7 +499,7 @@ namespace MonitorManagerCS_GUI.Controls
         }
         public void DebugDrawRect(Rect rect, Brush fill, Brush outline, double thickness = 1)
         {
-            if (!_debug) return;
+            if (!_debug || !_canRedrawDebug) return;
 
             _debugAdorner?.DrawActions.Add(dc =>
             {
@@ -490,6 +515,7 @@ namespace MonitorManagerCS_GUI.Controls
 
             _debugAdorner?.DrawActions.Clear();
             _debugAdorner?.Invalidate();
+            _canRedrawDebug = true;
         }
 
         #endregion

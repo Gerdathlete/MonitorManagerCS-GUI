@@ -186,8 +186,10 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaySelector}">
-            <!--  Display Selector  -->
+            
+            <!--  Debug Overlay For ExplorableCanvas  -->
             <AdornerDecorator>
+                <!--  Display Selector  -->
                 <ItemsControl ItemsSource="{Binding DisplayViewModels}">
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
@@ -198,7 +200,7 @@
 
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <ctrls:ExplorableCanvas />
+                            <ctrls:ExplorableCanvas ContentsPadding="50,130" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
