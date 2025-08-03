@@ -87,10 +87,8 @@ namespace MonitorManagerCS_GUI.Controls
 
                 var globalMousePos = e.GetPosition(null);
                 _lastMousePos = globalMousePos;
-                Mouse.Capture(this);
+                Mouse.Capture(this, CaptureMode.SubTree);
             }
-
-            e.Handled = true;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -106,8 +104,6 @@ namespace MonitorManagerCS_GUI.Controls
 
                 MoveViewInBounds();
             }
-
-            e.Handled = true;
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
@@ -117,8 +113,6 @@ namespace MonitorManagerCS_GUI.Controls
                 _isPanning = false;
                 Mouse.Capture(null);
             }
-
-            e.Handled = true;
         }
 
         public void ZoomAboutPoint(Point pos, double zoomFactor)
