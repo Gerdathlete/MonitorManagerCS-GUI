@@ -8,7 +8,7 @@ namespace MonitorManagerCS_GUI.Core
     public class DisplayManager
     {
         [JsonProperty]
-        public DisplayInfo Display { get; }
+        public DisplayInfo Display { get; set; }
         [JsonProperty]
         public List<VCPCodeController> VCPCodeControllers { get; set; }
 
@@ -63,7 +63,7 @@ namespace MonitorManagerCS_GUI.Core
             string json = File.ReadAllText(filePath);
             var displayManager = JsonConvert.DeserializeObject<DisplayManager>(json);
 
-            displayManager.Display.NumberID = display.NumberID;
+            displayManager.Display = display;
 
             return displayManager;
         }

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MonitorManagerCS_GUI.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -68,7 +69,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public static string GetTabName(DisplayInfo display)
         {
-            return $"{display.ShortID} (SN: {display.SerialNumber})";
+            return $"VCP Codes for Display {display.Number}";
         }
 
         public void SelectVCPCode(string code)
@@ -93,17 +94,17 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-        private RelayCommand saveAndApplyCommand;
+        private RelayCommand _saveAndApplyCommand;
         public ICommand SaveAndApplyCommand
         {
             get
             {
-                if (saveAndApplyCommand == null)
+                if (_saveAndApplyCommand == null)
                 {
-                    saveAndApplyCommand = new RelayCommand(SaveAndApply);
+                    _saveAndApplyCommand = new RelayCommand(SaveAndApply);
                 }
 
-                return saveAndApplyCommand;
+                return _saveAndApplyCommand;
             }
         }
 
@@ -117,6 +118,26 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             //Save to config file
             _displayManager.Save();
+        }
+
+        private RelayCommand _exitButtonCommand;
+        public ICommand ExitButtonCommand
+        {
+            get
+            {
+                if (_exitButtonCommand == null)
+                {
+                    _exitButtonCommand = new RelayCommand(OnExitButton);
+                }
+
+                return _exitButtonCommand;
+            }
+        }
+
+        public event EventHandler ExitButtonPressed;
+        private void OnExitButton()
+        {
+            ExitButtonPressed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

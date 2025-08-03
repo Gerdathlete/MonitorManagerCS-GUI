@@ -1,176 +1,277 @@
-﻿<Window x:Class="MonitorManagerCS_GUI.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MonitorManagerCS_GUI"
-        xmlns:vm="clr-namespace:MonitorManagerCS_GUI.ViewModels"
-        xmlns:ctrls="clr-namespace:MonitorManagerCS_GUI.Controls"
-        xmlns:livecharts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
-        Title="Nathan's Monitor Manager"
-        Width="800" Height="450"
-        FontFamily="pack://application:,,,/Assets/Fonts/#Inter Variable">
+﻿<Window
+    x:Class="MonitorManagerCS_GUI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ctrls="clr-namespace:MonitorManagerCS_GUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:livecharts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+    xmlns:local="clr-namespace:MonitorManagerCS_GUI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:MonitorManagerCS_GUI.ViewModels"
+    Title="Nathan's Monitor Manager"
+    Width="825"
+    Height="500"
+    d:DataContext="{d:DesignInstance Type=vm:MainViewModel,
+                                     IsDesignTimeCreatable=True}"
+    FontFamily="pack://application:,,,/Assets/Fonts/#Inter Variable"
+    mc:Ignorable="d">
 
     <Window.Icon>
-        <BitmapImage UriSource="pack://application:,,,/Assets/icon.ico"/>
+        <BitmapImage UriSource="pack://application:,,,/Assets/icon.ico" />
     </Window.Icon>
 
     <Window.Resources>
-        <!-- Tab Templates -->
+        <!--  Tab Templates  -->
         <DataTemplate DataType="{x:Type vm:DisplayTab}">
-            <!-- Display Tab Content -->
-            <Grid Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
+            <!--  Display Tab Content  -->
+            <Border BorderBrush="LightGray" BorderThickness="3">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Margin="5">
-                    <!-- Combobox and activation checkbox -->
-                    <StackPanel Grid.Column="0" HorizontalAlignment="Center" 
+                    <!--  Window bar with X button  -->
+                    <Grid Grid.Row="0" Margin="5">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Text="{Binding TabName}"
+                            TextAlignment="Center" />
+                        <Button
+                            Width="30"
+                            Height="30"
+                            HorizontalAlignment="Right"
+                            Command="{Binding ExitButtonCommand}"
+                            Content="🗙"
+                            Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="Background" Value="#19000000" />
+                                    <Setter Property="BorderBrush" Value="LightGray" />
+                                    <Setter Property="BorderThickness" Value="1" />
+                                    <Setter Property="Foreground" Value="Gray" />
+                                    <Setter Property="FontSize" Value="16" />
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#0CFF0000" />
+                                            <Setter Property="Foreground" Value="#FFBF9E9E" />
+                                            <Setter Property="BorderBrush" Value="#8FFF8F8F" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Foreground" Value="#FFB57777" />
+                                            <Setter Property="BorderThickness" Value="2" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+
+                    <!--  Menu Bar Separator  -->
+                    <Separator
+                        Grid.Row="1"
+                        Margin="5"
+                        Foreground="LightGray" />
+
+                    <!--  VCP code automation editor  -->
+                    <Grid Grid.Row="2" Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <!--  Combobox and activation checkbox  -->
+                        <Grid Grid.Row="0" Margin="5">
+                            <StackPanel
+                                Grid.Column="0"
+                                HorizontalAlignment="Center"
                                 Orientation="Horizontal">
-                        <ComboBox Grid.Column="0" 
-                                  ItemsSource="{Binding VCPCodeCharts}" SelectedItem="{Binding SelectedVCPCodeChart}" 
-                                  MaxWidth="200" Height="25">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" DataContext="{Binding VCPController}">
-                                        <TextBlock Text="{Binding Name}"/>
-                                        <TextBlock Text=" ("/>
-                                        <TextBlock Text="{Binding Code}"/>
-                                        <TextBlock Text=")"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <TextBlock Text="Automated?" Margin="5,5,0,5"/>
-                        <CheckBox Margin ="5" 
-              DataContext="{Binding SelectedVCPCodeChart}" 
-              IsChecked="{Binding Enabled}"/>
-                    </StackPanel>
+                                <ComboBox
+                                    Grid.Column="0"
+                                    Height="25"
+                                    MaxWidth="200"
+                                    ItemsSource="{Binding VCPCodeCharts}"
+                                    SelectedItem="{Binding SelectedVCPCodeChart}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel DataContext="{Binding VCPController}" Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Name}" />
+                                                <TextBlock Text=" (" />
+                                                <TextBlock Text="{Binding Code}" />
+                                                <TextBlock Text=")" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBlock Margin="5,5,0,5" Text="Automated?" />
+                                <CheckBox
+                                    Margin="5"
+                                    DataContext="{Binding SelectedVCPCodeChart}"
+                                    IsChecked="{Binding Enabled}" />
+                            </StackPanel>
 
-                    <Button Grid.Column="0" HorizontalAlignment="Right" 
-                            Content="Save and Apply"
-                            Command="{Binding SaveAndApplyCommand}"/>
+                            <Button
+                                Grid.Column="0"
+                                HorizontalAlignment="Right"
+                                Command="{Binding SaveAndApplyCommand}"
+                                Content="Save and Apply" />
+                        </Grid>
+
+                        <!--  Interactive Chart  -->
+                        <Grid
+                            Grid.Row="1"
+                            Margin="5"
+                            DataContext="{Binding SelectedVCPCodeChart}">
+
+                            <livecharts:CartesianChart
+                                MinWidth="740"
+                                MinHeight="258"
+                                Margin="5"
+                                EasingFunction="{x:Null}"
+                                IsEnabled="{Binding Enabled}"
+                                PointerMoveCommand="{Binding PointerMovedCommand}"
+                                PointerPressedCommand="{Binding PointerPressedCommand}"
+                                PointerReleasedCommand="{Binding PointerReleasedCommand}"
+                                Series="{Binding DraggableSeries}"
+                                TooltipPosition="{Binding TooltipPos}"
+                                XAxes="{Binding XAxes}"
+                                YAxes="{Binding YAxes}" />
+
+                            <!--  Rectangle that indicates the chart is disabled  -->
+                            <Rectangle
+                                Fill="Gray"
+                                IsHitTestVisible="False"
+                                Opacity="0.25"
+                                Visibility="{Binding Enabled, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                        </Grid>
+                    </Grid>
                 </Grid>
-                
-                <!-- Interactive Chart -->
-                <Grid Grid.Row="1" 
-                      DataContext="{Binding SelectedVCPCodeChart}"
-                      Margin="5">
-                    
-                    <livecharts:CartesianChart 
-                        MinWidth="740" MinHeight="258" Margin="5"
-                        Series ="{Binding DraggableSeries}" 
-                        XAxes="{Binding XAxes}" YAxes="{Binding YAxes}"
-                        PointerReleasedCommand="{Binding PointerReleasedCommand}"
-                        PointerMoveCommand="{Binding PointerMovedCommand}"
-                        PointerPressedCommand="{Binding PointerPressedCommand}"
-                        EasingFunction="{x:Null}"
-                        TooltipPosition="{Binding TooltipPos}"
-                        IsEnabled="{Binding Enabled}">
-                    </livecharts:CartesianChart>
-                    
-                    <!-- Rectangle that indicates the chart is disabled -->
-                    <Rectangle Fill="Gray" Opacity="0.25" IsHitTestVisible="False" 
-                               Visibility="{Binding Enabled, 
-                        Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                </Grid>
-                
-                
-            </Grid>
+            </Border>
         </DataTemplate>
-        
+
         <DataTemplate DataType="{x:Type vm:SettingsTab}">
-            <!-- Settings Tab Content -->
-            <TextBlock Text="{Binding Text}"/>
+            <!--  Settings Tab Content  -->
+            <TextBlock Text="{Binding Text}" />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaysTab}">
             <TabControl
+                BorderThickness="0"
                 ItemsSource="{Binding Tabs}"
-                SelectedItem="{Binding SelectedTab}"
                 SelectedIndex="{Binding SelectedTabIndex}"
-                BorderThickness="0">
+                SelectedItem="{Binding SelectedTab}">
                 <TabControl.Resources>
                     <Style TargetType="TabItem">
-                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Setter Property="Visibility" Value="Collapsed" />
                     </Style>
                 </TabControl.Resources>
             </TabControl>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaySelector}">
-            <!--Display Selector-->
+            <!--  Display Selector  -->
             <AdornerDecorator>
                 <ItemsControl ItemsSource="{Binding DisplayViewModels}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="{Binding Background}" 
-                                    BorderBrush="{Binding BorderBrush}" 
-                                    BorderThickness="{Binding BorderThickness}"
-                                    Width="{Binding ActualBounds.Width}" 
-                                    Height="{Binding ActualBounds.Height}"
-                                    CornerRadius="5">
-
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseEnter">
-                                        <i:InvokeCommandAction Command="{Binding MouseEnterCommand}"/>
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeave">
-                                        <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-
-                                <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
-                            <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding ActualBounds.Left}"/>
-                            <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding ActualBounds.Top}"/>
+                            <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding ActualBounds.Left}" />
+                            <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding ActualBounds.Top}" />
                         </Style>
                     </ItemsControl.ItemContainerStyle>
 
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <ctrls:ExplorableCanvas/>
+                            <ctrls:ExplorableCanvas />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
             </AdornerDecorator>
         </DataTemplate>
 
+        <!--  Other Templates  -->
+        <DataTemplate DataType="{x:Type vm:DisplayViewModel}">
+            <Border
+                Width="{Binding ActualBounds.Width}"
+                Height="{Binding ActualBounds.Height}"
+                Background="{Binding Background}"
+                BorderBrush="{Binding BorderBrush}"
+                BorderThickness="{Binding BorderThickness}"
+                CornerRadius="5">
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseLeave">
+                        <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseUp">
+                        <i:InvokeCommandAction Command="{Binding MouseUpCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="{Binding Label}" />
+            </Border>
+        </DataTemplate>
+
     </Window.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button Content="Reload Displays" 
-                    Margin="5" Width="Auto" HorizontalAlignment="Center"
-                    Command="{Binding LoadDisplaysCommand}"/>
-            <Button Content="Start Service" 
-                    Margin="5" Width="Auto" HorizontalAlignment="Center"
-                    Command="{Binding StartServiceCommand}"/>
-            <Button Content="End Service" 
-                    Margin="5" Width="Auto" HorizontalAlignment="Center"
-                    Command="{Binding EndServiceCommand}"/>
-            <Button Content="Restart Service" 
-                    Margin="5" Width="Auto" HorizontalAlignment="Center"
-                    Command="{Binding RestartServiceCommand}"/>
+            <Button
+                Width="Auto"
+                Margin="5"
+                HorizontalAlignment="Center"
+                Command="{Binding LoadDisplaysCommand}"
+                Content="Reload Displays" />
+            <Button
+                Width="Auto"
+                Margin="5"
+                HorizontalAlignment="Center"
+                Command="{Binding StartServiceCommand}"
+                Content="Start Service" />
+            <Button
+                Width="Auto"
+                Margin="5"
+                HorizontalAlignment="Center"
+                Command="{Binding EndServiceCommand}"
+                Content="End Service" />
+            <Button
+                Width="Auto"
+                Margin="5"
+                HorizontalAlignment="Center"
+                Command="{Binding RestartServiceCommand}"
+                Content="Restart Service" />
         </StackPanel>
-        <TabControl 
-            DockPanel.Dock="Bottom" 
-            ItemsSource="{Binding Tabs}" 
-            SelectedItem="{Binding SelectedTab}" 
-            SelectedIndex="{Binding SelectedTabIndex}">
+
+        <TabControl
+            DockPanel.Dock="Bottom"
+            ItemsSource="{Binding Tabs}"
+            SelectedIndex="{Binding SelectedTabIndex}"
+            SelectedItem="{Binding SelectedTab}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <!-- Tab Header -->
-                    <TextBlock Text="{Binding TabName}"/>
+                    <!--  Tab Header  -->
+                    <TextBlock Text="{Binding TabName}" />
                 </DataTemplate>
             </TabControl.ItemTemplate>
         </TabControl>

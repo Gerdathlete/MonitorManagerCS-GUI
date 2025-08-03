@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
@@ -104,8 +101,14 @@ namespace MonitorManagerCS_GUI.ViewModels
 
                 //Select brightness by default
                 displayTab.SelectVCPCode("10");
+                displayTab.ExitButtonPressed += DisplayTab_ExitButtonPressed;
             }
 
+            SelectedTab = _selectorTab;
+        }
+
+        private void DisplayTab_ExitButtonPressed(object sender, EventArgs e)
+        {
             SelectedTab = _selectorTab;
         }
 
@@ -131,7 +134,38 @@ namespace MonitorManagerCS_GUI.ViewModels
         private ObservableCollection<DisplayViewModel> GetVMsFromDisplays(List<DisplayInfo> displays)
         {
             return new ObservableCollection<DisplayViewModel>(
-                displays.Select(d => new DisplayViewModel(d, Scale)));
+                displays.Select(d =>
+                {
+                    var vm = new DisplayViewModel(d, Scale);
+                    vm.LeftClicked += DisplayVM_OnLeftClicked;
+                    return vm;
+                }));
+        }
+
+        private void DisplayVM_OnLeftClicked(object sender, DisplayInfo display)
+        {
+            var displayTab = GetDisplayTab(display);
+
+            if (displayTab is null) return;
+
+            SelectedTab = displayTab;
+        }
+
+        private DisplayTab GetDisplayTab(DisplayInfo display)
+        {
+            var displayTabs = Tabs
+                .Where(t => t is DisplayTab)
+                .Select(t => (DisplayTab)t);
+
+            foreach (var displayTab in displayTabs)
+            {
+                if (displayTab.DisplayManager.Display == display)
+                {
+                    return displayTab;
+                }
+            }
+
+            return null;
         }
     }
 

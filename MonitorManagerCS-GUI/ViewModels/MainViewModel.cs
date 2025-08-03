@@ -13,7 +13,6 @@ namespace MonitorManagerCS_GUI.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
         private ObservableCollection<TabViewModel> _tabs;
         public ObservableCollection<TabViewModel> Tabs
         {
@@ -53,8 +52,8 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
-        private readonly MonitorService _monitorService;
 
+        private readonly MonitorService _monitorService;
         private readonly SettingsTab _settingsTab;
         private readonly DisplaysTab _displaysTab;
 
@@ -76,7 +75,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             Tabs = new ObservableCollection<TabViewModel>(defaultTabs);
 
-            SelectedTabIndex = 0;
+            SelectedTab = _displaysTab;
 
             //Skip the rest of the constructor to prevent running the monitor service
             //in the design window
@@ -218,6 +217,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             BindingErrors.Show();
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

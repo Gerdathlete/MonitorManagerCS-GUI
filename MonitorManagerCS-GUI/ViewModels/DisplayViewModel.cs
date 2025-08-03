@@ -3,8 +3,10 @@ using CommunityToolkit.Mvvm.Input;
 using MonitorManagerCS_GUI.Core;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -241,6 +243,8 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         private bool _isHighlighted = false;
 
+        private readonly DisplayInfo _display;
+
         private void UpdateActualBounds()
         {
             if (Bounds == Rect.Empty) return;
@@ -277,6 +281,8 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public DisplayViewModel(DisplayInfo displayInfo, double scale)
         {
+            _display = displayInfo;
+
             _scale = scale;
 
             string serial = displayInfo.SerialNumber == string.Empty
@@ -338,6 +344,28 @@ namespace MonitorManagerCS_GUI.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private RelayCommand<MouseButtonEventArgs> _mouseUpCommand;
+        public ICommand MouseUpCommand
+        {
+            get
+            {
+                if (_mouseUpCommand == null)
+                {
+                    _mouseUpCommand = new RelayCommand<MouseButtonEventArgs>(MouseUp);
+                }
+
+                return _mouseUpCommand;
+            }
+        }
+        public event EventHandler<DisplayInfo> LeftClicked;
+        private void MouseUp(MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                LeftClicked?.Invoke(this, _display);
+            }
         }
     }
 }
