@@ -90,6 +90,21 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaysTab}">
+            <TabControl
+                ItemsSource="{Binding Tabs}"
+                SelectedItem="{Binding SelectedTab}"
+                SelectedIndex="{Binding SelectedTabIndex}"
+                BorderThickness="0">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </Style>
+                </TabControl.Resources>
+            </TabControl>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:DisplaySelector}">
+            <!--Display Selector-->
             <AdornerDecorator>
                 <ItemsControl ItemsSource="{Binding DisplayViewModels}">
                     <ItemsControl.ItemTemplate>
@@ -109,7 +124,7 @@
                                         <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
-                                
+
                                 <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </DataTemplate>

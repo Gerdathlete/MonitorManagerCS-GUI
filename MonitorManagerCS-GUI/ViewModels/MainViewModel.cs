@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MonitorManagerCS_GUI.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -54,24 +55,10 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         private readonly MonitorService _monitorService;
 
-        private SettingsTab _settingsTab;
-        private DisplaysTab _displaysTab;
+        private readonly SettingsTab _settingsTab;
+        private readonly DisplaysTab _displaysTab;
 
         public MainViewModel()
-        {
-            //Skip the rest of the constructor to prevent running the monitor service
-            //in the design window
-            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-            {
-                return;
-            }
-
-            _monitorService = MonitorService.Instance();
-
-            Init();
-        }
-
-        public async void Init()
         {
             _settingsTab = new SettingsTab
             {
@@ -91,12 +78,27 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             SelectedTabIndex = 0;
 
-            var displayManagers = await LoadDisplaysAsync();
+            //Skip the rest of the constructor to prevent running the monitor service
+            //in the design window
+            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+            {
+                return;
+            }
 
-            _monitorService.DisplayManagers = displayManagers;
-            _monitorService.UpdatePeriodMillis = 5 * 1000;
+            _monitorService = MonitorService.Instance();
 
-            _monitorService.Start();
+            _ = Task.Run(async () =>
+            {
+                await UpdateDisplaysAsync();
+
+                _monitorService.UpdatePeriodMillis =
+#if DEBUG
+                5 * 1000; //Every five seconds
+#else
+                5 * 60 * 1000; //Every five minutes
+#endif
+                _monitorService.Start();
+            });
         }
 
         private RelayCommand _startServiceCommand;
@@ -166,19 +168,13 @@ namespace MonitorManagerCS_GUI.ViewModels
                 return _loadDisplaysCommand;
             }
         }
-        public async void LoadDisplays()
+        public void LoadDisplays()
         {
-            _monitorService.DisplayManagers = await LoadDisplaysAsync();
+            Task.Run(UpdateDisplaysAsync);
         }
 
-        public async Task<List<DisplayManager>> LoadDisplaysAsync()
+        public async Task<List<DisplayManager>> GetDisplayManagersAsync(List<DisplayInfo> displays)
         {
-            var displays = await DisplayRetriever.GetDisplayList();
-
-            _displaysTab.Displays = displays;
-
-            RemoveDisplayTabs();
-
             var displayManagers = new List<DisplayManager>();
             foreach (var display in displays)
             {
@@ -191,28 +187,26 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
 
                 displayManagers.Add(displayManager);
-
-                var displayTab = new DisplayTab(displayManager);
-
-                Tabs.Insert(0, displayTab);
-
-                //Select brightness by default
-                displayTab.SelectVCPCode("10");
             }
-
-            SelectedTabIndex = 0;
 
             return displayManagers;
         }
 
-        private void RemoveDisplayTabs()
+        public async Task UpdateDisplaysAsync()
         {
-            var displayTabs = Tabs.OfType<DisplayTab>().ToList();
+            var displays = await DisplayRetriever.GetDisplayList();
+            var displayManagers = await GetDisplayManagersAsync(displays);
 
-            foreach (var tab in displayTabs)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                RemoveTab(tab);
-            }
+                //This needs to run on the UI thread since it sets an ObservableCollection
+                _displaysTab.Displays = displays;
+
+                //This has to be run after displays is set
+                _displaysTab.DisplayManagers = displayManagers;
+            });
+
+            _monitorService.DisplayManagers = displayManagers;
         }
 
         public void RemoveTab(TabViewModel tab)

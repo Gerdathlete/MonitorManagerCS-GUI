@@ -1,14 +1,57 @@
 ﻿using MonitorManagerCS_GUI.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
     public class DisplaysTab : TabViewModel
     {
+        private ObservableCollection<TabViewModel> _tabs = new ObservableCollection<TabViewModel>();
+        public ObservableCollection<TabViewModel> Tabs
+        {
+            get => _tabs;
+            set
+            {
+                if (_tabs != value)
+                {
+                    _tabs = value;
+                    OnPropertyChanged(nameof(Tabs));
+                }
+            }
+        }
+        private TabViewModel _selectedTab;
+        public TabViewModel SelectedTab
+        {
+            get => _selectedTab;
+            set
+            {
+                if (_selectedTab != value)
+                {
+                    _selectedTab = value;
+                    OnPropertyChanged(nameof(SelectedTab));
+                }
+            }
+        }
+        private int _selectedTabIndex;
+        public int SelectedTabIndex
+        {
+            get => _selectedTabIndex;
+            set
+            {
+                if (_selectedTabIndex != value)
+                {
+                    _selectedTabIndex = value;
+                    OnPropertyChanged(nameof(SelectedTabIndex));
+                }
+            }
+        }
+
         private List<DisplayInfo> _displays;
         public List<DisplayInfo> Displays
         {
@@ -18,12 +61,84 @@ namespace MonitorManagerCS_GUI.ViewModels
                 if (_displays != value)
                 {
                     _displays = value;
-                    DisplayViewModels = GetVMsFromDisplays(value);
+                    _selectorTab.DisplayViewModels = GetVMsFromDisplays(value);
                 }
             }
         }
 
-        private ObservableCollection<DisplayViewModel> _displayViewModels;
+        private List<DisplayManager> _displayManagers;
+        public List<DisplayManager> DisplayManagers
+        {
+            get => _displayManagers;
+            set
+            {
+                if (_displayManagers != value)
+                {
+                    _displayManagers = value;
+                    UpdateDisplayTabs();
+                }
+            }
+        }
+
+        private readonly DisplaySelector _selectorTab = new DisplaySelector();
+
+        public double Scale { get; set; } = 0.1;
+
+        public DisplaysTab()
+        {
+            TabName = "Displays";
+
+            Tabs.Add(_selectorTab);
+            SelectedTab = _selectorTab;
+        }
+
+        private void UpdateDisplayTabs()
+        {
+            RemoveDisplayTabs();
+
+            foreach (var displayManager in _displayManagers)
+            {
+                var displayTab = new DisplayTab(displayManager);
+
+                Tabs.Add(displayTab);
+
+                //Select brightness by default
+                displayTab.SelectVCPCode("10");
+            }
+
+            SelectedTab = _selectorTab;
+        }
+
+        public void RemoveDisplayTabs()
+        {
+            var displayTabs = Tabs.OfType<DisplayTab>().ToList();
+
+            foreach (var tab in displayTabs)
+            {
+                RemoveTab(tab);
+            }
+        }
+
+        public void RemoveTab(TabViewModel tab)
+        {
+            BindingErrors.Hide();
+
+            Tabs.Remove(tab);
+
+            BindingErrors.Show();
+        }
+
+        private ObservableCollection<DisplayViewModel> GetVMsFromDisplays(List<DisplayInfo> displays)
+        {
+            return new ObservableCollection<DisplayViewModel>(
+                displays.Select(d => new DisplayViewModel(d, Scale)));
+        }
+    }
+
+    public class DisplaySelector : TabViewModel
+    {
+        private ObservableCollection<DisplayViewModel> _displayViewModels =
+            new ObservableCollection<DisplayViewModel>();
         public ObservableCollection<DisplayViewModel> DisplayViewModels
         {
             get { return _displayViewModels; }
@@ -35,20 +150,6 @@ namespace MonitorManagerCS_GUI.ViewModels
                     OnPropertyChanged();
                 }
             }
-        }
-
-        public double Scale { get; set; } = 0.1;
-
-        public DisplaysTab()
-        {
-            DisplayViewModels = new ObservableCollection<DisplayViewModel>();
-            TabName = "Displays";
-        }
-
-        private ObservableCollection<DisplayViewModel> GetVMsFromDisplays(List<DisplayInfo> displays)
-        {
-            return new ObservableCollection<DisplayViewModel>(
-                displays.Select(d => new DisplayViewModel(d, Scale)));
         }
     }
 }
