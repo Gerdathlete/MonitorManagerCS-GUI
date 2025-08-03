@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MonitorManagerCS_GUI.Core
 {
     internal static class Programs
     {
-        internal const string controlMyMonitor =
-            @"C:\PortableApplications\controlmymonitor\ControlMyMonitor.exe";
+        internal static readonly string controlMyMonitor = 
+            Path.Combine(Folders.ControlMyMonitor, "ControlMyMonitor.exe");
 
         /// <summary>
         /// Runs the given program and returns the text output

@@ -186,7 +186,7 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaySelector}">
-            
+
             <!--  Debug Overlay For ExplorableCanvas  -->
             <AdornerDecorator>
                 <!--  Display Selector  -->
