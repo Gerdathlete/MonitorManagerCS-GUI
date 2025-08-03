@@ -10,5 +10,6 @@ Start in system tray setting. - default on
 Minimize to tray setting. - default on
 Zoom in on chart for accurate placement
 Adjust snapping
+Checkbox to show only automated VCP codes for each display
 Copy VCP automation points and paste onto another VCP chart
 Allow VCP codes to be 'linked' so that they are set in parallel and have the same values.
