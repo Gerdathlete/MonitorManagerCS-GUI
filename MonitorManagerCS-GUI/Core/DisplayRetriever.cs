@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -10,6 +9,11 @@ namespace MonitorManagerCS_GUI.Core
 {
     public static class DisplayRetriever
     {
+        public static List<string> InvalidVCPCodes = new List<string>
+        {
+            "08", "04", "06", "05", "0A", "B0", "00"
+        };
+
         public static async Task<List<DisplayInfo>> GetDisplayList()
         {
             string fileDirectory = Folders.CMMonitorOutput;
@@ -44,6 +48,14 @@ namespace MonitorManagerCS_GUI.Core
 
         public static async Task<List<VCPCode>> GetVCPCodes(DisplayInfo display)
         {
+            var vcpCodes = await GetRawVCPCodes(display);
+
+            vcpCodes = vcpCodes.Filtered();
+
+            return vcpCodes;
+        }
+        public static async Task<List<VCPCode>> GetRawVCPCodes(DisplayInfo display)
+        {
             string fileDirectory = Folders.CMMonitorOutput;
             var fileName = display.ConfigFileName;
             var filePath = Path.Combine(fileDirectory, fileName);
@@ -72,6 +84,17 @@ namespace MonitorManagerCS_GUI.Core
             var vcpCodes = JsonSerializer.Deserialize<List<VCPCode>>(json);
 
             return vcpCodes;
+        }
+
+        private static List<VCPCode> Filtered(this List<VCPCode> vcpCodes)
+        {
+            return vcpCodes
+                .Where(vcp =>
+                !InvalidVCPCodes.Contains(vcp.Code) //Isn't in the invalid code list
+                && vcp.MaximumValue != "0" //A max value of 0 indicates an unsupported code
+                && vcp.IsWritable
+                ).GroupBy(vcp => vcp.Code).Select(g => g.First()) //Remove duplicates
+                .ToList();
         }
 
         private static List<DisplayInfo> ParseSMonitorsFile(string filePath)

@@ -1,10 +1,5 @@
 Completely overhauling this program now.
 
-Remove unwanted VCP codes:
-	Duplicates
-	Codes with a current value of 0 and a maximum value of 0
-	Reset codes
-
 Menu bar for restarting service, reloading display information
 	Maybe a dev-only menu bar with extra non-user-friendly options?
 

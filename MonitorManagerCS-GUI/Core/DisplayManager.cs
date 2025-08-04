@@ -27,10 +27,8 @@ namespace MonitorManagerCS_GUI.Core
 
         private List<VCPCodeController> MakeVCPCodeControllers(List<VCPCode> vcpCodes)
         {
-            var writableCodes = vcpCodes.Where(vcpCode => vcpCode.IsWritable).ToList();
-
             var codeControllers = new List<VCPCodeController>();
-            foreach (var vcpCode in writableCodes)
+            foreach (var vcpCode in vcpCodes)
             {
                 var codeController = new VCPCodeController(vcpCode);
                 codeControllers.Add(codeController);
