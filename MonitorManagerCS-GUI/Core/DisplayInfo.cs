@@ -28,6 +28,7 @@ namespace MonitorManagerCS_GUI.Core
         public string ConfigFileName { get => DataFormatter.GetSafeFileName(LongID) + ".json"; }
 
         private string _number = string.Empty;
+        [JsonIgnore]
         public string Number
         {
             get
