@@ -143,9 +143,13 @@ namespace MonitorManagerCS_GUI.Core
         public async Task UpdateActiveVCPCodes() => await UpdateActiveVCPCodes(DisplayManagers);
         private static async Task UpdateActiveVCPCodes(List<DisplayManager> displayManagers)
         {
-            DebugLog("Started updated VCP codes.");
-
             var activeControllersForDisplay = GetActiveControllersForDisplays(displayManagers);
+
+            bool hasActiveVCPs = activeControllersForDisplay.Any(d => d.Value.Any());
+            if (!hasActiveVCPs) return;
+
+            DebugLog("Updating automated VCP codes");
+
             var VCPCommands = new StringBuilder();
 
             foreach (DisplayManager displayManager in displayManagers)
@@ -168,9 +172,11 @@ namespace MonitorManagerCS_GUI.Core
                 }
             }
 
-            await Programs.RunProgramAsync(Programs.ControlMyMonitor, VCPCommands.ToString());
-
-            DebugLog("Finished updating VCP codes.");
+            if (VCPCommands.Length > 0)
+            {
+                await Programs.RunProgramAsync(Programs.ControlMyMonitor, VCPCommands.ToString());
+                DebugLog("Finished updating VCP codes.");
+            }
         }
 
         private static void LogVCPChange(string code, int value, DisplayInfo display)
