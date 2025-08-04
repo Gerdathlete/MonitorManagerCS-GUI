@@ -249,6 +249,12 @@
                 Width="Auto"
                 Margin="5"
                 HorizontalAlignment="Center"
+                Command="{Binding UpdateConfigsCommand}"
+                Content="Update Old Configs" />
+            <Button
+                Width="Auto"
+                Margin="5"
+                HorizontalAlignment="Center"
                 Command="{Binding StartServiceCommand}"
                 Content="Start Service" />
             <Button

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -88,7 +89,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             _ = Task.Run(async () =>
             {
-                await UpdateDisplaysAsync();
+                await GetAndUpdateDisplays();
 
                 _monitorService.UpdatePeriodMillis =
 #if DEBUG
@@ -169,10 +170,42 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         public void LoadDisplays()
         {
-            Task.Run(UpdateDisplaysAsync);
+            Task.Run(GetAndUpdateDisplays);
         }
 
-        public async Task<List<DisplayManager>> GetDisplayManagersAsync(List<DisplayInfo> displays)
+        private RelayCommand updateConfigsCommand;
+        public ICommand UpdateConfigsCommand
+        {
+            get
+            {
+                if (updateConfigsCommand == null)
+                {
+                    updateConfigsCommand = new RelayCommand(UpdateConfigs);
+                }
+
+                return updateConfigsCommand;
+            }
+        }
+        private void UpdateConfigs()
+        {
+            Task.Run(UpdateOldConfigs);
+        }
+
+        public async Task UpdateOldConfigs()
+        {
+            var displays = await DisplayRetriever.GetDisplayList();
+            var displayManagers = new List<DisplayManager>();
+
+            foreach (var display in displays)
+            {
+                var displayManager = await DisplayManager.ConvertOldConfig(display);
+                displayManagers.Add(displayManager);
+            }
+
+            UpdateDisplays(displays, displayManagers);
+        }
+
+        public async Task<List<DisplayManager>> GetDisplayManagers(List<DisplayInfo> displays)
         {
             var displayManagers = new List<DisplayManager>();
             foreach (var display in displays)
@@ -191,11 +224,16 @@ namespace MonitorManagerCS_GUI.ViewModels
             return displayManagers;
         }
 
-        public async Task UpdateDisplaysAsync()
+        public async Task GetAndUpdateDisplays()
         {
             var displays = await DisplayRetriever.GetDisplayList();
-            var displayManagers = await GetDisplayManagersAsync(displays);
+            var displayManagers = await GetDisplayManagers(displays);
 
+            UpdateDisplays(displays, displayManagers);
+        }
+
+        public void UpdateDisplays(List<DisplayInfo> displays, List<DisplayManager> displayManagers)
+        {
             Application.Current.Dispatcher.Invoke(() =>
             {
                 //This needs to run on the UI thread since it sets an ObservableCollection
