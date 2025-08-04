@@ -9,9 +9,20 @@ namespace MonitorManagerCS_GUI.Core
 {
     public static class DisplayRetriever
     {
-        public static List<string> InvalidVCPCodes = new List<string>
+        public static readonly List<string> InvalidVCPCodes = new List<string>
         {
-            "08", "04", "06", "05", "0A", "B0", "00"
+            //Preset Functions
+            "08", "04", "06", "05", "0A", "B0", "00", 
+            //Image Adjustment
+            "0E", "1C", "1E", "1F", "3E", "56", "58", "73", "74", "75", "7C", "88", "A2", "A4", 
+            "A5", "A6", "A7",
+            //Display Control
+            "C8", "C9", "C6", "AC", "DB", "CA", "CC", "B5", "B4", "DF", "AE", 
+            //Geometry
+            "95", "96", "97", "98", "DA",
+            //Miscellaneous Functions
+            "02", "03", "52", "76", "78", "B2", "B6", "C2", "C3", "C4", "C6", "C7", "C8", "CE",
+            "D2", "DE", "8D", "94"
         };
 
         public static async Task<List<DisplayInfo>> GetDisplayList()
@@ -90,9 +101,9 @@ namespace MonitorManagerCS_GUI.Core
         {
             return vcpCodes
                 .Where(vcp =>
-                !InvalidVCPCodes.Contains(vcp.Code) //Isn't in the invalid code list
-                && vcp.MaximumValue != "0" //A max value of 0 indicates an unsupported code
+                vcp.MaximumValue != "0" //A max value of 0 indicates an unsupported code
                 && vcp.IsWritable
+                && !InvalidVCPCodes.Contains(vcp.Code) //Isn't in the invalid code list
                 ).GroupBy(vcp => vcp.Code).Select(g => g.First()) //Remove duplicates
                 .ToList();
         }
