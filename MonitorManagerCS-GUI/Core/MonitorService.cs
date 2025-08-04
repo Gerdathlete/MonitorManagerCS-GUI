@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -119,33 +120,11 @@ namespace MonitorManagerCS_GUI.Core
         private static async Task ServiceLoop(List<DisplayManager> displayManagers,
             CancellationToken cancellationToken, int updatePeriodMillis)
         {
-            Debug.WriteLine("Monitor service started");
-
-            Dictionary<DisplayManager, List<VCPCodeController>> activeControllersForDisplay;
+            DebugLog("Monitor service started");
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                activeControllersForDisplay = GetActiveControllersForDisplays(displayManagers);
-
-                foreach (DisplayManager displayManager in displayManagers)
-                {
-                    var vcpSetTasks = new List<Task>();
-
-                    foreach (var vcpController in activeControllersForDisplay[displayManager])
-                    {
-                        var timedValues = vcpController.TimedValues;
-
-                        if (!timedValues.Any()) { continue; }
-
-                        double currentHour = DateTime.Now.TimeOfDay.TotalHours;
-                        int value = GetInterpolatedInt(timedValues, currentHour);
-
-                        vcpSetTasks.Add(SetVCPValue(displayManager.Display, vcpController, value));
-                    }
-
-                    //Run all the VCP value setters for the display manager in parallel.
-                    await Task.WhenAll(vcpSetTasks);
-                }
+                await UpdateActiveVCPCodes(displayManagers);
 
                 Thread.Sleep(updatePeriodMillis);
                 try
@@ -158,15 +137,52 @@ namespace MonitorManagerCS_GUI.Core
                 }
             }
 
-            Debug.WriteLine("Monitor service ended");
+            DebugLog("Monitor service ended");
         }
 
-        private static async Task SetVCPValue(DisplayInfo Display, VCPCodeController vcpController, int value)
+        public async Task UpdateActiveVCPCodes() => await UpdateActiveVCPCodes(DisplayManagers);
+        private static async Task UpdateActiveVCPCodes(List<DisplayManager> displayManagers)
         {
-            Debug.WriteLine($"Setting VCP code {vcpController.Code} to {value} for {Display.LongID} ({Display.NumberID})");
+            DebugLog("Started updated VCP codes.");
 
-            await Programs.RunProgramAsync(Programs.controlMyMonitor,
-                $"/SetValueIfNeeded {Display.NumberID} {vcpController.Code} {value}");
+            var activeControllersForDisplay = GetActiveControllersForDisplays(displayManagers);
+            var VCPCommands = new StringBuilder();
+
+            foreach (DisplayManager displayManager in displayManagers)
+            {
+                foreach (var vcpController in activeControllersForDisplay[displayManager])
+                {
+                    var timedValues = vcpController.TimedValues;
+
+                    double currentHour = DateTime.Now.TimeOfDay.TotalHours;
+                    int value = GetInterpolatedInt(timedValues, currentHour);
+
+                    if (VCPCommands.Length > 0)
+                    {
+                        VCPCommands.Append(' ');
+                    }
+
+                    VCPCommands.Append(
+                        VCPSetValueCommand(displayManager.Display, vcpController, value));
+                    LogVCPChange(vcpController.Code, value, displayManager.Display);
+                }
+            }
+
+            await Programs.RunProgramAsync(Programs.ControlMyMonitor, VCPCommands.ToString());
+
+            DebugLog("Finished updating VCP codes.");
+        }
+
+        private static void LogVCPChange(string code, int value, DisplayInfo display)
+        {
+            DebugLog($"Setting VCP code {code} to {value}" +
+                $" for {display.LongID} ({display.NumberID})");
+        }
+
+        private static string VCPSetValueCommand(DisplayInfo display, 
+            VCPCodeController vcpController, int value)
+        {
+            return $"/SetValueIfNeeded {display.NumberID} {vcpController.Code} {value}";
         }
 
         private static int GetInterpolatedInt(ICollection<TimedValue> timedValues, double hour)
@@ -250,13 +266,18 @@ namespace MonitorManagerCS_GUI.Core
             {
                 var activeControllers = new List<VCPCodeController>();
                 activeControllers = displayManager.VCPCodeControllers
-                    .Where(vcc => vcc.IsActive)
+                    .Where(vcp => vcp.IsActive && vcp.TimedValues.Any())
                     .ToList();
 
                 activeControllersForDisplay.Add(displayManager, activeControllers);
             }
 
             return activeControllersForDisplay;
+        }
+
+        private static void DebugLog(string message)
+        {
+            Debug.WriteLine("[Monitor Service] " + message);
         }
     }
 }

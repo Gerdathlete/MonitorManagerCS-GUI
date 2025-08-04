@@ -21,7 +21,7 @@ namespace MonitorManagerCS_GUI.Core
                 Directory.CreateDirectory(fileDirectory);
             }
 
-            await Programs.RunProgramAsync(Programs.controlMyMonitor, $"/smonitors \"{filePath}\"");
+            await Programs.RunProgramAsync(Programs.ControlMyMonitor, $"/smonitors \"{filePath}\"");
 
             var displays = ParseSMonitorsFile(filePath);
 
@@ -58,7 +58,7 @@ namespace MonitorManagerCS_GUI.Core
                 //Get the display's VCP codes
                 //(/sjson generates a json file with the display's VCP codes given one of its
                 //identifiers)
-                await Programs.RunProgramAsync(Programs.controlMyMonitor,
+                await Programs.RunProgramAsync(Programs.ControlMyMonitor,
                     $"/sjson \"{filePath}\" \"{display.NumberID}\"");
             }
 

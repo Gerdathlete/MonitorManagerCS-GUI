@@ -7,7 +7,7 @@ namespace MonitorManagerCS_GUI.Core
 {
     internal static class Programs
     {
-        internal static readonly string controlMyMonitor = 
+        internal static readonly string ControlMyMonitor = 
             Path.Combine(Folders.ControlMyMonitor, "ControlMyMonitor.exe");
 
         /// <summary>
