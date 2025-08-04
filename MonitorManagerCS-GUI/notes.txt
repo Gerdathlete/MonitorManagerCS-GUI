@@ -1,7 +1,14 @@
 Completely overhauling this program now.
 
-Status bar for service
-Menu bar for controlling service, reloading display information
+Remove unwanted VCP codes:
+	Duplicates
+	Codes with a current value of 0 and a maximum value of 0
+	Reset codes
+
+Menu bar for restarting service, reloading display information
+	Maybe a dev-only menu bar with extra non-user-friendly options?
+
+Save and Apply restarts service or triggers it to update.
 
 Improvements:
 Are you sure you want to exit? message
