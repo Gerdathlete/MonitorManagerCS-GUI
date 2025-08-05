@@ -51,9 +51,13 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-        public DisplayTab(DisplayManager displayManager)
+        private readonly MonitorService _monitorService;
+
+        public DisplayTab(DisplayManager displayManager, DisplaysTab parent)
         {
             DisplayManager = displayManager;
+
+            _monitorService = parent.MonitorService;
         }
 
         private void MakeVCPCodeCharts(List<VCPCodeController> vcpControllers)
@@ -118,6 +122,9 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             //Save to config file
             _displayManager.Save();
+
+            //Apply
+            _monitorService.Refresh();
         }
 
         private RelayCommand _exitButtonCommand;

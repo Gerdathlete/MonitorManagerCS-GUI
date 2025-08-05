@@ -1,5 +1,3 @@
-Save and Apply restarts service or triggers it to update.
-
 Improvements:
 Are you sure you want to exit? message
 

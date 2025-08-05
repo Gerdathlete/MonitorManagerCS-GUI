@@ -35,6 +35,7 @@ namespace MonitorManagerCS_GUI.Core
         public int UpdatePeriodMillis { get; set; } = 60000;
 
         private CancellationTokenSource _cancellationTokenSource;
+        private readonly Interrupter _interrupter = new Interrupter();
         private Task _serviceTask;
 
         /// <summary>
@@ -71,7 +72,8 @@ namespace MonitorManagerCS_GUI.Core
 
             _serviceTask = Task.Run(async () =>
             {
-                await ServiceLoop(DisplayManagers, _cancellationTokenSource.Token, UpdatePeriodMillis);
+                await ServiceLoop(DisplayManagers, _cancellationTokenSource, _interrupter,
+                    UpdatePeriodMillis);
             });
 
             return true;
@@ -107,33 +109,57 @@ namespace MonitorManagerCS_GUI.Core
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Monitor service shutdown error: {ex}");
+                DebugLogFailure(ex);
                 return false;
             }
 
-            void DebugLogFailure(string reason)
+            void DebugLogFailure(object reason)
             {
                 Debug.WriteLine($"Failed to end monitor service: {reason}");
             }
         }
 
+        public void Refresh()
+        {
+            if (_serviceTask is null || _serviceTask.IsCompleted)
+            {
+                Debug.WriteLine("Failed to refresh because the monitor service isn't running!");
+            }
+
+            _interrupter.Trigger();
+        }
+
         private static async Task ServiceLoop(List<DisplayManager> displayManagers,
-            CancellationToken cancellationToken, int updatePeriodMillis)
+            CancellationTokenSource shutdownCTS, Interrupter interrupt, int updatePeriodMillis)
         {
             DebugLog("Monitor service started");
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (!shutdownCTS.IsCancellationRequested)
             {
                 await UpdateActiveVCPCodes(displayManagers);
 
-                Thread.Sleep(updatePeriodMillis);
+                CancellationTokenSource linkedCTS = null;
                 try
                 {
-                    await Task.Delay(updatePeriodMillis, cancellationToken);
+                    linkedCTS = CancellationTokenSource.CreateLinkedTokenSource(
+                        shutdownCTS.Token, interrupt.Source.Token);
+
+                    await Task.Delay(updatePeriodMillis, linkedCTS.Token);
                 }
-                catch (TaskCanceledException)
+                catch (OperationCanceledException)
                 {
-                    break;
+                    if (shutdownCTS.IsCancellationRequested)
+                    {
+                        shutdownCTS?.Dispose();
+                        break;
+                    }
+                }
+                finally
+                {
+                    linkedCTS?.Dispose();
+
+                    interrupt.Source.Dispose();
+                    interrupt.Source = new CancellationTokenSource();
                 }
             }
 
@@ -185,7 +211,7 @@ namespace MonitorManagerCS_GUI.Core
                 $" for {display.LongID} ({display.NumberID})");
         }
 
-        private static string VCPSetValueCommand(DisplayInfo display, 
+        private static string VCPSetValueCommand(DisplayInfo display,
             VCPCodeController vcpController, int value)
         {
             return $"/SetValueIfNeeded {display.NumberID} {vcpController.Code} {value}";
@@ -284,6 +310,17 @@ namespace MonitorManagerCS_GUI.Core
         private static void DebugLog(string message)
         {
             Debug.WriteLine("[Monitor Service] " + message);
+        }
+
+        public class Interrupter
+        {
+            public CancellationTokenSource Source { get; set; } = new CancellationTokenSource();
+
+            public void Trigger()
+            {
+                if (!Source.IsCancellationRequested)
+                    Source.Cancel();
+            }
         }
     }
 }

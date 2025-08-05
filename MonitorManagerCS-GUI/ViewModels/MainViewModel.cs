@@ -86,6 +86,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
 
             _monitorService = MonitorService.Instance();
+            _displaysTab.MonitorService = _monitorService;
 
             _ = Task.Run(async () =>
             {

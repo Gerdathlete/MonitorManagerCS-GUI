@@ -80,6 +80,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         private readonly DisplaySelector _selectorTab = new DisplaySelector();
 
         public double Scale { get; set; } = 0.1;
+        internal MonitorService MonitorService { get; set; }
 
         public DisplaysTab()
         {
@@ -95,7 +96,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             foreach (var displayManager in _displayManagers)
             {
-                var displayTab = new DisplayTab(displayManager);
+                var displayTab = new DisplayTab(displayManager, this);
 
                 Tabs.Add(displayTab);
 
