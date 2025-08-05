@@ -1,4 +1,5 @@
-﻿using MonitorManagerCS_GUI.ViewModels;
+﻿using MonitorManagerCS_GUI.Core;
+using MonitorManagerCS_GUI.ViewModels;
 using System;
 using System.Drawing;
 using System.IO;
@@ -7,7 +8,6 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Shell;
 
 namespace MonitorManagerCS_GUI
 {
@@ -25,6 +25,8 @@ namespace MonitorManagerCS_GUI
 
         public MainWindow()
         {
+            Settings.Load();
+
             //Load the XAML code
             InitializeComponent();
 
@@ -32,9 +34,12 @@ namespace MonitorManagerCS_GUI
 
             StateChanged += MainWindow_StateChanged;
 
-#if !DEBUG
-            MinimizeToTray();
-#endif
+//#if !DEBUG
+            if (Settings.StartInTray)
+            {
+                MinimizeToTray();
+            }
+//#endif
 
             ViewModel = new MainViewModel();
             DataContext = ViewModel;
@@ -94,7 +99,7 @@ namespace MonitorManagerCS_GUI
 
         private void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            if (WindowState == WindowState.Minimized)
+            if (WindowState == WindowState.Minimized && Settings.MinimizeToTray)
             {
                 MinimizeToTray();
             }
@@ -126,7 +131,7 @@ namespace MonitorManagerCS_GUI
             string exitQuestion = "Are you sure you want to exit?" + Environment.NewLine +
                 Environment.NewLine + "This will exit the monitor service and disable automation.";
 
-            var result = System.Windows.MessageBox.Show(exitQuestion,Title, 
+            var result = System.Windows.MessageBox.Show(exitQuestion, Title,
                 MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
@@ -188,7 +193,7 @@ namespace MonitorManagerCS_GUI
         }
 
         [DllImport("dwmapi.dll")]
-        static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, 
+        static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue,
             int attrSize);
         protected override void OnSourceInitialized(EventArgs e)
         {

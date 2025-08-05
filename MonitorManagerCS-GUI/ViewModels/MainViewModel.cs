@@ -76,12 +76,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public MainViewModel()
         {
-            _settingsTab = new SettingsTab
-            {
-                TabName = "Settings",
-                Text = "This is a settings tab."
-            };
-
+            _settingsTab = new SettingsTab();
             _displaysTab = new DisplaysTab();
 
             var defaultTabs = new List<TabViewModel>()

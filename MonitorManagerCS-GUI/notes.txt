@@ -1,3 +1,6 @@
+Stability Improvements:
+On startup, check if the folder locations are writable to prevent crashing when writing files.
+
 Improvements:
 Start in system tray setting. - default on
 

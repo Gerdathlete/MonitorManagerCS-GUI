@@ -95,6 +95,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Behaviors\AutoSpanner.cs" />
     <Compile Include="Controls\DebugAdorner.cs" />
     <Compile Include="Controls\ExplorableCanvas.xaml.cs">
       <DependentUpon>ExplorableCanvas.xaml</DependentUpon>
@@ -102,6 +103,7 @@
     <Compile Include="Core\DisplayManager.cs" />
     <Compile Include="Core\Folders.cs" />
     <Compile Include="Core\MonitorService.cs" />
+    <Compile Include="Core\Settings.cs" />
     <Compile Include="Core\TimedValue.cs" />
     <Compile Include="ViewModels\DisplaysTab.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
