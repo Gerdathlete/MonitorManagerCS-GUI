@@ -2,10 +2,6 @@ Stability Improvements:
 On startup, check if the folder locations are writable to prevent crashing when writing files.
 
 Improvements:
-Start in system tray setting. - default on
-
-Minimize to tray setting. - default on
-
 Settings tab accessible through a button (cog icon), menu item, or right click context menu rather 
 than a tab. Then hide the tab bar because its ugly.
 
