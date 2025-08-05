@@ -123,7 +123,16 @@ namespace MonitorManagerCS_GUI
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            string exitQuestion = "Are you sure you want to exit?" + Environment.NewLine +
+                Environment.NewLine + "This will exit the monitor service and disable automation.";
+
+            var result = System.Windows.MessageBox.Show(exitQuestion,Title, 
+                MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Close();
+            }
         }
 
         private void ToggleMaximized()

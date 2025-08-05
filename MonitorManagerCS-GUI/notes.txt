@@ -1,6 +1,4 @@
 Improvements:
-Are you sure you want to exit? message
-
 Visually indicate when the service is running.
 
 Start in system tray setting. - default on
