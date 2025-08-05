@@ -2,9 +2,11 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Shell;
 
 namespace MonitorManagerCS_GUI
@@ -165,6 +167,28 @@ namespace MonitorManagerCS_GUI
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
+        }
+
+        const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+        enum DwmWindowCornerPreference
+        {
+            Default = 0,
+            DoNotRound = 1,
+            Round = 2,
+            RoundSmall = 3
+        }
+
+        [DllImport("dwmapi.dll")]
+        static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, 
+            int attrSize);
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            //Let Windows 11 know to round the corners on this window
+            var hwnd = new WindowInteropHelper(this).Handle;
+            int attrValue = (int)DwmWindowCornerPreference.Round;
+            DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref attrValue, sizeof(int));
         }
     }
 }

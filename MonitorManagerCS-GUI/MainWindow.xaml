@@ -24,7 +24,7 @@
     <WindowChrome.WindowChrome>
         <WindowChrome
             CaptionHeight="0"
-            CornerRadius="5"
+            CornerRadius="0"
             GlassFrameThickness="0" />
     </WindowChrome.WindowChrome>
 
