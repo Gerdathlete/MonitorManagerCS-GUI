@@ -107,7 +107,7 @@
     <Compile Include="Core\TimedValue.cs" />
     <Compile Include="ViewModels\DisplaysTab.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
-    <Compile Include="ViewModels\InverseBooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="ViewModels\BindingErrors.cs" />
     <Compile Include="ViewModels\VCPCodeChart.cs" />
     <Page Include="Controls\ExplorableCanvas.xaml">
