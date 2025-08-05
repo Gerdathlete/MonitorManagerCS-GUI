@@ -92,6 +92,7 @@
             </Style.Triggers>
         </Style>
 
+        <!--  Window Maximize/Restore Button  -->
         <Style
             x:Key="WindowMaximizeButton"
             BasedOn="{StaticResource WindowStateButton}"
@@ -104,6 +105,21 @@
                 <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
                     <Setter Property="Content" Value="&#xE923;" />
                 </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="MenuItemFakeEnabledStyle"
+            BasedOn="{StaticResource {x:Type MenuItem}}"
+            TargetType="MenuItem">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <!--  Override foreground to normal  -->
+                    <Setter Property="Foreground" Value="Black" />
+                    <!--  Override opacity  -->
+                    <Setter Property="Opacity" Value="1" />
+                    <!--  Override any other visual effects here  -->
+                </Trigger>
             </Style.Triggers>
         </Style>
 
@@ -308,9 +324,51 @@
                 </MenuItem>
 
                 <MenuItem Header="Service">
-                    <MenuItem Command="{Binding RestartServiceCommand}" Header="Restart Service" />
-                    <MenuItem Command="{Binding StartServiceCommand}" Header="Start Service" />
-                    <MenuItem Command="{Binding EndServiceCommand}" Header="End Service" />
+                    <MenuItem
+                        Command="{Binding RestartServiceCommand}"
+                        Header="Restart Service"
+                        IsEnabled="{Binding IsServiceRunning}" />
+                    <MenuItem
+                        Command="{Binding StartServiceCommand}"
+                        Header="Start Service"
+                        IsEnabled="{Binding IsServiceStopped}" />
+                    <MenuItem
+                        Command="{Binding EndServiceCommand}"
+                        Header="End Service"
+                        IsEnabled="{Binding IsServiceRunning}" />
+                    <Separator />
+                    <!--  Service Status Item  -->
+                    <MenuItem IsEnabled="False" Style="{StaticResource MenuItemFakeEnabledStyle}">
+                        <MenuItem.Icon>
+                            <ContentControl>
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Setter Property="Content" Value="■" />
+                                        <Setter Property="Foreground" Value="Red" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsServiceRunning}" Value="True">
+                                                <Setter Property="Foreground" Value="Green" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
+                        </MenuItem.Icon>
+                        <MenuItem.Header>
+                            <TextBlock>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Service is stopped" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsServiceRunning}" Value="True">
+                                                <Setter Property="Text" Value="Service is running" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </MenuItem.Header>
+                    </MenuItem>
                 </MenuItem>
             </Menu>
 

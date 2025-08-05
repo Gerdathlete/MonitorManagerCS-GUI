@@ -54,6 +54,22 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
+        private bool _isServiceRunning;
+        public bool IsServiceRunning
+        {
+            get => _isServiceRunning;
+            set
+            {
+                if (!Equals(_isServiceRunning, value))
+                {
+                    _isServiceRunning = value;
+                    OnPropertyChanged(nameof(IsServiceRunning));
+                    OnPropertyChanged(nameof(IsServiceStopped));
+                }
+            }
+        }
+        public bool IsServiceStopped => !IsServiceRunning;
+
         private readonly MonitorService _monitorService;
         private readonly SettingsTab _settingsTab;
         private readonly DisplaysTab _displaysTab;
@@ -98,7 +114,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 #else
                 5 * 60 * 1000; //Every five minutes
 #endif
-                _monitorService.Start();
+                StartService();
             });
         }
 
@@ -117,7 +133,12 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         public void StartService()
         {
-            _monitorService.Start();
+            bool wasStarted = _monitorService.Start();
+
+            if (wasStarted)
+            {
+                IsServiceRunning = true;
+            }
         }
 
         private RelayCommand _endServiceCommand;
@@ -135,7 +156,17 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         public void EndService()
         {
-            _ = _monitorService.End();
+            _ = EndServiceAsync();
+        }
+
+        public async Task EndServiceAsync()
+        {
+            bool wasEnded = await _monitorService.End();
+
+            if (wasEnded)
+            {
+                IsServiceRunning = false;
+            }
         }
 
         private RelayCommand _restartServiceCommand;
@@ -153,7 +184,13 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
         public void RestartService()
         {
-            _ = _monitorService.Restart();
+            _ = RestartServiceAsync();
+        }
+
+        public async Task RestartServiceAsync()
+        {
+            await EndServiceAsync();
+            StartService();
         }
 
         private RelayCommand _loadDisplaysCommand;

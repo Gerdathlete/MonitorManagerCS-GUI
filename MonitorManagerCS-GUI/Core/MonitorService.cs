@@ -33,6 +33,7 @@ namespace MonitorManagerCS_GUI.Core
 
         public List<DisplayManager> DisplayManagers { get; set; }
         public int UpdatePeriodMillis { get; set; } = 60000;
+        public bool IsRunning { get => !(_serviceTask is null || _serviceTask.IsCompleted); }
 
         private CancellationTokenSource _cancellationTokenSource;
         private readonly Interrupter _interrupter = new Interrupter();

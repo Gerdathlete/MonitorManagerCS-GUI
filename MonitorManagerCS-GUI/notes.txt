@@ -1,6 +1,4 @@
 Improvements:
-Visually indicate when the service is running.
-
 Start in system tray setting. - default on
 
 Minimize to tray setting. - default on
