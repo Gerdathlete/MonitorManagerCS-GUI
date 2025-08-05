@@ -1,6 +1,3 @@
-Menu bar for restarting service, reloading display information
-	Maybe a dev-only menu bar with extra non-user-friendly options?
-
 Save and Apply restarts service or triggers it to update.
 
 Improvements:
