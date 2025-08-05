@@ -4,6 +4,8 @@ using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Shell;
 
 namespace MonitorManagerCS_GUI
 {
@@ -21,7 +23,7 @@ namespace MonitorManagerCS_GUI
 
         public MainWindow()
         {
-            //Mandatory line to load the main window
+            //Load the XAML code
             InitializeComponent();
 
             InitializeTrayIcon();
@@ -107,6 +109,7 @@ namespace MonitorManagerCS_GUI
             base.OnClosed(e);
             _trayIcon.Dispose();
             ViewModel.EndService();
+            System.Windows.Application.Current.Shutdown();
         }
 
         private string StatusPrefix()
@@ -114,6 +117,54 @@ namespace MonitorManagerCS_GUI
             string output = _statusPrefixes[_statusPrefixIndex++];
             if (_statusPrefixIndex >= _statusPrefixes.Length) _statusPrefixIndex = 0;
             return output;
+        }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void ToggleMaximized()
+        {
+            if (WindowState == WindowState.Normal)
+            {
+                WindowState = WindowState.Maximized;
+                MainDockPanel.Margin = SystemParameters.WindowResizeBorderThickness;
+            }
+            else
+            {
+                WindowState = WindowState.Normal;
+                MainDockPanel.Margin = new Thickness(0);
+            }
+        }
+
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleMaximized();
+        }
+
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                ToggleMaximized();
+            }
+            else if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                try
+                {
+                    DragMove();
+                }
+                catch (InvalidOperationException)
+                {
+                    // DragMove can throw if mouse capture is lost - safe to ignore
+                }
+            }
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
         }
     }
 }

@@ -14,8 +14,19 @@
     Height="500"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel,
                                      IsDesignTimeCreatable=True}"
+    AllowsTransparency="False"
     FontFamily="pack://application:,,,/Assets/Fonts/#Inter Variable"
+    FontSize="14"
+    ResizeMode="CanResize"
+    WindowStyle="None"
     mc:Ignorable="d">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CaptionHeight="0"
+            CornerRadius="5"
+            GlassFrameThickness="0" />
+    </WindowChrome.WindowChrome>
 
     <Window.Icon>
         <BitmapImage UriSource="pack://application:,,,/Assets/icon.ico" />
@@ -47,42 +58,8 @@
                             HorizontalAlignment="Right"
                             Command="{Binding ExitButtonCommand}"
                             Content="🗙"
-                            Cursor="Hand">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="OverridesDefaultStyle" Value="True" />
-                                    <Setter Property="Background" Value="#19000000" />
-                                    <Setter Property="BorderBrush" Value="LightGray" />
-                                    <Setter Property="BorderThickness" Value="1" />
-                                    <Setter Property="Foreground" Value="Gray" />
-                                    <Setter Property="FontSize" Value="16" />
-                                    <Setter Property="FontWeight" Value="Bold" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border
-                                                    Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#0CFF0000" />
-                                            <Setter Property="Foreground" Value="#FFBF9E9E" />
-                                            <Setter Property="BorderBrush" Value="#8FFF8F8F" />
-                                        </Trigger>
-                                        <Trigger Property="IsPressed" Value="True">
-                                            <Setter Property="Foreground" Value="#FFB57777" />
-                                            <Setter Property="BorderThickness" Value="2" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                            Cursor="Hand"
+                            Style="{StaticResource DisplayTabExitButton}" />
                     </Grid>
 
                     <!--  Menu Bar Separator  -->
@@ -236,41 +213,134 @@
             </Border>
         </DataTemplate>
 
-    </Window.Resources>
-    <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button
-                Width="Auto"
-                Margin="5"
-                HorizontalAlignment="Center"
-                Command="{Binding LoadDisplaysCommand}"
-                Content="Reload Displays" />
-            <Button
-                Width="Auto"
-                Margin="5"
-                HorizontalAlignment="Center"
-                Command="{Binding UpdateConfigsCommand}"
-                Content="Update Old Configs" />
-            <Button
-                Width="Auto"
-                Margin="5"
-                HorizontalAlignment="Center"
-                Command="{Binding StartServiceCommand}"
-                Content="Start Service" />
-            <Button
-                Width="Auto"
-                Margin="5"
-                HorizontalAlignment="Center"
-                Command="{Binding EndServiceCommand}"
-                Content="End Service" />
-            <Button
-                Width="Auto"
-                Margin="5"
-                HorizontalAlignment="Center"
-                Command="{Binding RestartServiceCommand}"
-                Content="Restart Service" />
-        </StackPanel>
+        <!--  Styles  -->
+        <Style x:Key="DisplayTabExitButton" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Background" Value="#19000000" />
+            <Setter Property="BorderBrush" Value="LightGray" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#0CFF0000" />
+                    <Setter Property="Foreground" Value="#FFBF9E9E" />
+                    <Setter Property="BorderBrush" Value="#8FFF8F8F" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Foreground" Value="#FFB57777" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
+        <Style x:Key="WindowStateButton" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Width" Value="45" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Foreground" Value="#FF343434" />
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#20000000" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="WindowMaximizeButton"
+            BasedOn="{StaticResource WindowStateButton}"
+            TargetType="Button">
+            <Setter Property="Content" Value="&#xE922;" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#20000000" />
+                </Trigger>
+                <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                    <Setter Property="Content" Value="&#xE923;" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel x:Name="MainDockPanel" Background="#FFF0F0F0">
+        <!--  Menu bar and window buttons  -->
+        <Grid
+            Height="30"
+            Margin="0,0,0,5"
+            Background="Transparent"
+            DockPanel.Dock="Top"
+            MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+            <!--  Menu Bar  -->
+            <Menu
+                Margin="0,5,0,0"
+                HorizontalAlignment="Left"
+                FontSize="16">
+                <MenuItem Header="File">
+                    <MenuItem Command="{Binding LoadDisplaysCommand}" Header="Reload Displays" />
+                    <MenuItem Command="{Binding UpdateConfigsCommand}" Header="Update Old Configs" />
+                </MenuItem>
+
+                <MenuItem Header="Service">
+                    <MenuItem Command="{Binding RestartServiceCommand}" Header="Restart Service" />
+                    <MenuItem Command="{Binding StartServiceCommand}" Header="Start Service" />
+                    <MenuItem Command="{Binding EndServiceCommand}" Header="End Service" />
+                </MenuItem>
+            </Menu>
+
+            <!--  Window Buttons  -->
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+
+                <!--  Minimize  -->
+                <Button
+                    HorizontalAlignment="Right"
+                    Click="MinimizeButton_Click"
+                    Content="&#xE921;"
+                    Style="{StaticResource WindowStateButton}" />
+
+                <!--  Maximize  -->
+                <Button
+                    HorizontalAlignment="Right"
+                    Click="MaximizeButton_Click"
+                    Style="{StaticResource WindowMaximizeButton}" />
+
+                <!--  Exit  -->
+                <Button
+                    HorizontalAlignment="Right"
+                    Click="ExitButton_Click"
+                    Content="&#xE8BB;"
+                    Style="{StaticResource WindowStateButton}" />
+
+            </StackPanel>
+        </Grid>
+
+        <!--  Main Content  -->
         <TabControl
             DockPanel.Dock="Bottom"
             ItemsSource="{Binding Tabs}"
@@ -284,4 +354,5 @@
             </TabControl.ItemTemplate>
         </TabControl>
     </DockPanel>
+
 </Window>
