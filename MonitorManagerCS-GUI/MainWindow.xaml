@@ -518,9 +518,10 @@
 
         <!--  Main Content  -->
         <Grid DockPanel.Dock="Bottom">
-            <!--  Draggable empty background  -->
+            <!--  Window Dragging Handle  -->
             <Border Background="Transparent" MouseLeftButtonDown="Window_MouseLeftButtonDown" />
 
+            <!--  Tab Viewer  -->
             <ContentControl Margin="5,10,5,5" Content="{Binding SelectedTab}" />
         </Grid>
     </DockPanel>
