@@ -40,19 +40,6 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
-        private int _selectedTabIndex;
-        public int SelectedTabIndex
-        {
-            get => _selectedTabIndex;
-            set
-            {
-                if (_selectedTabIndex != value)
-                {
-                    _selectedTabIndex = value;
-                    OnPropertyChanged(nameof(SelectedTabIndex));
-                }
-            }
-        }
 
         private bool _isServiceRunning;
         public bool IsServiceRunning

@@ -174,76 +174,76 @@
         <DataTemplate DataType="{x:Type vm:DisplayTab}">
             <!--  Display Tab Content  -->
             <ctrls:InternalTab
-                        Margin="5"
+                Margin="5"
                 Command="{Binding ExitButtonCommand}"
                 Header="{Binding TabName}">
-                    <!--  VCP code automation editor  -->
+                <!--  VCP code automation editor  -->
                 <Grid Margin="5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <!--  Combobox and activation checkbox  -->
-                        <Grid Grid.Row="0" Margin="5">
-                            <StackPanel Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                Orientation="Horizontal">
-                                <ComboBox Grid.Column="0"
-                                    Height="25"
-                                    MaxWidth="200"
-                                    ItemsSource="{Binding VCPCodeCharts}"
-                                    SelectedItem="{Binding SelectedVCPCodeChart}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel DataContext="{Binding VCPController}" Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Name}" />
-                                                <TextBlock Text=" (" />
-                                                <TextBlock Text="{Binding Code}" />
-                                                <TextBlock Text=")" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                                <TextBlock Margin="5,5,0,5" Text="Automated?" />
-                                <CheckBox
-                                    Margin="5"
-                                    DataContext="{Binding SelectedVCPCodeChart}"
-                                    IsChecked="{Binding Enabled}" />
-                            </StackPanel>
-
-                            <Button Grid.Column="0"
-                                HorizontalAlignment="Right"
-                                Command="{Binding SaveAndApplyCommand}"
-                                Content="Save and Apply" />
-                        </Grid>
-
-                        <!--  Interactive Chart  -->
-                        <Grid Grid.Row="1"
-                            Margin="5"
-                            DataContext="{Binding SelectedVCPCodeChart}">
-
-                            <livecharts:CartesianChart
-                                MinWidth="740"
-                                MinHeight="258"
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <!--  Combobox and activation checkbox  -->
+                    <Grid Grid.Row="0" Margin="5">
+                        <StackPanel Grid.Column="0"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+                            <ComboBox Grid.Column="0"
+                                Height="25"
+                                MaxWidth="200"
+                                ItemsSource="{Binding VCPCodeCharts}"
+                                SelectedItem="{Binding SelectedVCPCodeChart}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel DataContext="{Binding VCPController}" Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" />
+                                            <TextBlock Text=" (" />
+                                            <TextBlock Text="{Binding Code}" />
+                                            <TextBlock Text=")" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Margin="5,5,0,5" Text="Automated?" />
+                            <CheckBox
                                 Margin="5"
-                                EasingFunction="{x:Null}"
-                                IsEnabled="{Binding Enabled}"
-                                PointerMoveCommand="{Binding PointerMovedCommand}"
-                                PointerPressedCommand="{Binding PointerPressedCommand}"
-                                PointerReleasedCommand="{Binding PointerReleasedCommand}"
-                                Series="{Binding DraggableSeries}"
-                                TooltipPosition="{Binding TooltipPos}"
-                                XAxes="{Binding XAxes}"
-                                YAxes="{Binding YAxes}" />
+                                DataContext="{Binding SelectedVCPCodeChart}"
+                                IsChecked="{Binding Enabled}" />
+                        </StackPanel>
 
-                            <!--  Rectangle that indicates the chart is disabled  -->
-                            <Rectangle
-                                Fill="Gray"
-                                IsHitTestVisible="False"
-                                Opacity="0.25"
-                                Visibility="{Binding Enabled, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
-                        </Grid>
+                        <Button Grid.Column="0"
+                            HorizontalAlignment="Right"
+                            Command="{Binding SaveAndApplyCommand}"
+                            Content="Save and Apply" />
                     </Grid>
+
+                    <!--  Interactive Chart  -->
+                    <Grid Grid.Row="1"
+                        Margin="5"
+                        DataContext="{Binding SelectedVCPCodeChart}">
+
+                        <livecharts:CartesianChart
+                            MinWidth="740"
+                            MinHeight="258"
+                            Margin="5"
+                            EasingFunction="{x:Null}"
+                            IsEnabled="{Binding Enabled}"
+                            PointerMoveCommand="{Binding PointerMovedCommand}"
+                            PointerPressedCommand="{Binding PointerPressedCommand}"
+                            PointerReleasedCommand="{Binding PointerReleasedCommand}"
+                            Series="{Binding DraggableSeries}"
+                            TooltipPosition="{Binding TooltipPos}"
+                            XAxes="{Binding XAxes}"
+                            YAxes="{Binding YAxes}" />
+
+                        <!--  Rectangle that indicates the chart is disabled  -->
+                        <Rectangle
+                            Fill="Gray"
+                            IsHitTestVisible="False"
+                            Opacity="0.25"
+                            Visibility="{Binding Enabled, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                    </Grid>
+                </Grid>
             </ctrls:InternalTab>
         </DataTemplate>
 
@@ -253,99 +253,86 @@
                 Command="{Binding ExitButtonCommand}"
                 Header="{Binding TabName}"
                 HeaderFontSize="20">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <!--  Settings Title  -->
-                <TextBlock Grid.Row="0"
-                    Margin="5"
-                    HorizontalAlignment="Center"
-                    FontSize="22"
-                    Text="Settings" />
-
-                <!--  Title Separator  -->
-                <Border Grid.Row="1"
-                    Height="1"
-                    Margin="5"
-                    Background="LightGray" />
-
-                <!--  Settings  -->
-                    <Grid Grid.Row="0"
-                    Margin="5"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Stretch">
+                <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!--  Settings List  -->
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                    <!--  Settings  -->
+                    <Grid Grid.Row="0"
+                        Margin="5"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Stretch">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <!--  Settings Labels  -->
-                        <TextBlock Grid.Row="0"
-                            Margin="5"
-                            Text="Start in System Tray" />
-                        <TextBlock Grid.Row="1"
-                            Margin="5"
-                            Text="Minimize to System Tray" />
+                        <!--  Settings List  -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                        <!--  Vertical Divider  -->
-                        <Border Grid.Column="1"
-                            Width="1"
-                            Margin="5,0"
-                            VerticalAlignment="Stretch"
-                            b:AutoSpanner.SpanAllRows="True"
-                            Background="LightGray" />
+                            <!--  Settings Labels  -->
+                            <TextBlock Grid.Row="0"
+                                Margin="5"
+                                Text="Start in System Tray" />
+                            <TextBlock Grid.Row="1"
+                                Margin="5"
+                                Text="Minimize to System Tray" />
 
-                        <!--  Settings Editors  -->
-                        <CheckBox Grid.Row="0" Grid.Column="2"
-                            Margin="5"
-                            IsChecked="{Binding StartInTray}" />
-                        <CheckBox Grid.Row="1" Grid.Column="2"
-                            Margin="5"
-                            IsChecked="{Binding MinimizeToTray}" />
+                            <!--  Vertical Divider  -->
+                            <Border Grid.Column="1"
+                                Width="1"
+                                Margin="5,0"
+                                VerticalAlignment="Stretch"
+                                b:AutoSpanner.SpanAllRows="True"
+                                Background="LightGray" />
+
+                            <!--  Settings Editors  -->
+                            <CheckBox Grid.Row="0" Grid.Column="2"
+                                Margin="5"
+                                IsChecked="{Binding StartInTray}" />
+                            <CheckBox Grid.Row="1" Grid.Column="2"
+                                Margin="5"
+                                IsChecked="{Binding MinimizeToTray}" />
+                        </Grid>
                     </Grid>
-                </Grid>
 
-                <!--  Settings Buttons  -->
+                    <!--  Settings Buttons  -->
                     <StackPanel Grid.Row="1"
-                    Margin="25"
+                        Margin="25"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top">
                         <Button MinWidth="125" Command="{Binding SaveCommand}">
-                        <TextBlock Margin="3" Text="Save Settings" />
-                    </Button>
-                </StackPanel>
-            </Grid>
+                            <TextBlock Margin="3" Text="Save Settings" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
             </ctrls:InternalTab>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaysTab}">
             <Grid>
                 <!--  Main Content  -->
-            <TabControl
-                BorderThickness="0"
-                ItemsSource="{Binding Tabs}"
-                SelectedIndex="{Binding SelectedTabIndex}"
-                SelectedItem="{Binding SelectedTab}">
-                <TabControl.Resources>
-                    <Style TargetType="TabItem">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                    </Style>
-                </TabControl.Resources>
-            </TabControl>
+                <TabControl
+                    BorderThickness="0"
+                    ItemsSource="{Binding Tabs}"
+                    SelectedIndex="{Binding SelectedTabIndex}"
+                    SelectedItem="{Binding SelectedTab}">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </TabControl.Resources>
+                </TabControl>
 
                 <!--  Bottom Right Buttons  -->
                 <StackPanel
@@ -504,17 +491,9 @@
         </Grid>
 
         <!--  Main Content  -->
-        <TabControl DockPanel.Dock="Bottom"
-            ItemsSource="{Binding Tabs}"
-            SelectedIndex="{Binding SelectedTabIndex}"
-            SelectedItem="{Binding SelectedTab}">
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <!--  Tab Header  -->
-                    <TextBlock Text="{Binding TabName}" />
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-        </TabControl>
+        <ContentControl DockPanel.Dock="Bottom"
+            Margin="5"
+            Content="{Binding SelectedTab}" />
     </DockPanel>
 
 </Window>
