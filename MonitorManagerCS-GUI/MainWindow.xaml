@@ -250,6 +250,7 @@
         <DataTemplate DataType="{x:Type vm:SettingsTab}">
             <!--  Settings Tab Content  -->
             <ctrls:InternalTab
+                Background="White"
                 Command="{Binding ExitButtonCommand}"
                 Header="{Binding TabName}"
                 HeaderFontSize="20">
