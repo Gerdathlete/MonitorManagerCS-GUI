@@ -11,7 +11,8 @@ Copy VCP automation points and paste onto another VCP chart
 
 Allow VCP codes to be 'linked' so that they are set in parallel and have the same values.
 
-Make the application look good.
+Dark Mode/Light Mode
+	Also a setting to link to Windows' Dark/Light mode toggle.
 
 Major Improvements:
 Replace ControlMyMonitor by creating a independent DDC/CI interface
