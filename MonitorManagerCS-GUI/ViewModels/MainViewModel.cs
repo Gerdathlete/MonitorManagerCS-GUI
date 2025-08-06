@@ -73,11 +73,15 @@ namespace MonitorManagerCS_GUI.ViewModels
         private readonly MonitorService _monitorService;
         private readonly SettingsTab _settingsTab;
         private readonly DisplaysTab _displaysTab;
+        private TabViewModel _prevTab;
 
         public MainViewModel()
         {
             _settingsTab = new SettingsTab();
             _displaysTab = new DisplaysTab();
+
+            _displaysTab.OpenedSettings += DisplaysTab_OpenedSettings;
+            _settingsTab.ExitButtonPressed += SettingsTab_ExitButtonPressed;
 
             var defaultTabs = new List<TabViewModel>()
             {
@@ -111,6 +115,40 @@ namespace MonitorManagerCS_GUI.ViewModels
 #endif
                 StartService();
             });
+        }
+
+        private void SettingsTab_ExitButtonPressed(object sender, EventArgs e)
+        {
+            CloseTab();
+        }
+
+        private void DisplaysTab_OpenedSettings(object sender, EventArgs e)
+        {
+            OpenTab(_settingsTab);
+        }
+
+        private void OpenTab(TabViewModel tab)
+        {
+            if (!Tabs.Contains(tab))
+            {
+                Debug.WriteLine($"Failed to switch tabs: {tab} is not in {nameof(Tabs)}!");
+                return;
+            }
+
+            _prevTab = SelectedTab;
+            SelectedTab = tab;
+        }
+
+        private void CloseTab()
+        {
+            if (_prevTab is null)
+            {
+                Debug.WriteLine($"Failed to close tab: {nameof(_prevTab)} was not set!");
+                return;
+            }
+
+            SelectedTab = _prevTab;
+            _prevTab = null;
         }
 
         private RelayCommand _startServiceCommand;

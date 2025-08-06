@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using MonitorManagerCS_GUI.Core;
+using System;
 using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI.ViewModels
@@ -51,5 +52,24 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
         public void Save() => Settings.Save();
+
+        private RelayCommand exitButtonCommand;
+        public ICommand ExitButtonCommand
+        {
+            get
+            {
+                if (exitButtonCommand == null)
+                {
+                    exitButtonCommand = new RelayCommand(ExitButton);
+                }
+
+                return exitButtonCommand;
+            }
+        }
+        public event EventHandler ExitButtonPressed;
+        private void ExitButton()
+        {
+            ExitButtonPressed?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

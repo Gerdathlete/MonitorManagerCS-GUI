@@ -1,9 +1,11 @@
-﻿using MonitorManagerCS_GUI.Core;
+﻿using CommunityToolkit.Mvvm.Input;
+using MonitorManagerCS_GUI.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Input;
 
 namespace MonitorManagerCS_GUI.ViewModels
 {
@@ -167,6 +169,25 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
 
             return null;
+        }
+
+        private RelayCommand openSettingsCommand;
+        public ICommand OpenSettingsCommand
+        {
+            get
+            {
+                if (openSettingsCommand == null)
+                {
+                    openSettingsCommand = new RelayCommand(OpenSettings);
+                }
+
+                return openSettingsCommand;
+            }
+        }
+        public event EventHandler OpenedSettings;
+        private void OpenSettings()
+        {
+            OpenedSettings?.Invoke(this, EventArgs.Empty);
         }
     }
 
