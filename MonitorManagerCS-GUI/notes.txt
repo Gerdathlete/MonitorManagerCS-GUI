@@ -5,6 +5,8 @@ Improvements:
 Settings tab accessible through a button (cog icon), menu item, or right click context menu rather 
 than a tab. Then hide the tab bar because its ugly.
 
+Loading indicator/disable UI during loads
+
 Zoom in on chart for accurate placement
 
 Adjust snapping
