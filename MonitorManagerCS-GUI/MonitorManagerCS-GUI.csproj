@@ -106,6 +106,7 @@
     <Compile Include="Core\MonitorService.cs" />
     <Compile Include="Core\Settings.cs" />
     <Compile Include="Core\TimedValue.cs" />
+    <Compile Include="ViewModels\DisplaySelector.cs" />
     <Compile Include="ViewModels\DisplaysTab.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
