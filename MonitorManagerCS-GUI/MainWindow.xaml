@@ -401,7 +401,6 @@
         <!--  Menu bar and window buttons  -->
         <Grid DockPanel.Dock="Top"
             Height="30"
-            Margin="0,0,0,5"
             Background="Transparent"
             MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
@@ -491,9 +490,12 @@
         </Grid>
 
         <!--  Main Content  -->
-        <ContentControl DockPanel.Dock="Bottom"
-            Margin="5"
-            Content="{Binding SelectedTab}" />
+        <Grid DockPanel.Dock="Bottom">
+            <!--  Draggable empty background  -->
+            <Border Background="Transparent" MouseLeftButtonDown="Window_MouseLeftButtonDown" />
+
+            <ContentControl Margin="5,10,5,5" Content="{Binding SelectedTab}" />
+        </Grid>
     </DockPanel>
 
 </Window>
