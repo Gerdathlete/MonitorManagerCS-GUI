@@ -100,6 +100,7 @@
     <Compile Include="Controls\ExplorableCanvas.xaml.cs">
       <DependentUpon>ExplorableCanvas.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\InternalTab.cs" />
     <Compile Include="Core\DisplayManager.cs" />
     <Compile Include="Core\Folders.cs" />
     <Compile Include="Core\MonitorService.cs" />
@@ -138,6 +139,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
