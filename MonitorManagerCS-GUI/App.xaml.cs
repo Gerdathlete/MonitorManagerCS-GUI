@@ -1,9 +1,9 @@
-﻿using System.Windows;
+﻿using MonitorManagerCS_GUI.Core;
+using System;
+using System.Windows;
 
 namespace MonitorManagerCS_GUI
 {
-    //This program uses ControlMyMonitor v1.37 https://www.nirsoft.net/utils/control_my_monitor.html
-
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -11,6 +11,15 @@ namespace MonitorManagerCS_GUI
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            if (!Folders.CanReadAndWrite(out Exception ex))
+            {
+                MessageBox.Show($"The application does not have access to required directories." +
+                    Environment.NewLine + Environment.NewLine + $" {ex}",
+                    "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+                return;
+            }
+
             base.OnStartup(e);
         }
     }
