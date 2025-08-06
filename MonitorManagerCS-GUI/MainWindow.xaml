@@ -400,71 +400,97 @@
     <DockPanel x:Name="MainDockPanel" Background="#FFF0F0F0">
         <!--  Menu bar and window buttons  -->
         <Grid DockPanel.Dock="Top"
-            Height="30"
+            MinHeight="30"
             Background="Transparent"
             MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
-            <!--  Menu Bar  -->
-            <Menu
-                Margin="5,5,0,0"
-                HorizontalAlignment="Left"
-                FontSize="16">
-                <MenuItem Header="File">
-                    <MenuItem Command="{Binding LoadDisplaysCommand}" Header="Reload Displays" />
-                    <MenuItem Command="{Binding UpdateConfigsCommand}" Header="Update Old Configs" />
-                </MenuItem>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-                <MenuItem Header="Service">
-                    <MenuItem
-                        Command="{Binding RestartServiceCommand}"
-                        Header="Restart Service"
-                        IsEnabled="{Binding IsServiceRunning}" />
-                    <MenuItem
-                        Command="{Binding StartServiceCommand}"
-                        Header="Start Service"
-                        IsEnabled="{Binding IsServiceStopped}" />
-                    <MenuItem
-                        Command="{Binding EndServiceCommand}"
-                        Header="End Service"
-                        IsEnabled="{Binding IsServiceRunning}" />
-                    <Separator />
-                    <!--  Service Status Item  -->
-                    <MenuItem IsEnabled="False" Style="{StaticResource MenuItemFakeEnabledStyle}">
-                        <MenuItem.Icon>
-                            <ContentControl>
-                                <ContentControl.Style>
-                                    <Style TargetType="ContentControl">
-                                        <Setter Property="Content" Value="■" />
-                                        <Setter Property="Foreground" Value="Red" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsServiceRunning}" Value="True">
-                                                <Setter Property="Foreground" Value="Green" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContentControl.Style>
-                            </ContentControl>
-                        </MenuItem.Icon>
-                        <MenuItem.Header>
-                            <TextBlock>
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="Service is stopped" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsServiceRunning}" Value="True">
-                                                <Setter Property="Text" Value="Service is running" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </MenuItem.Header>
+            <!--  Menu Bar  -->
+            <StackPanel Grid.Column="0"
+                Margin="10,10,0,0"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+
+                <TextBlock
+                    Margin="0,0,5,0"
+                    FontFamily="Segoe Fluent Icons"
+                    FontSize="22"
+                    Foreground="#404040"
+                    Text="&#xF182;" />
+
+                <Menu FontSize="16">
+                    <MenuItem Header="File">
+                        <MenuItem Command="{Binding LoadDisplaysCommand}" Header="Reload Displays" />
+                        <MenuItem Command="{Binding UpdateConfigsCommand}" Header="Update Old Configs" />
                     </MenuItem>
-                </MenuItem>
-            </Menu>
+
+                    <MenuItem Header="Service">
+                        <MenuItem
+                            Command="{Binding RestartServiceCommand}"
+                            Header="Restart Service"
+                            IsEnabled="{Binding IsServiceRunning}" />
+                        <MenuItem
+                            Command="{Binding StartServiceCommand}"
+                            Header="Start Service"
+                            IsEnabled="{Binding IsServiceStopped}" />
+                        <MenuItem
+                            Command="{Binding EndServiceCommand}"
+                            Header="End Service"
+                            IsEnabled="{Binding IsServiceRunning}" />
+                        <Separator />
+                        <!--  Service Status Item  -->
+                        <MenuItem IsEnabled="False" Style="{StaticResource MenuItemFakeEnabledStyle}">
+                            <MenuItem.Icon>
+                                <ContentControl>
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="Content" Value="■" />
+                                            <Setter Property="Foreground" Value="Red" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsServiceRunning}" Value="True">
+                                                    <Setter Property="Foreground" Value="Green" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+                            </MenuItem.Icon>
+                            <MenuItem.Header>
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="Service is stopped" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsServiceRunning}" Value="True">
+                                                    <Setter Property="Text" Value="Service is running" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+            </StackPanel>
+
+            <!--  Window Title  -->
+            <TextBlock Grid.Column="1"
+                Margin="0,15,0,0"
+                HorizontalAlignment="Center"
+                FontFamily="{DynamicResource {x:Static SystemFonts.MenuFontFamilyKey}}"
+                FontSize="16"
+                Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}" />
 
             <!--  Window Buttons  -->
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <StackPanel Grid.Column="2"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
 
                 <!--  Minimize  -->
                 <Button
