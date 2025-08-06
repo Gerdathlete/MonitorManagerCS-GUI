@@ -60,7 +60,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 if (_displays != value)
                 {
                     _displays = value;
-                    _selectorTab.DisplayViewModels = GetVMsFromDisplays(value);
+                    SelectorTab.DisplayViewModels = GetVMsFromDisplays(value);
                 }
             }
         }
@@ -79,7 +79,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-        private readonly DisplaySelector _selectorTab = new DisplaySelector();
+        public DisplaySelector SelectorTab { get; } = new DisplaySelector();
 
         public double Scale { get; set; } = 0.1;
         internal MonitorService MonitorService { get; set; }
@@ -88,8 +88,8 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             TabName = "Displays";
 
-            Tabs.Add(_selectorTab);
-            SelectedTab = _selectorTab;
+            Tabs.Add(SelectorTab);
+            SelectedTab = SelectorTab;
         }
 
         private void UpdateDisplayTabs()
@@ -107,12 +107,12 @@ namespace MonitorManagerCS_GUI.ViewModels
                 displayTab.ExitButtonPressed += DisplayTab_ExitButtonPressed;
             }
 
-            SelectedTab = _selectorTab;
+            SelectedTab = SelectorTab;
         }
 
         private void DisplayTab_ExitButtonPressed(object sender, EventArgs e)
         {
-            SelectedTab = _selectorTab;
+            SelectedTab = SelectorTab;
         }
 
         public void RemoveDisplayTabs()

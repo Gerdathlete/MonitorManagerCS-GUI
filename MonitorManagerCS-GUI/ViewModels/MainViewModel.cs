@@ -283,10 +283,14 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public async Task GetAndUpdateDisplays()
         {
+            _displaysTab.SelectorTab.IsLoading = true;
+
             var displays = await DisplayRetriever.GetDisplayList();
             var displayManagers = await GetDisplayManagers(displays);
 
             UpdateDisplays(displays, displayManagers);
+
+            _displaysTab.SelectorTab.IsLoading = false;
         }
 
         public void UpdateDisplays(List<DisplayInfo> displays, List<DisplayManager> displayManagers)

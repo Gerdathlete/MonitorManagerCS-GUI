@@ -18,5 +18,21 @@ namespace MonitorManagerCS_GUI.ViewModels
                 }
             }
         }
+
+        private bool _isLoading = false;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                if (!Equals(_isLoading, value))
+                {
+                    _isLoading = value;
+                    OnPropertyChanged(nameof(IsLoading));
+                    OnPropertyChanged(nameof(IsNotLoading));
+                }
+            }
+        }
+        public bool IsNotLoading => !IsLoading;
     }
 }

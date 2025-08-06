@@ -9,6 +9,7 @@
     xmlns:livecharts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
     xmlns:local="clr-namespace:MonitorManagerCS_GUI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:vm="clr-namespace:MonitorManagerCS_GUI.ViewModels"
     Title="Nathan's Monitor Manager"
     Width="825"
@@ -347,25 +348,41 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaySelector}">
+            <Grid>
+                <!--  Loading Overlay  -->
+                <Border
+                    Background="#80000000"
+                    IsHitTestVisible="False"
+                    Visibility="{Binding IsNotLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
 
-            <!--  Debug Overlay For ExplorableCanvas  -->
-            <AdornerDecorator>
-                <!--  Display Selector  -->
-                <ItemsControl ItemsSource="{Binding DisplayViewModels}">
-                    <ItemsControl.ItemContainerStyle>
-                        <Style TargetType="ContentPresenter">
-                            <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding ActualBounds.Left}" />
-                            <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding ActualBounds.Top}" />
-                        </Style>
-                    </ItemsControl.ItemContainerStyle>
+                    <!--  Loading Indicator  -->
+                    <ui:ProgressRing
+                        Width="50"
+                        Height="50"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsActive="True" />
+                </Border>
 
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ctrls:ExplorableCanvas ContentsPadding="50,130" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </AdornerDecorator>
+                <!--  Debug Overlay For ExplorableCanvas  -->
+                <AdornerDecorator>
+                    <!--  Display Selector  -->
+                    <ItemsControl IsEnabled="{Binding IsNotLoading}" ItemsSource="{Binding DisplayViewModels}">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="ctrls:ExplorableCanvas.X" Value="{Binding ActualBounds.Left}" />
+                                <Setter Property="ctrls:ExplorableCanvas.Y" Value="{Binding ActualBounds.Top}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ctrls:ExplorableCanvas ContentsPadding="50,130" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </AdornerDecorator>
+            </Grid>
         </DataTemplate>
 
         <!--  Other Templates  -->
