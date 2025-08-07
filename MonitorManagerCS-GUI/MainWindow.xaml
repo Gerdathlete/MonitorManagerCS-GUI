@@ -351,7 +351,7 @@
             <Grid>
                 <!--  Loading Overlay  -->
                 <Border
-                    Background="#80000000"
+                    Background="#40000000"
                     IsHitTestVisible="False"
                     Visibility="{Binding IsNotLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
 

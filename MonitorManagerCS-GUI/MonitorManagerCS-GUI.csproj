@@ -1,21 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{90E8AA4B-D73A-4372-A8B6-676EE3A3F6E8}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>MonitorManagerCS_GUI</RootNamespace>
-    <AssemblyName>MonitorManagerCS-GUI</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -33,155 +22,39 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <ManifestCertificateThumbprint>745068D2A1FF28367D3046384A5597103188D909</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
     <ManifestKeyFile>MonitorManagerCS-GUI_1_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup>
     <SignManifests>true</SignManifests>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Behaviors\AutoSpanner.cs" />
-    <Compile Include="Controls\DebugAdorner.cs" />
-    <Compile Include="Controls\ExplorableCanvas.xaml.cs">
-      <DependentUpon>ExplorableCanvas.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\InternalTab.cs" />
-    <Compile Include="Core\DisplayManager.cs" />
-    <Compile Include="Core\Folders.cs" />
-    <Compile Include="Core\MonitorService.cs" />
-    <Compile Include="Core\Settings.cs" />
-    <Compile Include="Core\TimedValue.cs" />
-    <Compile Include="ViewModels\DisplaySelector.cs" />
-    <Compile Include="ViewModels\DisplaysTab.cs" />
-    <Compile Include="ViewModels\DisplayViewModel.cs" />
-    <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
-    <Compile Include="ViewModels\BindingErrors.cs" />
-    <Compile Include="ViewModels\VCPCodeChart.cs" />
-    <Page Include="Controls\ExplorableCanvas.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Core\DisplayInfo.cs" />
-    <Compile Include="Core\Programs.cs" />
-    <Compile Include="Core\DisplayRetriever.cs" />
-    <Compile Include="Core\VCPCode.cs" />
-    <Compile Include="Core\DataFormatter.cs" />
-    <Compile Include="Core\DataInterpreter.cs" />
-    <Compile Include="Core\VCPCodeController.cs" />
-    <Compile Include="ViewModels\TimeChartDraggable.cs" />
-    <Compile Include="ViewModels\DisplayTab.cs" />
-    <Compile Include="ViewModels\SettingsTab.cs" />
-    <Compile Include="ViewModels\TabViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Themes\Generic.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <None Include=".editorconfig" />
     <Resource Include="Assets\Fonts\Inter.ttc" />
     <Resource Include="Assets\Fonts\InterVariable-Italic.ttf" />
     <Resource Include="Assets\Fonts\InterVariable.ttf" />
     <Content Include="ThirdParty\ControlMyMonitor\ControlMyMonitor.chm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="MonitorManagerCS-GUI_1_TemporaryKey.pfx" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="notes.txt" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Text.Json" Version="9.0.8" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
@@ -198,39 +71,6 @@
   <ItemGroup>
     <Resource Include="Assets\icon.ico" />
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm">
-      <Version>8.4.0</Version>
-    </PackageReference>
-    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF">
-      <Version>2.0.0-rc5.4</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
-      <Version>1.1.135</Version>
-    </PackageReference>
-    <PackageReference Include="ModernWpfUI">
-      <Version>0.9.6</Version>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.3</Version>
-    </PackageReference>
-    <PackageReference Include="System.Memory">
-      <Version>4.6.3</Version>
-    </PackageReference>
-    <PackageReference Include="System.Text.Json">
-      <Version>9.0.8</Version>
-    </PackageReference>
-    <PackageReference Include="System.Threading.Tasks.Extensions">
-      <Version>4.6.3</Version>
-    </PackageReference>
-    <PackageReference Include="System.ValueTuple">
-      <Version>4.6.1</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icon.ico" />
-  </ItemGroup>
   <ItemGroup>
     <Content Include="ThirdParty\ControlMyMonitor\ControlMyMonitor.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -239,9 +79,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
 </Project>
