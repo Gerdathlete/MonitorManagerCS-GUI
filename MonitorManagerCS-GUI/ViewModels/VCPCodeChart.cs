@@ -100,44 +100,6 @@ namespace MonitorManagerCS_GUI.ViewModels
             return values;
         }
 
-        /// <summary>
-        /// Prints information about the vcp controller's TimedValues for debug purposes
-        /// </summary>
-        private void CheckTimedValues()
-        {
-            StringBuilder debugMessage = new();
-            debugMessage.Append("TimedValues = {");
-
-            int i = 0;
-            int indexOfLast = VCPController.TimedValues.Count - 1;
-            foreach (var value in VCPController.TimedValues)
-            {
-                EnsureValidValue(value);
-                debugMessage.Append(value.ToString());
-
-                if (i < indexOfLast)
-                {
-                    debugMessage.Append(", ");
-                }
-
-                i++;
-            }
-            debugMessage.Append('}');
-
-            Debug.WriteLine(debugMessage);
-
-            static void EnsureValidValue(TimedValue timedValue)
-            {
-                var value = (double)timedValue.Value;
-
-                //If the value isn't really close to an integer, let the user know
-                if (value - Math.Round(value) > 1e-10)
-                {
-                    Debug.WriteLine("Invalid TimeValue detected!");
-                }
-            }
-        }
-
         public override LvcPointD? GetValidPointLocation(LvcPointD chartPos,
             ObservablePoint point = null)
         {
