@@ -1,5 +1,9 @@
 Improvements:
-Loading indicator/disable UI during loads
+Make automated checkbox more intuitive
+
+Add placeholder text for the VCP code combobox rather than preselecting brightness
+
+Make the overlay for the chart (when inactive) communicate its purpose
 
 Zoom in on chart for accurate placement
 
