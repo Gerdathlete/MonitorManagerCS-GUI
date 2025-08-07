@@ -4,8 +4,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 {
     public class DisplaySelector : TabViewModel
     {
-        private ObservableCollection<DisplayViewModel> _displayViewModels =
-            new ObservableCollection<DisplayViewModel>();
+        private ObservableCollection<DisplayViewModel> _displayViewModels = [];
         public ObservableCollection<DisplayViewModel> DisplayViewModels
         {
             get { return _displayViewModels; }

@@ -2,16 +2,10 @@
 
 namespace MonitorManagerCS_GUI.Core
 {
-    public class TimedValue
+    public class TimedValue(double? hour, double? value)
     {
-        public double? Hour { get; set; }
-        public double? Value { get; set; }
-
-        public TimedValue(double? hour, double? value)
-        {
-            Hour = hour;
-            Value = value;
-        }
+        public double? Hour { get; set; } = hour;
+        public double? Value { get; set; } = value;
 
         public override string ToString()
         {

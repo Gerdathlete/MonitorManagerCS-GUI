@@ -165,7 +165,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             {
                 if (_background != value)
                 {
-                    _background = value; 
+                    _background = value;
                     OnPropertyChanged();
                 }
             }
@@ -179,12 +179,12 @@ namespace MonitorManagerCS_GUI.ViewModels
                 {
                     return BorderBrushHighlight;
                 }
-                
+
                 return BorderBrushNormal;
             }
         }
 
-        private Thickness _borderThickness = new Thickness(1);
+        private Thickness _borderThickness = new(1);
         public Thickness BorderThickness
         {
             get => _borderThickness;
@@ -198,7 +198,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             }
         }
 
-        private Thickness _padding = new Thickness(2);
+        private Thickness _padding = new(2);
         public Thickness Padding
         {
             get => _padding;
@@ -250,10 +250,10 @@ namespace MonitorManagerCS_GUI.ViewModels
             if (Bounds == Rect.Empty) return;
 
             _actualBounds = new Rect(
-                _bounds.Left * _scale + _padding.Left, 
-                _bounds.Top * _scale + _padding.Top,
-                _bounds.Width * _scale - _padding.Left - _padding.Right, 
-                _bounds.Height * _scale - _padding.Top - _padding.Bottom);
+                (_bounds.Left * _scale) + _padding.Left,
+                (_bounds.Top * _scale) + _padding.Top,
+                (_bounds.Width * _scale) - _padding.Left - _padding.Right,
+                (_bounds.Height * _scale) - _padding.Top - _padding.Bottom);
 
             OnPropertyChanged(nameof(ActualBounds));
         }
@@ -285,11 +285,11 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             _scale = scale;
 
-            string serial = displayInfo.SerialNumber == string.Empty
+            string serial = displayInfo.SerialNumber?.Length == 0
                 ? "(Not Set)"
                 : displayInfo.SerialNumber;
 
-            _label = displayInfo.ToString() + Environment.NewLine
+            _label = displayInfo + Environment.NewLine
                 + $"SN: {serial}";
 
             System.Drawing.Rectangle rect = displayInfo.Bounds;
@@ -306,10 +306,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_mouseEnterCommand == null)
-                {
-                    _mouseEnterCommand = new RelayCommand(OnMouseEnter);
-                }
+                _mouseEnterCommand ??= new RelayCommand(OnMouseEnter);
 
                 return _mouseEnterCommand;
             }
@@ -325,10 +322,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_mouseLeaveCommand == null)
-                {
-                    _mouseLeaveCommand = new RelayCommand(OnMouseLeave);
-                }
+                _mouseLeaveCommand ??= new RelayCommand(OnMouseLeave);
 
                 return _mouseLeaveCommand;
             }
@@ -351,10 +345,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_mouseUpCommand == null)
-                {
-                    _mouseUpCommand = new RelayCommand<MouseButtonEventArgs>(MouseUp);
-                }
+                _mouseUpCommand ??= new RelayCommand<MouseButtonEventArgs>(MouseUp);
 
                 return _mouseUpCommand;
             }

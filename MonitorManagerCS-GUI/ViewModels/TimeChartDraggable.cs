@@ -75,7 +75,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             PointerMovedCommand = new RelayCommand<PointerCommandArgs>(OnMouseMoved);
             PointerPressedCommand = new RelayCommand<PointerCommandArgs>(OnMousePressed);
 
-            _points = new ObservableCollection<ObservablePoint>();
+            _points = [];
 
             _series1 = new LineSeries<ObservablePoint>
             {
@@ -84,7 +84,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 LineSmoothness = 0,
             };
 
-            DraggableSeries = new ISeries[] { _series1 };
+            DraggableSeries = [_series1];
 
             TimeAxis = new Axis
             {
@@ -106,9 +106,9 @@ namespace MonitorManagerCS_GUI.ViewModels
                 MaxLimit = 100,
             };
 
-            XAxes = new[] { TimeAxis };
+            XAxes = [TimeAxis];
 
-            YAxes = new[] { YAxis };
+            YAxes = [YAxis];
 
             _prevTooltipPos = TooltipPos;
         }
@@ -130,7 +130,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             var clickedPoints = chart.GetPointsAt(mousePos);
             ObservablePoint clickedPoint = null;
 
-            if (clickedPoints != null && clickedPoints.Any())
+            if (clickedPoints?.Any() == true)
             {
                 ChartPoint clickedChartPoint = clickedPoints.First();
                 clickedPoint = (ObservablePoint)clickedChartPoint.Context.DataSource;
@@ -213,13 +213,13 @@ namespace MonitorManagerCS_GUI.ViewModels
         }
 
         /// <summary>
-        /// Adds a point to the chart at the correct index so that the lines connect in order of 
+        /// Adds a point to the chart at the correct index so that the lines connect in order of
         /// X value
         /// </summary>
         /// <param name="chartPos"></param>
         public ObservablePoint AddPoint(LvcPointD chartPos) => AddPoint(chartPos.X, chartPos.Y);
         /// <summary>
-        /// Adds a point to the chart at the correct index so that the lines connect in order of 
+        /// Adds a point to the chart at the correct index so that the lines connect in order of
         /// X value
         /// </summary>
         /// <param name="x"></param>
@@ -311,7 +311,7 @@ namespace MonitorManagerCS_GUI.ViewModels
                 default:
                     //Use interpolation to calculate y value of wrapping points
                     var point1 = points[0];
-                    var point2 = points.Last();
+                    var point2 = points[^1];
 
                     var p1Y = (double)point1.Y;
                     var p1X = (double)point1.X;
@@ -353,7 +353,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         public virtual LvcPointD? GetValidPointLocation(LvcPointD chartPos,
             ObservablePoint point = null)
         {
-            LvcPointD pointLocation = new LvcPointD(chartPos.X, chartPos.Y);
+            LvcPointD pointLocation = new(chartPos.X, chartPos.Y);
 
             //Snap to grid
             pointLocation.X = Math.Round(pointLocation.X / XSnap) * XSnap;
@@ -385,7 +385,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             int oldIndex = 0;
             if (point != null)
             {
-                oldIndex = (point.MetaData != null) ? point.MetaData.EntityIndex : 0;
+                oldIndex = (point.MetaData?.EntityIndex) ?? 0;
                 _points.Remove(point);
             }
 
@@ -432,11 +432,11 @@ namespace MonitorManagerCS_GUI.ViewModels
                 if (leftDist >= rightDist)
                 {
                     //Try moving right, check if out of bounds
-                    newX = pointLocation.X + rightDist * XSnap;
+                    newX = pointLocation.X + (rightDist * XSnap);
                     if (newX > TimeAxis.MaxLimit)
                     {
                         //Try moving left, return null if still out of bounds
-                        newX = pointLocation.X - leftDist * XSnap;
+                        newX = pointLocation.X - (leftDist * XSnap);
                         if (newX < TimeAxis.MinLimit)
                         {
                             return null;
@@ -446,11 +446,11 @@ namespace MonitorManagerCS_GUI.ViewModels
                 else
                 {
                     //Try moving left, check if out of bounds
-                    newX = pointLocation.X - leftDist * XSnap;
+                    newX = pointLocation.X - (leftDist * XSnap);
                     if (newX < TimeAxis.MinLimit)
                     {
                         //Try moving right, return null if still out of bounds
-                        newX = pointLocation.X + rightDist * XSnap;
+                        newX = pointLocation.X + (rightDist * XSnap);
                         if (newX > TimeAxis.MaxLimit)
                         {
                             return null;
@@ -510,7 +510,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         /// </summary>
         private void InvokePointsChanged()
         {
-            PointsChanged?.Invoke(this, new EventArgs());
+            PointsChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

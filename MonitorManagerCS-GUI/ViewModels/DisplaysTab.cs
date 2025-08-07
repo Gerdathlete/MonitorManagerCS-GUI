@@ -11,7 +11,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 {
     public class DisplaysTab : TabViewModel
     {
-        private ObservableCollection<TabViewModel> _tabs = new ObservableCollection<TabViewModel>();
+        private ObservableCollection<TabViewModel> _tabs = [];
         public ObservableCollection<TabViewModel> Tabs
         {
             get => _tabs;
@@ -157,8 +157,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         private DisplayTab GetDisplayTab(DisplayInfo display)
         {
             var displayTabs = Tabs
-                .Where(t => t is DisplayTab)
-                .Select(t => (DisplayTab)t);
+                .OfType<DisplayTab>();
 
             foreach (var displayTab in displayTabs)
             {
@@ -176,10 +175,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (openSettingsCommand == null)
-                {
-                    openSettingsCommand = new RelayCommand(OpenSettings);
-                }
+                openSettingsCommand ??= new RelayCommand(OpenSettings);
 
                 return openSettingsCommand;
             }

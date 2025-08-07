@@ -13,7 +13,7 @@ namespace MonitorManagerCS_GUI
         {
             if (!Folders.CanReadAndWrite(out Exception ex))
             {
-                MessageBox.Show($"The application does not have access to required directories." +
+                MessageBox.Show("The application does not have access to required directories." +
                     Environment.NewLine + Environment.NewLine + $" {ex}",
                     "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown();

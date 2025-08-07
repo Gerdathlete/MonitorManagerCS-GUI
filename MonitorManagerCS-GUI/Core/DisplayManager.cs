@@ -93,7 +93,7 @@ namespace MonitorManagerCS_GUI.Core
                 if (!oldVCPController.IsActive) continue;
 
                 var newVCPController = newVCPControllers
-                    .Where(vcp => vcp.Code == oldVCPController.Code).FirstOrDefault();
+                    .FirstOrDefault(vcp => vcp.Code == oldVCPController.Code);
 
                 if (newVCPController == null)
                 {
@@ -102,8 +102,10 @@ namespace MonitorManagerCS_GUI.Core
 
                     if (!madeBackup)
                     {
-                        Debug.WriteLine($"Saving a backup of this display's config");
+                        Debug.WriteLine("Saving a backup of this display's config");
                         displayManager.Save("Old");
+
+                        madeBackup = true;
                     }
 
                     continue;

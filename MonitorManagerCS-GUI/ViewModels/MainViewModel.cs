@@ -142,10 +142,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_startServiceCommand == null)
-                {
-                    _startServiceCommand = new RelayCommand(StartService);
-                }
+                _startServiceCommand ??= new RelayCommand(StartService);
 
                 return _startServiceCommand;
             }
@@ -165,10 +162,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_endServiceCommand == null)
-                {
-                    _endServiceCommand = new RelayCommand(EndService);
-                }
+                _endServiceCommand ??= new RelayCommand(EndService);
 
                 return _endServiceCommand;
             }
@@ -193,10 +187,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_restartServiceCommand == null)
-                {
-                    _restartServiceCommand = new RelayCommand(RestartService);
-                }
+                _restartServiceCommand ??= new RelayCommand(RestartService);
 
                 return _restartServiceCommand;
             }
@@ -217,10 +208,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_loadDisplaysCommand == null)
-                {
-                    _loadDisplaysCommand = new RelayCommand(LoadDisplays);
-                }
+                _loadDisplaysCommand ??= new RelayCommand(LoadDisplays);
 
                 return _loadDisplaysCommand;
             }
@@ -235,10 +223,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (updateConfigsCommand == null)
-                {
-                    updateConfigsCommand = new RelayCommand(UpdateConfigs);
-                }
+                updateConfigsCommand ??= new RelayCommand(UpdateConfigs);
 
                 return updateConfigsCommand;
             }
@@ -262,7 +247,7 @@ namespace MonitorManagerCS_GUI.ViewModels
             UpdateDisplays(displays, displayManagers);
         }
 
-        public async Task<List<DisplayManager>> GetDisplayManagers(List<DisplayInfo> displays)
+        public static async Task<List<DisplayManager>> GetDisplayManagers(List<DisplayInfo> displays)
         {
             var displayManagers = new List<DisplayManager>();
             foreach (var display in displays)

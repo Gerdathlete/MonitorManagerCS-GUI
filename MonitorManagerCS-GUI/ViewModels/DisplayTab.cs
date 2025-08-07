@@ -78,7 +78,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public void SelectVCPCode(string code)
         {
-            if (_vcpCodeCharts == null || !_vcpCodeCharts.Any()) { return; }
+            if (_vcpCodeCharts?.Any() == false) { return; }
 
             bool hasCode = false;
 
@@ -103,10 +103,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_saveAndApplyCommand == null)
-                {
-                    _saveAndApplyCommand = new RelayCommand(SaveAndApply);
-                }
+                _saveAndApplyCommand ??= new RelayCommand(SaveAndApply);
 
                 return _saveAndApplyCommand;
             }
@@ -132,10 +129,7 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (_exitButtonCommand == null)
-                {
-                    _exitButtonCommand = new RelayCommand(OnExitButton);
-                }
+                _exitButtonCommand ??= new RelayCommand(OnExitButton);
 
                 return _exitButtonCommand;
             }

@@ -11,12 +11,12 @@ namespace MonitorManagerCS_GUI.Core
         public int? CurrentValue { get; set; }
         public int? MaximumValue { get; set; }
         public List<int> PossibleValues { get; set; }
-        public List<TimedValue> TimedValues { get; set; } = new List<TimedValue>();
+        public List<TimedValue> TimedValues { get; set; } = [];
         public bool IsActive { get; set; } = false;
 
         public VCPCodeController(VCPCode vcpCode)
         {
-            if (vcpCode is null) { throw new ArgumentNullException(nameof(vcpCode)); }
+            ArgumentNullException.ThrowIfNull(vcpCode);
 
             Code = vcpCode.Code;
             Name = vcpCode.Name;
@@ -38,14 +38,13 @@ namespace MonitorManagerCS_GUI.Core
             var possibleValuesStr = vcpCode.PossibleValues;
             if (string.IsNullOrEmpty(possibleValuesStr))
             {
-                return new List<int>();
+                return [];
             }
 
-            return vcpCode.PossibleValues
+            return [.. vcpCode.PossibleValues
                 .Split(',')
                 .Select(s => s.Trim())
-                .Select(int.Parse)
-                .ToList();
+                .Select(int.Parse)];
         }
     }
 }

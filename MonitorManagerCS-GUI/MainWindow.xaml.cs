@@ -13,14 +13,14 @@ namespace MonitorManagerCS_GUI
 {
     public partial class MainWindow : Window
     {
-        private static readonly Uri _iconUri = new Uri("pack://application:,,,/Assets/icon.ico",
+        private static readonly Uri _iconUri = new("pack://application:,,,/Assets/icon.ico",
             UriKind.Absolute);
         private NotifyIcon _trayIcon;
         private ContextMenuStrip _trayMenuStrip;
         private ToolStripMenuItem _showTrayMenuItem;
         private ToolStripMenuItem _exitTrayMenuItem;
         public MainViewModel ViewModel { get; set; }
-        private static readonly string[] _statusPrefixes = { "", "  ", "    " };
+        private static readonly string[] _statusPrefixes = ["", "  ", "    "];
         private int _statusPrefixIndex;
 
         public MainWindow()
@@ -34,12 +34,12 @@ namespace MonitorManagerCS_GUI
 
             StateChanged += MainWindow_StateChanged;
 
-//#if !DEBUG
+            //#if !DEBUG
             if (Settings.StartInTray)
             {
                 MinimizeToTray();
             }
-//#endif
+            //#endif
 
             ViewModel = new MainViewModel();
             DataContext = ViewModel;
@@ -51,15 +51,13 @@ namespace MonitorManagerCS_GUI
 
             if (_resourceInfo != null)
             {
-                using (Stream iconStream = _resourceInfo.Stream)
+                using Stream iconStream = _resourceInfo.Stream;
+                _trayIcon = new NotifyIcon
                 {
-                    _trayIcon = new NotifyIcon
-                    {
-                        Icon = new Icon(iconStream),
-                        Visible = false,
-                        Text = "Nathan's Monitor Manager"
-                    };
-                }
+                    Icon = new Icon(iconStream),
+                    Visible = false,
+                    Text = "Nathan's Monitor Manager"
+                };
             }
 
             _trayMenuStrip = new ContextMenuStrip();
@@ -192,9 +190,8 @@ namespace MonitorManagerCS_GUI
             RoundSmall = 3
         }
 
-        [DllImport("dwmapi.dll")]
-        static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue,
-            int attrSize);
+        [LibraryImport("dwmapi.dll", SetLastError = true)]
+        internal static partial int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);

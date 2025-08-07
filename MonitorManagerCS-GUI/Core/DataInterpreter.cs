@@ -3,7 +3,7 @@
 namespace MonitorManagerCS_GUI.Core
 
 {
-    public static class DataInterpreter
+    public static partial class DataInterpreter
     {
         public static int[] ParseReadableTime(string time)
         {
@@ -33,13 +33,13 @@ namespace MonitorManagerCS_GUI.Core
                     //If there is a leading zero (ie. buffer == "0#"), remove it
                     if (time[i - 2] == '0')
                     {
-                        buffer = buffer.Substring(1);
+                        buffer = buffer[1..];
                     }
                     //Store the buffer value as the minute
                     minute = byte.Parse(buffer);
 
                     //Put the last two characters into the buffer
-                    buffer = time.Substring(i + 1);
+                    buffer = time[(i + 1)..];
 
                     //If its PM, but not 12 PM, add 12 to the hour
                     if (buffer == "PM")
@@ -60,14 +60,14 @@ namespace MonitorManagerCS_GUI.Core
                 //Add the character to the buffer
                 buffer += c;
             }
-            return new int[] { hour, minute };
+            return [hour, minute];
         }
 
-        public static Regex readableTimeRegex = new Regex(@"^([1-9]|1[0-2]):[0-5][0-9] (AM|PM)$");
+        public readonly static Regex ReadableTimeRegex = ReadableTimeRegX();
 
-        public static Regex blueLightRegex = new Regex(@"^[0-4]-[0-4]$");
+        public readonly static Regex BlueLightRegex = BlueLightRegX();
 
-        public static Regex minMaxRegex = new Regex(@"^(?:0|[1-9][0-9]?|100)-(?:0|[1-9][0-9]?|100)$");
+        public readonly static Regex MinMaxRegex = MinMaxRegX();
 
         /// <summary>
         /// Turns a min-max string into two ints
@@ -79,8 +79,15 @@ namespace MonitorManagerCS_GUI.Core
         {
             //Example input: 15-100
             string[] minMax = minMaxString.Split('-');
-            return new int[] { int.Parse(minMax[0]), int.Parse(minMax[1]) };
+            return [int.Parse(minMax[0]), int.Parse(minMax[1])];
 
         }
+
+        [GeneratedRegex(@"^([1-9]|1[0-2]):[0-5][0-9] (AM|PM)$")]
+        private static partial Regex ReadableTimeRegX();
+        [GeneratedRegex(@"^[0-4]-[0-4]$")]
+        private static partial Regex BlueLightRegX();
+        [GeneratedRegex(@"^(?:0|[1-9][0-9]?|100)-(?:0|[1-9][0-9]?|100)$")]
+        private static partial Regex MinMaxRegX();
     }
 }

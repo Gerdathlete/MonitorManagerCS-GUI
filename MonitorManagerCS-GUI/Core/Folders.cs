@@ -19,8 +19,7 @@ namespace MonitorManagerCS_GUI.Core
             ControlMyMonitor = Path.Combine(baseDirectory, "ThirdParty", "ControlMyMonitor");
             CMMonitorOutput = Path.Combine(ControlMyMonitor, "Output");
 
-            _directories = new string[]
-            { baseDirectory, Config, ControlMyMonitor, CMMonitorOutput };
+            _directories = [baseDirectory, Config, ControlMyMonitor, CMMonitorOutput];
         }
 
         /// <summary>

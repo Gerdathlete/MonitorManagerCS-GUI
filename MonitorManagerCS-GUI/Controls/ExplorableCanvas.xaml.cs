@@ -12,7 +12,7 @@ namespace MonitorManagerCS_GUI.Controls
     /// </summary>
     public partial class ExplorableCanvas : Panel
     {
-        private Thickness _contentsPadding = new Thickness(100);
+        private Thickness _contentsPadding = new(100);
         public Thickness ContentsPadding
         {
             get => _contentsPadding;
@@ -32,7 +32,7 @@ namespace MonitorManagerCS_GUI.Controls
         private Point _lastMousePos;
         private bool _isPanning = false;
         private bool _isHoldingLeftMouse = false;
-        private double _panDeadzone = 10.0;
+        private const double _panDeadzone = 10.0;
         private double _minScaleFactor = 1.0;
         private const double _maxScaleFactor = 100.0;
         private Rect _providedBounds;
@@ -230,37 +230,25 @@ namespace MonitorManagerCS_GUI.Controls
 
         public static void SetX(UIElement element, double value)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValue(XProperty, value);
         }
         public static double GetX(UIElement element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (double)element.GetValue(XProperty);
         }
         public static void SetY(UIElement element, double value)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             element.SetValue(YProperty, value);
         }
         public static double GetY(UIElement element)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
+            ArgumentNullException.ThrowIfNull(element);
 
             return (double)element.GetValue(YProperty);
         }
@@ -293,7 +281,7 @@ namespace MonitorManagerCS_GUI.Controls
         private Rect GetChildrenBounds()
         {
             //default bounds if no children
-            Rect bounds = new Rect(0, 0,
+            Rect bounds = new(0, 0,
                 ContentsPadding.Left + ContentsPadding.Right,
                 ContentsPadding.Top + ContentsPadding.Bottom);
 
@@ -342,7 +330,7 @@ namespace MonitorManagerCS_GUI.Controls
             if (bounds.Width <= 0 || bounds.Height <= 0)
             {
                 throw new Exception($"{nameof(ExplorableCanvas)}.{nameof(GetChildrenBounds)} " +
-                    $"returned an invalid width or height!");
+                    "returned an invalid width or height!");
             }
 
             return bounds;
@@ -394,7 +382,7 @@ namespace MonitorManagerCS_GUI.Controls
         /// </returns>
         protected override Size MeasureOverride(Size constraint)
         {
-            Size availableSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
+            Size availableSize = new(double.PositiveInfinity, double.PositiveInfinity);
             foreach (UIElement internalChild in InternalChildren)
             {
                 internalChild?.Measure(availableSize);
@@ -408,7 +396,7 @@ namespace MonitorManagerCS_GUI.Controls
         /// System.Windows.UIElement.ClipToBounds property is set to true.
         /// </summary>
         /// <param name="layoutSlotSize">The available size of the element.</param>
-        /// <returns>A System.Windows.Media.Geometry that represents the area that is clipped if 
+        /// <returns>A System.Windows.Media.Geometry that represents the area that is clipped if
         /// System.Windows.UIElement.is true.</returns>
         protected override Geometry GetLayoutClip(Size layoutSlotSize)
         {
@@ -462,9 +450,8 @@ namespace MonitorManagerCS_GUI.Controls
             if (!_debug || !_canRedrawDebug) return;
 
             _debugAdorner?.DrawActions.Add(dc =>
-            {
-                dc.DrawEllipse(brush, new Pen(Brushes.Black, 1), pt, radius, radius);
-            });
+            dc.DrawEllipse(brush, new Pen(Brushes.Black, 1), pt, radius, radius));
+
             _debugAdorner?.Invalidate();
         }
 

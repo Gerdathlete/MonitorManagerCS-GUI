@@ -8,8 +8,7 @@ namespace MonitorManagerCS_GUI.Controls
 {
     public class DebugAdorner : Adorner
     {
-        public List<Action<DrawingContext>> DrawActions { get; } =
-            new List<Action<DrawingContext>>();
+        public List<Action<DrawingContext>> DrawActions { get; } = [];
 
         public DebugAdorner(UIElement adornedElement) : base(adornedElement)
         {

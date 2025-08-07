@@ -26,10 +26,7 @@ namespace MonitorManagerCS_GUI.Core
         public bool IsWritable { get => GetIsWritable(); }
         private bool GetIsWritable()
         {
-            if (_isWritable is null)
-            {
-                _isWritable = ReadWrite != "Read Only";
-            }
+            _isWritable ??= ReadWrite != "Read Only";
 
             return (bool)_isWritable;
         }

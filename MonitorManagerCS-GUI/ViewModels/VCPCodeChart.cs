@@ -12,12 +12,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 {
     public class VCPCodeChart : TimeChartDraggable
     {
-        private VCPCodeController _vcpController;
-        public VCPCodeController VCPController
-        {
-            get => _vcpController;
-            set => _vcpController = value;
-        }
+        public VCPCodeController VCPController { get; set; }
         private bool _enabled;
         public bool Enabled
         {
@@ -41,7 +36,7 @@ namespace MonitorManagerCS_GUI.ViewModels
 
             if (vcpController.PossibleValues.Count > 0)
             {
-                _possibleValues = vcpController.PossibleValues.Select(x => (double)x).ToList();
+                _possibleValues = vcpController.PossibleValues.ConvertAll(x => (double)x);
                 YAxis.CustomSeparators = _possibleValues;
                 YAxis.MaxLimit = _possibleValues.Max();
                 YAxis.MinLimit = _possibleValues.Min();
@@ -79,8 +74,8 @@ namespace MonitorManagerCS_GUI.ViewModels
 
         public void UpdateVCPController()
         {
-            _vcpController.IsActive = _enabled;
-            _vcpController.TimedValues = GetTimedValues(Points);
+            VCPController.IsActive = _enabled;
+            VCPController.TimedValues = GetTimedValues(Points);
         }
 
         /// <summary>
@@ -110,12 +105,12 @@ namespace MonitorManagerCS_GUI.ViewModels
         /// </summary>
         private void CheckTimedValues()
         {
-            StringBuilder debugMessage = new StringBuilder();
+            StringBuilder debugMessage = new();
             debugMessage.Append("TimedValues = {");
 
             int i = 0;
-            int indexOfLast = _vcpController.TimedValues.Count - 1;
-            foreach (var value in _vcpController.TimedValues)
+            int indexOfLast = VCPController.TimedValues.Count - 1;
+            foreach (var value in VCPController.TimedValues)
             {
                 EnsureValidValue(value);
                 debugMessage.Append(value.ToString());
@@ -127,11 +122,11 @@ namespace MonitorManagerCS_GUI.ViewModels
 
                 i++;
             }
-            debugMessage.Append("}");
+            debugMessage.Append('}');
 
             Debug.WriteLine(debugMessage);
 
-            void EnsureValidValue(TimedValue timedValue)
+            static void EnsureValidValue(TimedValue timedValue)
             {
                 var value = (double)timedValue.Value;
 

@@ -16,7 +16,7 @@ namespace MonitorManagerCS_GUI.Converters
         public object ConvertBack(object value, Type targetType, object parameter,
             CultureInfo culture)
         {
-            return (value is Visibility visibility && visibility != Visibility.Visible);
+            return value is Visibility visibility && visibility != Visibility.Visible;
         }
     }
 }

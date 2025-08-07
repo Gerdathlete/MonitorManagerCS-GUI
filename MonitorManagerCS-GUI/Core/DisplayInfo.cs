@@ -7,7 +7,7 @@ namespace MonitorManagerCS_GUI.Core
     /// <summary>
     /// Stores info about a display (monitor)
     /// </summary>
-    public class DisplayInfo
+    public partial class DisplayInfo
     {
         //From ControlMyMonitor
         [JsonIgnore]
@@ -33,14 +33,14 @@ namespace MonitorManagerCS_GUI.Core
         {
             get
             {
-                if (_number == string.Empty)
+                if (_number?.Length == 0)
                 {
                     try
                     {
                         string[] numIDParts = NumberID.Split('\\');
 
-                        string outputNumber = Regex.Replace(numIDParts[3], "[^0-9]", "");
-                        int outputSubNumber = int.Parse(Regex.Replace(numIDParts[4], "[^0-9]", ""));
+                        string outputNumber = NumbersRegex().Replace(numIDParts[3], "");
+                        int outputSubNumber = int.Parse(NumbersRegex().Replace(numIDParts[4], ""));
 
                         if (outputSubNumber > 0)
                         {
@@ -63,5 +63,8 @@ namespace MonitorManagerCS_GUI.Core
         {
             return $"Display {Number}: {ShortID}";
         }
+
+        [GeneratedRegex("[^0-9]")]
+        private static partial Regex NumbersRegex();
     }
 }

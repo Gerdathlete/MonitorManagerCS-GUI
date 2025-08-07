@@ -11,7 +11,7 @@ namespace MonitorManagerCS_GUI.Core
     sealed class MonitorService
     {
         private static MonitorService _instance;
-        private static readonly object _lock = new object();
+        private static readonly object _lock = new();
 
         private MonitorService() { }
 
@@ -21,10 +21,7 @@ namespace MonitorManagerCS_GUI.Core
             {
                 lock (_lock)
                 {
-                    if (_instance is null)
-                    {
-                        _instance = new MonitorService();
-                    }
+                    _instance ??= new MonitorService();
                 }
             }
 
@@ -33,10 +30,10 @@ namespace MonitorManagerCS_GUI.Core
 
         public List<DisplayManager> DisplayManagers { get; set; }
         public int UpdatePeriodMillis { get; set; } = 60000;
-        public bool IsRunning { get => !(_serviceTask is null || _serviceTask.IsCompleted); }
+        public bool IsRunning { get => _serviceTask?.IsCompleted == false; }
 
         private CancellationTokenSource _cancellationTokenSource;
-        private readonly Interrupter _interrupter = new Interrupter();
+        private readonly Interrupter _interrupter = new();
         private Task _serviceTask;
 
         /// <summary>
@@ -55,13 +52,13 @@ namespace MonitorManagerCS_GUI.Core
         /// <returns></returns>
         public bool Start()
         {
-            if (DisplayManagers is null || !DisplayManagers.Any())
+            if (DisplayManagers is null || DisplayManagers.Count == 0)
             {
                 DebugLogFailure("DisplayManagers is null or empty!");
                 return false;
             }
 
-            if (_serviceTask != null && !_serviceTask.IsCompleted)
+            if (_serviceTask?.IsCompleted == false)
             {
                 DebugLogFailure("Monitor service is already running!");
                 return false;
@@ -79,7 +76,7 @@ namespace MonitorManagerCS_GUI.Core
 
             return true;
 
-            void DebugLogFailure(string reason)
+            static void DebugLogFailure(string reason)
             {
                 Debug.WriteLine($"Failed to start monitor service: {reason}");
             }
@@ -91,7 +88,7 @@ namespace MonitorManagerCS_GUI.Core
         /// <returns></returns>
         public async Task<bool> End()
         {
-            if (_serviceTask is null || _serviceTask.IsCompleted)
+            if (_serviceTask?.IsCompleted == true)
             {
                 DebugLogFailure("Service is not running!");
                 return false;
@@ -114,7 +111,7 @@ namespace MonitorManagerCS_GUI.Core
                 return false;
             }
 
-            void DebugLogFailure(object reason)
+            static void DebugLogFailure(object reason)
             {
                 Debug.WriteLine($"Failed to end monitor service: {reason}");
             }
@@ -122,7 +119,7 @@ namespace MonitorManagerCS_GUI.Core
 
         public void Refresh()
         {
-            if (_serviceTask is null || _serviceTask.IsCompleted)
+            if (_serviceTask?.IsCompleted == true)
             {
                 Debug.WriteLine("Failed to refresh because the monitor service isn't running!");
             }
@@ -172,7 +169,7 @@ namespace MonitorManagerCS_GUI.Core
         {
             var activeControllersForDisplay = GetActiveControllersForDisplays(displayManagers);
 
-            bool hasActiveVCPs = activeControllersForDisplay.Any(d => d.Value.Any());
+            bool hasActiveVCPs = activeControllersForDisplay.Any(d => d.Value.Count != 0);
             if (!hasActiveVCPs) return;
 
             DebugLog("Updating automated VCP codes");
@@ -218,28 +215,28 @@ namespace MonitorManagerCS_GUI.Core
             return $"/SetValueIfNeeded {display.NumberID} {vcpController.Code} {value}";
         }
 
-        private static int GetInterpolatedInt(ICollection<TimedValue> timedValues, double hour)
+        private static int GetInterpolatedInt(List<TimedValue> timedValues, double hour)
         {
             //Handle edge cases
-            if (!timedValues.Any())
+            if (timedValues.Count == 0)
             {
                 throw new ArgumentException($"{nameof(timedValues)} must contain at least one item!");
             }
 
             if (timedValues.Count == 1)
             {
-                return DoubleToInt(timedValues.First().Value);
+                return DoubleToInt(timedValues[0].Value);
             }
 
             //Just in case, check for an exact match
-            var matchingTimedValue = timedValues.Where(tv => tv.Hour == hour).FirstOrDefault();
+            var matchingTimedValue = timedValues.FirstOrDefault(tv => tv.Hour == hour);
             if (matchingTimedValue != null)
             {
                 return DoubleToInt(matchingTimedValue.Value);
             }
 
-            var prevTimedValue = timedValues.Where(tv => tv.Hour < hour).LastOrDefault();
-            var nextTimedValue = timedValues.Where(tv => tv.Hour > hour).FirstOrDefault();
+            var prevTimedValue = timedValues.LastOrDefault(tv => tv.Hour < hour);
+            var nextTimedValue = timedValues.FirstOrDefault(tv => tv.Hour > hour);
 
             double? prevHour = null;
             double? nextHour = null;
@@ -247,7 +244,7 @@ namespace MonitorManagerCS_GUI.Core
             double? nextValue = null;
             if (prevTimedValue is null)
             {
-                var lastTimedValue = timedValues.Last();
+                var lastTimedValue = timedValues[^1];
                 prevHour = lastTimedValue.Hour - 24;
                 prevValue = lastTimedValue.Value;
             }
@@ -259,7 +256,7 @@ namespace MonitorManagerCS_GUI.Core
 
             if (nextTimedValue is null)
             {
-                var firstTimedValue = timedValues.First();
+                var firstTimedValue = timedValues[0];
                 nextHour = firstTimedValue.Hour + 24;
                 nextValue = firstTimedValue.Value;
             }
@@ -280,7 +277,7 @@ namespace MonitorManagerCS_GUI.Core
 
             var periodPercentage = timeSincePeriodBegan / periodLength;
             var valueDiff = (nextValue - prevValue);
-            var interpolatedValue = (prevValue + valueDiff * periodPercentage);
+            var interpolatedValue = (prevValue + (valueDiff * periodPercentage));
             return DoubleToInt(interpolatedValue);
         }
 
@@ -298,9 +295,8 @@ namespace MonitorManagerCS_GUI.Core
             foreach (DisplayManager displayManager in displayManagers)
             {
                 var activeControllers = new List<VCPCodeController>();
-                activeControllers = displayManager.VCPCodeControllers
-                    .Where(vcp => vcp.IsActive && vcp.TimedValues.Any())
-                    .ToList();
+                activeControllers = [.. displayManager.VCPCodeControllers
+                    .Where(vcp => vcp.IsActive && vcp.TimedValues.Count != 0)];
 
                 activeControllersForDisplay.Add(displayManager, activeControllers);
             }

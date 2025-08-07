@@ -43,25 +43,19 @@ namespace MonitorManagerCS_GUI.ViewModels
         {
             get
             {
-                if (saveCommand == null)
-                {
-                    saveCommand = new RelayCommand(Save);
-                }
+                saveCommand ??= new RelayCommand(Save);
 
                 return saveCommand;
             }
         }
-        public void Save() => Settings.Save();
+        public static void Save() => Settings.Save();
 
         private RelayCommand exitButtonCommand;
         public ICommand ExitButtonCommand
         {
             get
             {
-                if (exitButtonCommand == null)
-                {
-                    exitButtonCommand = new RelayCommand(ExitButton);
-                }
+                exitButtonCommand ??= new RelayCommand(ExitButton);
 
                 return exitButtonCommand;
             }
