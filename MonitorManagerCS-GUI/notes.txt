@@ -1,3 +1,5 @@
+Moving all colors to system colors through ModernWPF so that themeing is easy
+
 Improvements:
 Make automated checkbox more intuitive
 
