@@ -5,6 +5,9 @@ Add placeholder text for the VCP code combobox rather than preselecting brightne
 
 Make the overlay for the chart (when inactive) communicate its purpose
 
+Add some feedback when you save settings
+	And maybe also for save&apply button for display settings
+
 Zoom in on chart for accurate placement
 
 Adjust snapping
