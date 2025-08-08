@@ -9,9 +9,11 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!--Removed these because they overwrite the base styles (which I don't want)
                 <ui:ThemeResources />
-                <ui:XamlControlsResources />
+                <ui:XamlControlsResources />-->
                 <!--  Other merged dictionaries here  -->
+                
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
 
