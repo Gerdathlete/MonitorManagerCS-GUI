@@ -20,8 +20,6 @@ namespace MonitorManagerCS_GUI
         private ToolStripMenuItem _showTrayMenuItem;
         private ToolStripMenuItem _exitTrayMenuItem;
         public MainViewModel ViewModel { get; set; }
-        private static readonly string[] _statusPrefixes = ["", "  ", "    "];
-        private int _statusPrefixIndex;
 
         public MainWindow()
         {
@@ -119,13 +117,6 @@ namespace MonitorManagerCS_GUI
             _trayIcon.Dispose();
             ViewModel.EndService();
             System.Windows.Application.Current.Shutdown();
-        }
-
-        private string StatusPrefix()
-        {
-            string output = _statusPrefixes[_statusPrefixIndex++];
-            if (_statusPrefixIndex >= _statusPrefixes.Length) _statusPrefixIndex = 0;
-            return output;
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
