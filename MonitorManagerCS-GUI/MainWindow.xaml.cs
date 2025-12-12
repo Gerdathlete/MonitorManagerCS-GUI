@@ -76,18 +76,14 @@ namespace MonitorManagerCS_GUI
             {
                 if (e.Button == MouseButtons.Left)
                 {
-                    Show();
-                    WindowState = WindowState.Normal;
-                    _trayIcon.Visible = false;
+                    OpenFromTray();
                 }
             };
         }
 
         private void ShowTrayMenuItem_Click(object sender, EventArgs e)
         {
-            Show();
-            WindowState = WindowState.Normal;
-            _trayIcon.Visible = false;
+            OpenFromTray();
         }
 
         private void ExitTrayMenuItem_Click(object sender, EventArgs e)
@@ -107,6 +103,14 @@ namespace MonitorManagerCS_GUI
         {
             Hide();
             _trayIcon.Visible = true;
+        }
+
+        private void OpenFromTray()
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            _trayIcon.Visible = false;
+            Focus();
         }
 
         protected override void OnClosed(EventArgs e)
